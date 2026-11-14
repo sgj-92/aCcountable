@@ -1,0 +1,6 @@
+# Minimal Supabase CLI config. Run `supabase link --project-ref <ref>` to connect
+# this folder to your hosted project; unset options use the CLI defaults.
+project_id = "accountable"
+
+[functions.analyze-food]
+verify_jwt = true
