@@ -1,0 +1,42 @@
+{
+ "foods": [
+  {
+   "fdcId": 2511625,
+   "description": "OREO CEREAL, OREO",
+   "dataType": "Branded",
+   "brandName": "OREO O'S",
+   "brandOwner": "Post Consumer Brands, LLC",
+   "gtinUpc": "884912268396",
+   "servingSize": 30.0,
+   "servingSizeUnit": "MG",
+   "householdServingFullText": "1 cup",
+   "foodMeasures": [],
+   "foodNutrients": [
+    {
+     "nutrientId": 1003,
+     "nutrientName": "Protein",
+     "value": 3.33,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1004,
+     "nutrientName": "Total lipid (fat)",
+     "value": 5.0,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1005,
+     "nutrientName": "Carbohydrate, by difference",
+     "value": 83.3,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1008,
+     "nutrientName": "Energy",
+     "value": 400,
+     "unitName": "KCAL"
+    }
+   ]
+  }
+ ]
+}

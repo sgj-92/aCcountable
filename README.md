@@ -1,8 +1,10 @@
 # aCcountable
 
-A calorie tracker for iOS and Android that **sets each day's target from the training you have planned** and logs meals from a **photo using Claude's vision model**.
+A calorie tracker for iOS and Android that **sets each day's target from the training you have planned**. You can log meals by **weighing food from a database**, **scanning a barcode**, or **taking a photo** for Claude's vision model to estimate.
 
-- **Today:** calories left, protein/carbs/fat bars, the day's sessions, and meals. Snap a photo or add food by hand.
+- **Today:** calories left, protein/carbs/fat bars, the day's sessions, and meals. Snap a photo, or add food from search, a barcode or by hand.
+- **Food search:** whole foods come from USDA FoodData Central (lab-analysed, per 100 g). Branded and packaged foods come from Open Food Facts, the open database MacroFactor also uses for barcodes. Pick a food, type the weight in grams, and calories and macros scale to match. Weighed entries remember their weight, so you can reopen one and re-weigh it, or re-log it from Recent.
+- **Barcode scanning:** point the camera at a packaged food. The app looks it up in Open Food Facts first, then USDA's branded foods.
 - **Week:** plan sessions for each day, see each day's target and what you ate, and check your week against plan. "Copy last week's training" repeats a regular schedule.
 - **Photo scan:** Claude lists every item on the plate with portion, grams, kcal, macros and a confidence level. Everything is editable, and "How much did you eat?" (¼–2×) scales the whole plate before you save.
 - **Profile:** body stats, daily activity outside training, goal (lose/maintain/gain, kg per week), protein g/kg, fat %, and training eat-back %.
@@ -33,7 +35,7 @@ src/app/                 Expo Router screens
   (tabs)/week.tsx        Week planner
   (tabs)/profile.tsx     Profile + target settings
   scan.tsx               Photo → AI estimate → review → log
-  food.tsx               Add/edit a food entry (with recent foods)
+  food.tsx               Search / barcode → weigh in grams → log; manual entry; edit
   training.tsx           Add/edit a training session
   sign-in.tsx
 src/lib/
@@ -41,9 +43,15 @@ src/lib/
   targets.ts             Maps a stored profile + sessions onto the engine
   api.ts                 Supabase data access
   scan.ts                Image downscale + Edge Function call
+  foods.ts               Food search / barcode calls + gram scaling
+src/components/
+  food-search.tsx        Search box, barcode button, results
+  barcode-scanner.tsx    Camera barcode reader
 supabase/
   migrations/            Schema + row level security
   functions/analyze-food Edge Function that calls Claude
+  functions/food-search  Edge Function: USDA + Open Food Facts search and barcode lookup
+  functions/tests/       Deno tests, using saved real API responses as fixtures
 ```
 
 ## Setup
@@ -81,10 +89,20 @@ supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
 ```
 
 ```bash
+supabase secrets set USDA_API_KEY=your-data-gov-key
+```
+
+```bash
 supabase functions deploy analyze-food
 ```
 
-You can get an API key at [platform.claude.com](https://platform.claude.com). Each user is capped at 60 scans per rolling 24 hours. Change that with `supabase secrets set DAILY_SCAN_LIMIT=100`. Every scan is logged in the `ai_scans` table with its token counts, so you can watch the cost.
+```bash
+supabase functions deploy food-search
+```
+
+You can get an Anthropic API key at [platform.claude.com](https://platform.claude.com). Get a free USDA key at [api.data.gov/signup](https://api.data.gov/signup/). It takes a minute and allows 1,000 requests an hour. Without one, the function falls back to the shared `DEMO_KEY`, which runs out after a few searches. Search still works then, but returns Open Food Facts results only.
+
+Optionally, Open Food Facts asks apps to identify themselves. You can set `supabase secrets set OFF_USER_AGENT="aCcountable/1.0 (you@example.com)"`. Each user is capped at 60 scans per rolling 24 hours. Change that with `supabase secrets set DAILY_SCAN_LIMIT=100`. Every scan is logged in the `ai_scans` table with its token counts, so you can watch the cost.
 
 ### 4. Run on your phone
 
@@ -127,6 +145,12 @@ npm test
 ```
 
 ```bash
+npm run test:functions
+```
+
+`test:functions` needs [Deno](https://deno.com).
+
+```bash
 npm run typecheck
 ```
 
@@ -146,6 +170,5 @@ npx expo lint
 
 - Import workouts from Apple Health / Health Connect, so planned sessions get swapped for actual burn
 - Weight log with adaptive TDEE (adjust targets from your real weight trend)
-- Barcode scanning for packaged food
-- Saved meals and recipes
+- Saved meals and recipes (combine weighed ingredients into a recipe with per-100 g values)
 - Sync training plans from a calendar

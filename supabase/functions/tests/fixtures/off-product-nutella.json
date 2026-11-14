@@ -1,0 +1,16 @@
+{
+ "status": 1,
+ "product": {
+  "brands": "Ferrero, Nutella",
+  "code": "3017620422003",
+  "nutriments": {
+   "carbohydrates_100g": 57.5,
+   "energy-kcal_100g": 539,
+   "energy-kj_100g": 2252,
+   "energy_100g": 2252,
+   "fat_100g": 30.9,
+   "proteins_100g": 6.3
+  },
+  "product_name": "Nutella"
+ }
+}

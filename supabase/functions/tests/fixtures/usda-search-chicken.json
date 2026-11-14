@@ -1,0 +1,264 @@
+{
+ "foods": [
+  {
+   "fdcId": 2646170,
+   "description": "Chicken, breast, boneless, skinless, raw",
+   "dataType": "Foundation",
+   "foodMeasures": [],
+   "foodNutrients": [
+    {
+     "nutrientId": 1004,
+     "nutrientName": "Total lipid (fat)",
+     "value": 1.93,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1003,
+     "nutrientName": "Protein",
+     "value": 22.5,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1005,
+     "nutrientName": "Carbohydrate, by difference",
+     "value": 0.0,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 2047,
+     "nutrientName": "Energy (Atwater General Factors)",
+     "value": 106,
+     "unitName": "KCAL"
+    },
+    {
+     "nutrientId": 2048,
+     "nutrientName": "Energy (Atwater Specific Factors)",
+     "value": 112,
+     "unitName": "KCAL"
+    }
+   ]
+  },
+  {
+   "fdcId": 2727569,
+   "description": "Chicken, breast, meat and skin, raw",
+   "dataType": "Foundation",
+   "foodMeasures": [],
+   "foodNutrients": [
+    {
+     "nutrientId": 1004,
+     "nutrientName": "Total lipid (fat)",
+     "value": 4.78,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1003,
+     "nutrientName": "Protein",
+     "value": 21.4,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1005,
+     "nutrientName": "Carbohydrate, by difference",
+     "value": -0.428,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 2047,
+     "nutrientName": "Energy (Atwater General Factors)",
+     "value": 127,
+     "unitName": "KCAL"
+    },
+    {
+     "nutrientId": 2048,
+     "nutrientName": "Energy (Atwater Specific Factors)",
+     "value": 133,
+     "unitName": "KCAL"
+    }
+   ]
+  },
+  {
+   "fdcId": 171474,
+   "description": "Chicken, broilers or fryers, breast, meat and skin, raw",
+   "dataType": "SR Legacy",
+   "foodMeasures": [],
+   "foodNutrients": [
+    {
+     "nutrientId": 1003,
+     "nutrientName": "Protein",
+     "value": 20.8,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1004,
+     "nutrientName": "Total lipid (fat)",
+     "value": 9.25,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1005,
+     "nutrientName": "Carbohydrate, by difference",
+     "value": 0.0,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1008,
+     "nutrientName": "Energy",
+     "value": 172,
+     "unitName": "KCAL"
+    },
+    {
+     "nutrientId": 1062,
+     "nutrientName": "Energy",
+     "value": 720,
+     "unitName": "kJ"
+    }
+   ]
+  },
+  {
+   "fdcId": 2705955,
+   "description": "Chicken breast, baked, broiled, or roasted, skin eaten, from raw",
+   "dataType": "Survey (FNDDS)",
+   "foodMeasures": [
+    {
+     "disseminationText": "1 breast quarter (yield after cooking, bone removed)",
+     "gramWeight": 155
+    },
+    {
+     "disseminationText": "1 small or thin slice",
+     "gramWeight": 30
+    },
+    {
+     "disseminationText": "Quantity not specified",
+     "gramWeight": 130
+    },
+    {
+     "disseminationText": "1 large breast",
+     "gramWeight": 145
+    },
+    {
+     "disseminationText": "1 small breast",
+     "gramWeight": 110
+    },
+    {
+     "disseminationText": "1 oz, cooked",
+     "gramWeight": 28.35
+    },
+    {
+     "disseminationText": "1 medium breast",
+     "gramWeight": 130
+    },
+    {
+     "disseminationText": "1 medium slice",
+     "gramWeight": 60
+    },
+    {
+     "disseminationText": "1 cup, cooked, diced",
+     "gramWeight": 135
+    },
+    {
+     "disseminationText": "1 large or thick slice",
+     "gramWeight": 85
+    }
+   ],
+   "foodNutrients": [
+    {
+     "nutrientId": 1003,
+     "nutrientName": "Protein",
+     "value": 26.25,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1004,
+     "nutrientName": "Total lipid (fat)",
+     "value": 8.8,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1005,
+     "nutrientName": "Carbohydrate, by difference",
+     "value": 0,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1008,
+     "nutrientName": "Energy",
+     "value": 192,
+     "unitName": "KCAL"
+    }
+   ]
+  },
+  {
+   "fdcId": 2705956,
+   "description": "Chicken breast, baked, broiled, or roasted, skin not eaten, from raw",
+   "dataType": "Survey (FNDDS)",
+   "foodMeasures": [
+    {
+     "disseminationText": "1 breast quarter (yield after cooking, bone removed)",
+     "gramWeight": 155
+    },
+    {
+     "disseminationText": "1 cup, cooked, diced",
+     "gramWeight": 135
+    },
+    {
+     "disseminationText": "1 small breast",
+     "gramWeight": 105
+    },
+    {
+     "disseminationText": "1 medium slice",
+     "gramWeight": 60
+    },
+    {
+     "disseminationText": "1 large or thick slice",
+     "gramWeight": 85
+    },
+    {
+     "disseminationText": "1 small or thin slice",
+     "gramWeight": 30
+    },
+    {
+     "disseminationText": "Quantity not specified",
+     "gramWeight": 120
+    },
+    {
+     "disseminationText": "1 oz, cooked",
+     "gramWeight": 28.35
+    },
+    {
+     "disseminationText": "1 large breast",
+     "gramWeight": 135
+    },
+    {
+     "disseminationText": "1 medium breast",
+     "gramWeight": 120
+    }
+   ],
+   "foodNutrients": [
+    {
+     "nutrientId": 1003,
+     "nutrientName": "Protein",
+     "value": 30.22,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1004,
+     "nutrientName": "Total lipid (fat)",
+     "value": 3.52,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1005,
+     "nutrientName": "Carbohydrate, by difference",
+     "value": 0,
+     "unitName": "G"
+    },
+    {
+     "nutrientId": 1008,
+     "nutrientName": "Energy",
+     "value": 161,
+     "unitName": "KCAL"
+    }
+   ]
+  }
+ ]
+}

@@ -19,6 +19,8 @@ interface EditableItem {
   protein: string;
   carbs: string;
   fat: string;
+  /** AI-estimated weight, kept so photo entries can be re-weighed later. */
+  grams: number;
   confidence: 'low' | 'medium' | 'high';
 }
 
@@ -40,6 +42,7 @@ const toEditable = (r: ScanResult): EditableItem[] =>
     protein: String(Math.round(i.protein_g)),
     carbs: String(Math.round(i.carbs_g)),
     fat: String(Math.round(i.fat_g)),
+    grams: i.grams,
     confidence: i.confidence,
   }));
 
@@ -118,8 +121,9 @@ export default function ScanScreen() {
       p: t.p + n(i.protein) * portion,
       c: t.c + n(i.carbs) * portion,
       f: t.f + n(i.fat) * portion,
+      g: t.g + (i.grams || 0) * portion,
     }),
-    { kcal: 0, p: 0, c: 0, f: 0 },
+    { kcal: 0, p: 0, c: 0, f: 0, g: 0 },
   );
 
   async function save() {
@@ -144,7 +148,9 @@ export default function ScanScreen() {
               protein_g: round1(totals.p),
               carbs_g: round1(totals.c),
               fat_g: round1(totals.f),
+              grams: totals.g > 0 ? round1(totals.g) : null,
               source: 'photo',
+              source_ref: null,
               ai_confidence: worst,
             },
           ]
@@ -157,7 +163,9 @@ export default function ScanScreen() {
             protein_g: round1(n(i.protein) * portion),
             carbs_g: round1(n(i.carbs) * portion),
             fat_g: round1(n(i.fat) * portion),
+            grams: i.grams > 0 ? round1(i.grams * portion) : null,
             source: 'photo',
+            source_ref: null,
             ai_confidence: i.confidence,
           }));
     try {

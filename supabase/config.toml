@@ -4,3 +4,6 @@ project_id = "accountable"
 
 [functions.analyze-food]
 verify_jwt = true
+
+[functions.food-search]
+verify_jwt = true

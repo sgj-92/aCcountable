@@ -46,7 +46,11 @@ export interface FoodEntry {
   protein_g: number;
   carbs_g: number;
   fat_g: number;
-  source: 'manual' | 'photo';
+  /** Weight eaten in grams, when known (weighed foods and photo estimates). */
+  grams: number | null;
+  source: 'manual' | 'photo' | 'usda' | 'off';
+  /** USDA fdcId or Open Food Facts barcode. */
+  source_ref: string | null;
   ai_confidence: 'low' | 'medium' | 'high' | null;
   created_at: string;
 }
@@ -74,7 +78,13 @@ function normaliseProfile(p: Profile): Profile {
 }
 
 function normaliseFood(f: FoodEntry): FoodEntry {
-  return { ...f, protein_g: num(f.protein_g), carbs_g: num(f.carbs_g), fat_g: num(f.fat_g) };
+  return {
+    ...f,
+    protein_g: num(f.protein_g),
+    carbs_g: num(f.carbs_g),
+    fat_g: num(f.fat_g),
+    grams: f.grams == null ? null : num(f.grams),
+  };
 }
 
 export function isProfileComplete(p: Profile | null | undefined): p is Profile & {
@@ -152,7 +162,7 @@ export async function copyPreviousWeek(weekStart: string): Promise<number> {
 // ───────────── food ─────────────
 
 const FOOD_COLUMNS =
-  'id,date,meal,name,serving,kcal,protein_g,carbs_g,fat_g,source,ai_confidence,created_at';
+  'id,date,meal,name,serving,kcal,protein_g,carbs_g,fat_g,grams,source,source_ref,ai_confidence,created_at';
 
 export async function listFood(from: string, to: string): Promise<FoodEntry[]> {
   const res = await supabase

@@ -8,6 +8,7 @@
     "@supabase/supabase-js": "^2.119.0",
     "eslint-config-expo": "~58.0.4",
     "expo": "~58.0.25",
+    "expo-camera": "~58.0.14",
     "expo-constants": "~58.0.16",
     "expo-device": "~58.0.5",
     "expo-font": "~58.0.12",
@@ -47,10 +48,14 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:functions": "deno test --allow-read supabase/functions/tests/"
   },
   "private": true,
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "roots": [
+      "<rootDir>/src"
+    ]
   }
 }

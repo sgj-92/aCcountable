@@ -1,0 +1,39 @@
+{
+ "hits": [
+  {
+   "code": "0950214451108",
+   "nutriments": {
+    "carbohydrates_100g": 3,
+    "energy-kcal_100g": 54,
+    "sugars_100g": 3,
+    "proteins_100g": 10.300000190734863
+   },
+   "product_name": "Fage total 0%"
+  },
+  {
+   "code": "0689544084006",
+   "brands": [
+    "Fage"
+   ],
+   "product_name": "Fage Total 0%"
+  },
+  {
+   "code": "5201054017418",
+   "brands": [
+    "Fage"
+   ],
+   "nutriments": {
+    "carbohydrates_100g": 3,
+    "energy-kcal_100g": 54,
+    "energy-kj_100g": 230,
+    "fat_100g": 0,
+    "proteins_100g": 10.3,
+    "salt_100g": 0.1,
+    "saturated-fat_100g": 0,
+    "sodium_100g": 0.04,
+    "sugars_100g": 3
+   },
+   "product_name": "Fage Total 0%"
+  }
+ ]
+}

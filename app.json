@@ -43,8 +43,16 @@
         "expo-image-picker",
         {
           "photosPermission": "aCcountable uses your photos to estimate the calories in meals you choose to scan.",
-          "cameraPermission": "aCcountable uses the camera to photograph meals and estimate their calories.",
+          "cameraPermission": "aCcountable uses the camera to photograph meals and scan food barcodes.",
           "microphonePermission": false
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "aCcountable uses the camera to photograph meals and scan food barcodes.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
         }
       ]
     ],
