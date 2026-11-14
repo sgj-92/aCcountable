@@ -81,7 +81,7 @@ supabase link --project-ref YOUR-PROJECT-REF
 ```
 
 ```bash
-supabase db push
+supabase db push --remote
 ```
 
 ```bash
