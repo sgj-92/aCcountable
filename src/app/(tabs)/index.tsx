@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, RefreshControl, View } from 'react-native';
 
+import { Ring } from '@/components/ring';
 import {
   Button,
   Card,
@@ -9,7 +10,6 @@ import {
   ErrorText,
   fmt,
   Loading,
-  ProgressBar,
   Row,
   Screen,
   Stepper,
@@ -94,41 +94,32 @@ export default function TodayScreen() {
         </Card>
       ) : (
         <>
-          {/* Calories summary */}
-          <Card style={{ gap: Spacing.md }}>
-            <Row style={{ justifyContent: 'space-between', alignItems: 'flex-end' }}>
-              <View>
-                <T variant="big" color={remaining < 0 ? c.danger : c.text}>
+          {/* Calories + macros */}
+          <Card style={{ gap: Spacing.lg, paddingVertical: Spacing.xl }}>
+            <Row gap={Spacing.xl} style={{ alignItems: 'center' }}>
+              <Ring value={eaten.kcal} max={target.kcal} size={156} stroke={14}>
+                <T variant="big" color={remaining < 0 ? c.danger : c.text} style={{ fontSize: 34 }}>
                   {fmt(Math.abs(remaining))}
                 </T>
-                <T variant="muted">{remaining < 0 ? 'kcal over target' : 'kcal remaining'}</T>
-              </View>
-              <View style={{ alignItems: 'flex-end' }}>
-                <T variant="heading">
-                  {fmt(eaten.kcal)} / {fmt(target.kcal)}
-                </T>
-                <T variant="small">eaten / target</T>
+                <T variant="small">{remaining < 0 ? 'kcal over' : 'kcal left'}</T>
+              </Ring>
+              <View style={{ flex: 1, gap: Spacing.sm }}>
+                <Stat label="Eaten" value={fmt(eaten.kcal)} />
+                <Stat label="Target" value={fmt(target.kcal)} />
+                <Stat label="Base" value={fmt(target.base)} small />
+                <Stat label="Training" value={`+${fmt(target.training)}`} color={c.training} small />
               </View>
             </Row>
-            <ProgressBar value={eaten.kcal} max={target.kcal} height={10} />
-            <Row gap={Spacing.lg}>
-              <T variant="small">Base {fmt(target.base)}</T>
-              <T variant="small" color={c.training}>
-                + Training {fmt(target.training)}
-              </T>
+            <Row style={{ justifyContent: 'space-around' }}>
+              <MacroRing label="Protein" value={eaten.proteinG} target={target.proteinG} color={c.protein} />
+              <MacroRing label="Carbs" value={eaten.carbsG} target={target.carbsG} color={c.carbs} />
+              <MacroRing label="Fat" value={eaten.fatG} target={target.fatG} color={c.fat} />
             </Row>
             {target.flooredAtBmr ? (
               <T variant="small">
                 Your goal deficit was capped so the base target doesn’t drop below your BMR ({fmt(target.bmr)}).
               </T>
             ) : null}
-          </Card>
-
-          {/* Macros */}
-          <Card style={{ gap: Spacing.md }}>
-            <MacroBar label="Protein" value={eaten.proteinG} target={target.proteinG} color={c.protein} />
-            <MacroBar label="Carbs" value={eaten.carbsG} target={target.carbsG} color={c.carbs} />
-            <MacroBar label="Fat" value={eaten.fatG} target={target.fatG} color={c.fat} />
           </Card>
         </>
       )}
@@ -194,16 +185,29 @@ export default function TodayScreen() {
   );
 }
 
-function MacroBar({ label, value, target, color }: { label: string; value: number; target: number; color: string }) {
+function Stat({ label, value, color, small }: { label: string; value: string; color?: string; small?: boolean }) {
   return (
-    <View style={{ gap: Spacing.xs }}>
-      <Row style={{ justifyContent: 'space-between' }}>
-        <T>{label}</T>
-        <T variant="muted">
-          {fmt(value)} / {fmt(target)} g
+    <Row style={{ justifyContent: 'space-between' }}>
+      <T variant={small ? 'small' : 'muted'}>{label}</T>
+      <T variant={small ? 'muted' : 'heading'} color={color} style={{ fontVariant: ['tabular-nums'] }}>
+        {value}
+      </T>
+    </Row>
+  );
+}
+
+function MacroRing({ label, value, target, color }: { label: string; value: number; target: number; color: string }) {
+  return (
+    <View style={{ alignItems: 'center', gap: Spacing.xs }}>
+      <Ring value={value} max={target} size={78} stroke={8} color={color}>
+        <T variant="heading" style={{ fontVariant: ['tabular-nums'] }}>
+          {fmt(value)}
         </T>
-      </Row>
-      <ProgressBar value={value} max={target} color={color} />
+      </Ring>
+      <T variant="small" color={color}>
+        {label}
+      </T>
+      <T variant="small">of {fmt(target)} g</T>
     </View>
   );
 }

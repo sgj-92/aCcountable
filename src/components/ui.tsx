@@ -100,12 +100,12 @@ export function T({
 }
 
 const textStyles = StyleSheet.create({
-  title: { fontSize: 28, fontWeight: '700' },
+  title: { fontSize: 30, fontWeight: '800', letterSpacing: -0.5 },
   heading: { fontSize: 17, fontWeight: '600' },
   body: { fontSize: 15 },
   muted: { fontSize: 14 },
   small: { fontSize: 12 },
-  big: { fontSize: 40, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  big: { fontSize: 40, fontWeight: '800', letterSpacing: -1, fontVariant: ['tabular-nums'] },
 });
 
 // ───────────── controls ─────────────
@@ -251,7 +251,9 @@ export function Chip({
         borderRadius: Radius.pill,
         backgroundColor: active ? tint : c.input,
       }}>
-      <Text style={{ color: active ? '#fff' : c.text, fontSize: 13, fontWeight: '500' }}>{label}</Text>
+      <Text style={{ color: active ? c.primaryText : c.text, fontSize: 13, fontWeight: active ? '600' : '500' }}>
+        {label}
+      </Text>
     </Pressable>
   );
 }

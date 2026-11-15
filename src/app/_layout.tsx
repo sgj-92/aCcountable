@@ -1,9 +1,10 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
 
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { AppThemeProvider, useTheme, useThemeMode } from '@/hooks/use-theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,13 +34,37 @@ function RootNavigator() {
   );
 }
 
-export default function RootLayout() {
-  const scheme = useColorScheme();
+/** Navigation chrome (headers, modal backgrounds) in the app's palette. */
+function ThemedNavigation() {
+  const { scheme } = useThemeMode();
+  const c = useTheme();
+  const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
+  const theme = {
+    ...base,
+    colors: {
+      ...base.colors,
+      primary: c.primary,
+      background: c.background,
+      card: c.card,
+      text: c.text,
+      border: c.border,
+      notification: c.danger,
+    },
+  };
   return (
-    <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={theme}>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <AuthProvider>
         <RootNavigator />
       </AuthProvider>
     </ThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <AppThemeProvider>
+      <ThemedNavigation />
+    </AppThemeProvider>
   );
 }

@@ -4,7 +4,7 @@ import { Alert, View } from 'react-native';
 import { Button, Card, Chip, ErrorText, Field, fmt, Loading, Row, Screen, Segmented, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme, useThemeMode } from '@/hooks/use-theme';
 import { getProfile, updateProfile, type Profile } from '@/lib/api';
 import { dmyToIso, formatDmyInput, isoToDmy, today } from '@/lib/dates';
 import { LIFESTYLE_LABELS, type Goal, type Lifestyle, type Sex } from '@/lib/nutrition';
@@ -78,6 +78,7 @@ function toPatch(f: Form): Partial<Omit<Profile, 'id'>> {
 
 export default function ProfileScreen() {
   const c = useTheme();
+  const { mode, setMode } = useThemeMode();
   const { data: profile, error: loadError } = useAsync(getProfile, 'profile');
   // null = untouched, so the form shows the loaded profile until the first edit.
   const [edited, setForm] = useState<Form | null>(null);
@@ -227,6 +228,19 @@ export default function ProfileScreen() {
           onChangeText={(v) => set('training_eat_back_pct', v)}
           keyboardType="number-pad"
           hint="How much of each session's estimated burn to add to that day. Lower it (e.g. 75%) if you find estimates run high."
+        />
+      </Card>
+
+      <Card style={{ gap: Spacing.md }}>
+        <T variant="heading">Appearance</T>
+        <Segmented
+          value={mode}
+          onChange={setMode}
+          options={[
+            { label: 'Dark', value: 'dark' },
+            { label: 'Light', value: 'light' },
+            { label: 'System', value: 'system' },
+          ]}
         />
       </Card>
 
