@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { ProfileProvider } from '@/hooks/use-profile';
 import { AppThemeProvider, useTheme, useThemeMode } from '@/hooks/use-theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -55,7 +56,9 @@ function ThemedNavigation() {
     <ThemeProvider value={theme}>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <AuthProvider>
-        <RootNavigator />
+        <ProfileProvider>
+          <RootNavigator />
+        </ProfileProvider>
       </AuthProvider>
     </ThemeProvider>
   );

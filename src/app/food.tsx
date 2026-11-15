@@ -3,15 +3,14 @@ import { useEffect, useState } from 'react';
 import { Alert, Pressable, View } from 'react-native';
 
 import { FoodSearch } from '@/components/food-search';
-import { Button, Card, Chip, Divider, ErrorText, Field, fmt, Loading, Row, Screen, Segmented, T } from '@/components/ui';
+import { MealPicker } from '@/components/meal-picker';
+import { Button, Card, Chip, Divider, ErrorText, Field, fmt, Loading, Row, Screen, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import {
   addFood,
   deleteFood,
   getFood,
-  MEAL_LABELS,
-  MEALS,
   recentFoods,
   updateFood,
   type FoodEntry,
@@ -20,9 +19,10 @@ import {
 } from '@/lib/api';
 import { formatDay, isValidISODate, today } from '@/lib/dates';
 import { per100gFromEntry, scale, type FoodResult, type Per100g } from '@/lib/foods';
+import { SLOT_KEYS } from '@/lib/meals';
 import { kcalFromMacros } from '@/lib/nutrition';
 
-const isMeal = (m: unknown): m is Meal => typeof m === 'string' && (MEALS as string[]).includes(m);
+const isMeal = (m: unknown): m is Meal => typeof m === 'string' && (SLOT_KEYS as readonly string[]).includes(m);
 const parse = (s: string) => (s.trim() === '' ? 0 : Number(s.replace(',', '.')));
 
 /** A food whose values scale with weight. */
@@ -255,7 +255,7 @@ export default function FoodEditor() {
   return (
     <Screen padTop={false}>
       <Stack.Screen options={{ title: id ? 'Edit food' : `Add food · ${formatDay(date)}` }} />
-      <Segmented value={meal} onChange={setMeal} options={MEALS.map((m) => ({ label: MEAL_LABELS[m], value: m }))} />
+      <MealPicker value={meal} onChange={setMeal} />
 
       {mode === 'search' ? (
         <>

@@ -44,3 +44,10 @@ Deno.test('clamps values to database limits and fixes unknown meals', () => {
 Deno.test('drops nameless items', () => {
   assertEquals(normalizePlanItem({ ...base, name: '  ' }), null);
 });
+
+Deno.test("keeps the person's meal keys and files anything else under their last meal", () => {
+  const twoMeals = ['breakfast', 'lunch'] as const;
+  assertEquals(normalizePlanItem({ ...base, meal: 'lunch' }, twoMeals)!.meal, 'lunch');
+  assertEquals(normalizePlanItem({ ...base, meal: 'dinner' }, twoMeals)!.meal, 'lunch');
+  assertEquals(normalizePlanItem({ ...base, meal: 'meal6' }, ['breakfast', 'meal5', 'meal6'])!.meal, 'meal6');
+});

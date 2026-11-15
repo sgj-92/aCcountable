@@ -1,15 +1,9 @@
 import { addDays } from './dates';
+import type { MealKey } from './meals';
 import type { Activity, Goal, Intensity, Lifestyle, Sex } from './nutrition';
 import { supabase } from './supabase';
 
-export type Meal = 'breakfast' | 'lunch' | 'dinner' | 'snack';
-export const MEALS: Meal[] = ['breakfast', 'lunch', 'dinner', 'snack'];
-export const MEAL_LABELS: Record<Meal, string> = {
-  breakfast: 'Breakfast',
-  lunch: 'Lunch',
-  dinner: 'Dinner',
-  snack: 'Snacks',
-};
+export type Meal = MealKey;
 
 export interface Profile {
   id: string;
@@ -24,6 +18,11 @@ export interface Profile {
   protein_g_per_kg: number;
   fat_pct: number;
   training_eat_back_pct: number;
+  /** Custom meal names in display order; null = Breakfast/Lunch/Dinner/Snacks. */
+  meal_slots: { key: Meal; label: string }[] | null;
+  /** Intermittent-fasting eating window as "HH:MM"; both null when not fasting. */
+  eating_window_start: string | null;
+  eating_window_end: string | null;
 }
 
 export interface TrainingSession {
@@ -74,6 +73,10 @@ function normaliseProfile(p: Profile): Profile {
     goal_rate_kg_per_week: num(p.goal_rate_kg_per_week),
     protein_g_per_kg: num(p.protein_g_per_kg),
     fat_pct: num(p.fat_pct),
+    meal_slots: p.meal_slots ?? null,
+    // Postgres time comes back as "HH:MM:SS".
+    eating_window_start: p.eating_window_start ? p.eating_window_start.slice(0, 5) : null,
+    eating_window_end: p.eating_window_end ? p.eating_window_end.slice(0, 5) : null,
   };
 }
 
@@ -218,12 +221,4 @@ export async function recentFoods(limit = 15): Promise<FoodEntry[]> {
     if (out.length >= limit) break;
   }
   return out;
-}
-
-export function defaultMealForNow(d = new Date()): Meal {
-  const h = d.getHours();
-  if (h < 11) return 'breakfast';
-  if (h < 15) return 'lunch';
-  if (h >= 17 && h < 22) return 'dinner';
-  return 'snack';
 }

@@ -6,7 +6,8 @@ import { Button, Card, Divider, ErrorText, fmt, Loading, Row, Screen, Stepper, T
 import { Radius, Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
-import { getProfile, isProfileComplete, listFood, listSessions, MEAL_LABELS, MEALS } from '@/lib/api';
+import { getProfile, isProfileComplete, listFood, listSessions } from '@/lib/api';
+import { resolveSlots, slotsForData } from '@/lib/meals';
 import { addDays, formatDay, today } from '@/lib/dates';
 import { sumTotals } from '@/lib/nutrition';
 import { addMacros, macrosFor, planGaps, solvePlan, subtractMacros, type Macros } from '@/lib/planner';
@@ -61,6 +62,7 @@ export default function PlanScreen() {
   }
 
   const { profile, sessions, food, items } = data;
+  const slots = resolveSlots(profile.meal_slots);
   const dayTarget = targetFor(profile, date, sessions);
   const target: Macros | null = dayTarget
     ? { kcal: dayTarget.kcal, protein_g: dayTarget.proteinG, carbs_g: dayTarget.carbsG, fat_g: dayTarget.fatG }
@@ -82,7 +84,7 @@ export default function PlanScreen() {
     setActionError(null);
     setNotes(null);
     try {
-      const r = await addFoodsFromText(date, text.trim(), target, items.length);
+      const r = await addFoodsFromText(date, text.trim(), target, items.length, slots);
       if (r.added === 0) {
         setActionError("Couldn't find any foods in that. Try listing them like the example.");
       } else {
@@ -206,13 +208,16 @@ export default function PlanScreen() {
           </Card>
 
           {/* Foods by meal */}
-          {MEALS.map((meal) => {
+          {slotsForData(
+            slots,
+            items.map((i) => i.meal),
+          ).map(({ key: meal, label }) => {
             const mealItems = items.filter((i) => i.meal === meal);
             if (mealItems.length === 0) return null;
             return (
               <Card key={meal} style={{ gap: 0 }}>
                 <T variant="heading" style={{ marginBottom: Spacing.xs }}>
-                  {MEAL_LABELS[meal]}
+                  {label}
                 </T>
                 {mealItems.map((item, idx) => {
                   const logged = isLogged(item);

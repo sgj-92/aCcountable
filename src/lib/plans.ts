@@ -2,6 +2,7 @@ import { FunctionsHttpError } from '@supabase/supabase-js';
 
 import { addFoodEntry, type FoodEntry, type Meal } from './api';
 import type { Per100g } from './foods';
+import type { MealSlot } from './meals';
 import type { Macros, PlanFood } from './planner';
 import { supabase } from './supabase';
 
@@ -126,9 +127,10 @@ export async function addFoodsFromText(
   text: string,
   targets: Macros | null,
   startPosition: number,
+  meals: MealSlot[],
 ): Promise<{ added: number; notes: string }> {
   const { data, error } = await supabase.functions.invoke<{ items: ParsedItem[]; notes: string }>('plan-day', {
-    body: { text, targets: targets ?? undefined },
+    body: { text, targets: targets ?? undefined, meals },
   });
   if (error) {
     let message: string | undefined;

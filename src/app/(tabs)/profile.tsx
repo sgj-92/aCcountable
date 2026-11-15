@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, Pressable, Switch, TextInput, View } from 'react-native';
 
 import { AppVersion } from '@/components/app-version';
 import { Button, Card, Chip, ErrorText, Field, fmt, Loading, Row, Screen, Segmented, T } from '@/components/ui';
-import { Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
+import { useProfile } from '@/hooks/use-profile';
 import { useTheme, useThemeMode } from '@/hooks/use-theme';
 import { getProfile, updateProfile, type Profile } from '@/lib/api';
 import { dmyToIso, formatDmyInput, isoToDmy, today } from '@/lib/dates';
+import { FASTING_PRESETS, formatClock, formatClockInput, parseClock } from '@/lib/fasting';
+import { addSlot, CLASSIC_SLOTS, MAX_MEALS, numberedSlots, resolveSlots, type MealSlot } from '@/lib/meals';
 import { LIFESTYLE_LABELS, type Goal, type Lifestyle, type Sex } from '@/lib/nutrition';
 import { supabase } from '@/lib/supabase';
 import { targetFor } from '@/lib/targets';
@@ -25,6 +28,11 @@ type Form = {
   protein_g_per_kg: string;
   fat_pct: string;
   training_eat_back_pct: string;
+  meal_slots: MealSlot[];
+  fasting: boolean;
+  /** "HH:MM" as typed */
+  window_start: string;
+  window_hours: string;
 };
 
 const toForm = (p: Profile): Form => ({
@@ -39,7 +47,26 @@ const toForm = (p: Profile): Form => ({
   protein_g_per_kg: p.protein_g_per_kg.toString(),
   fat_pct: p.fat_pct.toString(),
   training_eat_back_pct: p.training_eat_back_pct.toString(),
+  meal_slots: resolveSlots(p.meal_slots),
+  fasting: !!p.eating_window_start && !!p.eating_window_end,
+  window_start: p.eating_window_start ?? '12:00',
+  window_hours: String(windowHours(p.eating_window_start, p.eating_window_end) ?? 8),
 });
+
+function windowHours(start: string | null, end: string | null): number | null {
+  const s = parseClock(start);
+  const e = parseClock(end);
+  if (s == null || e == null) return null;
+  return Math.round((((e - s + 1440) % 1440 || 1440) / 60) * 10) / 10;
+}
+
+/** End of the eating window ("HH:MM"), or null if the inputs aren't valid. */
+function windowEnd(f: Pick<Form, 'window_start' | 'window_hours'>): string | null {
+  const s = parseClock(f.window_start);
+  const h = parseNum(f.window_hours);
+  if (s == null || h == null || h <= 0 || h >= 24) return null;
+  return formatClock(s + h * 60);
+}
 
 const parseNum = (s: string) => {
   const n = Number(s.replace(',', '.'));
@@ -58,6 +85,11 @@ function validate(f: Form): string | null {
   if (fat == null || fat < 10 || fat > 60) return 'Fat must be 10–60%';
   const e = parseNum(f.training_eat_back_pct);
   if (e == null || e < 0 || e > 150) return 'Eat-back must be 0–150%';
+  if (f.meal_slots.some((s) => !s.label.trim())) return 'Give every meal a name';
+  if (f.fasting) {
+    if (parseClock(f.window_start) == null) return 'Enter when your eating window starts, e.g. 12:00';
+    if (!windowEnd(f)) return 'Eating window must be between 1 and 23 hours';
+  }
   return null;
 }
 
@@ -74,12 +106,16 @@ function toPatch(f: Form): Partial<Omit<Profile, 'id'>> {
     protein_g_per_kg: parseNum(f.protein_g_per_kg) ?? 1.8,
     fat_pct: parseNum(f.fat_pct) ?? 25,
     training_eat_back_pct: Math.round(parseNum(f.training_eat_back_pct) ?? 100),
+    meal_slots: f.meal_slots.map((s) => ({ key: s.key, label: s.label.trim().slice(0, 30) })),
+    eating_window_start: f.fasting ? formatClock(parseClock(f.window_start) ?? 720) : null,
+    eating_window_end: f.fasting ? windowEnd(f) : null,
   };
 }
 
 export default function ProfileScreen() {
   const c = useTheme();
   const { mode, setMode } = useThemeMode();
+  const { reload: reloadSharedProfile } = useProfile();
   const { data: profile, error: loadError } = useAsync(getProfile, 'profile');
   // null = untouched, so the form shows the loaded profile until the first edit.
   const [edited, setForm] = useState<Form | null>(null);
@@ -102,7 +138,8 @@ export default function ProfileScreen() {
     try {
       const updated = await updateProfile(profile.id, toPatch(form));
       setForm(toForm(updated));
-      Alert.alert('Saved', 'Your targets have been updated.');
+      await reloadSharedProfile();
+      Alert.alert('Saved', 'Your settings have been updated.');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -230,6 +267,115 @@ export default function ProfileScreen() {
           keyboardType="number-pad"
           hint="How much of each session's estimated burn to add to that day. Lower it (e.g. 75%) if you find estimates run high."
         />
+      </Card>
+
+      <Card style={{ gap: Spacing.md }}>
+        <T variant="heading">Meals</T>
+        <T variant="small">Pick a preset, then rename any meal. Up to {MAX_MEALS} meals.</T>
+        <Row style={{ flexWrap: 'wrap' }}>
+          <Chip
+            label="Breakfast · Lunch · Dinner"
+            active={JSON.stringify(form.meal_slots) === JSON.stringify(CLASSIC_SLOTS)}
+            onPress={() => set('meal_slots', CLASSIC_SLOTS)}
+          />
+          <Chip
+            label="Meal 1 · 2 · 3…"
+            active={form.meal_slots.every((s, i) => s.label === `Meal ${i + 1}`)}
+            onPress={() => set('meal_slots', numberedSlots(form.meal_slots.length))}
+          />
+        </Row>
+        {form.meal_slots.map((slot, i) => (
+          <Row key={slot.key} gap={Spacing.sm}>
+            <TextInput
+              value={slot.label}
+              onChangeText={(v) =>
+                set(
+                  'meal_slots',
+                  form.meal_slots.map((s, j) => (j === i ? { ...s, label: v } : s)),
+                )
+              }
+              maxLength={30}
+              placeholder={`Meal ${i + 1}`}
+              placeholderTextColor={c.textMuted}
+              accessibilityLabel={`Name of meal ${i + 1}`}
+              style={{
+                flex: 1,
+                backgroundColor: c.input,
+                color: c.text,
+                borderRadius: Radius.sm,
+                paddingHorizontal: Spacing.md,
+                paddingVertical: 10,
+                fontSize: 16,
+              }}
+            />
+            {form.meal_slots.length > 1 ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Remove ${slot.label || `meal ${i + 1}`}`}
+                hitSlop={8}
+                onPress={() => set('meal_slots', form.meal_slots.filter((_, j) => j !== i))}>
+                <T color={c.danger}>Remove</T>
+              </Pressable>
+            ) : null}
+          </Row>
+        ))}
+        {form.meal_slots.length < MAX_MEALS ? (
+          <Button title="+ Add a meal" variant="ghost" onPress={() => set('meal_slots', addSlot(form.meal_slots))} />
+        ) : null}
+        <T variant="small">Removing a meal doesn’t delete anything logged under it.</T>
+      </Card>
+
+      <Card style={{ gap: Spacing.md }}>
+        <Row style={{ justifyContent: 'space-between' }}>
+          <View style={{ flex: 1 }}>
+            <T variant="heading">Intermittent fasting</T>
+            <T variant="small">Shows your eating window and fast on Today.</T>
+          </View>
+          <Switch
+            value={form.fasting}
+            onValueChange={(v) => set('fasting', v)}
+            trackColor={{ true: c.primary }}
+            accessibilityLabel="Intermittent fasting"
+          />
+        </Row>
+        {form.fasting ? (
+          <>
+            <Row style={{ flexWrap: 'wrap' }}>
+              {FASTING_PRESETS.map((p) => (
+                <Chip
+                  key={p.id}
+                  label={p.label}
+                  active={parseNum(form.window_hours) === p.windowHours}
+                  onPress={() => set('window_hours', String(p.windowHours))}
+                />
+              ))}
+            </Row>
+            <Row gap={Spacing.md}>
+              <Field
+                style={{ flex: 1 }}
+                label="Window starts"
+                placeholder="12:00"
+                value={form.window_start}
+                onChangeText={(v) => set('window_start', formatClockInput(v))}
+                keyboardType="number-pad"
+                maxLength={5}
+              />
+              <Field
+                style={{ flex: 1 }}
+                label="Window length (h)"
+                value={form.window_hours}
+                onChangeText={(v) => set('window_hours', v)}
+                keyboardType="decimal-pad"
+              />
+            </Row>
+            {windowEnd(form) ? (
+              <T variant="muted">
+                Eat {formatClock(parseClock(form.window_start)!)}–{windowEnd(form)}, fast for{' '}
+                {fmt(24 - (parseNum(form.window_hours) ?? 0))} h.
+              </T>
+            ) : null}
+          </>
+        ) : null}
       </Card>
 
       <Card style={{ gap: Spacing.md }}>

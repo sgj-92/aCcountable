@@ -40,6 +40,10 @@ export function Screen({
         gap: Spacing.md,
       }}
       keyboardShouldPersistTaps="handled"
+      // We pad for the safe area ourselves; without this, iOS adds its own inset to the first
+      // tab's scroll view as well, so that tab started lower than the others.
+      contentInsetAdjustmentBehavior="never"
+      automaticallyAdjustContentInsets={false}
       refreshControl={refreshControl}>
       {children}
     </ScrollView>

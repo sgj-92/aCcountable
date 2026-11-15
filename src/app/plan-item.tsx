@@ -3,10 +3,11 @@ import { useEffect, useState } from 'react';
 import { Alert, Switch, View } from 'react-native';
 
 import { FoodSearch } from '@/components/food-search';
-import { Button, Card, ErrorText, Field, fmt, Loading, Row, Screen, Segmented, T } from '@/components/ui';
+import { Button, Card, ErrorText, Field, fmt, Loading, Row, Screen, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { deleteFood, MEAL_LABELS, MEALS, type Meal } from '@/lib/api';
+import { MealPicker } from '@/components/meal-picker';
+import { deleteFood, type Meal } from '@/lib/api';
 import type { FoodResult } from '@/lib/foods';
 import { macrosFor } from '@/lib/planner';
 import {
@@ -200,7 +201,7 @@ export default function PlanItemScreen() {
                 <T variant="heading">Fix this amount</T>
                 <T variant="small">Always have exactly this much; the plan works around it.</T>
               </View>
-              <Switch value={fixed} onValueChange={setFixed} accessibilityLabel="Fix this amount" />
+              <Switch value={fixed} onValueChange={setFixed} trackColor={{ true: c.primary }} accessibilityLabel="Fix this amount" />
             </Row>
             {fixed ? (
               <Field label="Amount (g)" value={fixedG} onChangeText={setFixedG} keyboardType="decimal-pad" />
@@ -215,7 +216,7 @@ export default function PlanItemScreen() {
 
           <Card style={{ gap: Spacing.md }}>
             <T variant="heading">Food and nutrition</T>
-            <Segmented value={meal} onChange={setMeal} options={MEALS.map((m) => ({ label: MEAL_LABELS[m], value: m }))} />
+            <MealPicker value={meal} onChange={setMeal} />
             <Field label="Name" value={name} onChangeText={setName} />
             <Row gap={Spacing.sm}>
               <Field style={{ flex: 1.2 }} label="kcal/100 g" value={kcal} onChangeText={setKcal} keyboardType="decimal-pad" />

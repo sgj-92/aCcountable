@@ -10,7 +10,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
-import { MEALS, normalizePlanItem, type PlanItem, type RawPlanItem } from './normalize.ts';
+import { MEALS, normalizePlanItem, type Meal, type PlanItem, type RawPlanItem } from './normalize.ts';
 
 const MODEL = 'claude-opus-5-5';
 
@@ -30,7 +30,40 @@ const RequestSchema = z.object({
       fat_g: z.number().nonnegative(),
     })
     .optional(),
+  // The person's meals in order, with their own names. Defaults to the classic four.
+  meals: z
+    .array(z.object({ key: z.enum(MEALS), label: z.string().trim().min(1).max(30) }))
+    .min(1)
+    .max(6)
+    .optional(),
 });
+
+const CLASSIC_MEALS = [
+  { key: 'breakfast', label: 'Breakfast' },
+  { key: 'lunch', label: 'Lunch' },
+  { key: 'dinner', label: 'Dinner' },
+  { key: 'snack', label: 'Snacks' },
+] as const;
+
+/** The output schema, with `meal` limited to this person's meal keys. */
+function outputSchema(mealKeys: readonly string[]) {
+  return {
+    ...OUTPUT_SCHEMA,
+    properties: {
+      ...OUTPUT_SCHEMA.properties,
+      items: {
+        ...OUTPUT_SCHEMA.properties.items,
+        items: {
+          ...OUTPUT_SCHEMA.properties.items.items,
+          properties: {
+            ...OUTPUT_SCHEMA.properties.items.items.properties,
+            meal: { type: 'string', enum: [...mealKeys] },
+          },
+        },
+      },
+    },
+  };
+}
 
 const OUTPUT_SCHEMA = {
   type: 'object',
@@ -96,7 +129,7 @@ const ResultSchema = z.object({
 const SYSTEM_PROMPT = `You turn a person's free-text list of what they plan to eat today into structured foods for a nutrition app used by an athlete who weighs their food. The app calculates the exact gram amounts that hit their calorie and macro targets, so you do not choose amounts. Your job is accurate nutrition per 100 g and a realistic portion range for each food.
 
 For each distinct food:
-- meal: keep the meal the person wrote it under. If they didn't say, infer it from the food and the order (e.g. oats → breakfast).
+- meal: the key of the meal it belongs to, from the list of the person's meals in their message. Match the meal they wrote it under, by name or by position ("first meal", "breakfast" for the first meal of the day). If they didn't say, infer it from the food and the order they listed things in.
 - name: a clear name that includes the weighing basis, e.g. "Chicken breast, skinless (raw)", "Basmati rice (dry)", "Rolled oats (dry)". People who weigh food usually weigh meat, fish and grains raw or dry, so default to that unless they say "cooked". Keep any brand they mention.
 - Nutrition per 100 g of the food in that state, from standard references such as USDA FoodData Central. If they name a specific product (e.g. "Fage Total 0%", "Myprotein Impact Whey"), use that product's label values if you know them. Keep kcal consistent with the macros (protein 4, carbs 4, fat 9 kcal per gram, allowing for fibre and alcohol).
 - min_g, typical_g, max_g: a sensible range for one serving of that food at that meal for an active adult. Make max_g generous enough that the day's targets are reachable with the foods listed, but keep it something a person would actually eat. Use small ranges for oils, butter, nut butters, sauces and sweeteners (e.g. olive oil 3 to 20 g). If they gave an amount ("2 eggs", "30 g whey", "1 scoop"), set min_g, typical_g and max_g all to that amount in grams.
@@ -145,8 +178,12 @@ Deno.serve(async (req) => {
     return json({ error: 'Invalid request: expected { text, targets? }' }, 400);
   }
 
+  const meals = body.meals ?? CLASSIC_MEALS;
+  const mealKeys = meals.map((m) => m.key) as Meal[];
   const t = body.targets;
+  const mealList = meals.map((m, i) => `${i + 1}. "${m.label}" (key: ${m.key})`).join('\n');
   const userText =
+    `My meals, in order:\n${mealList}\n\n` +
     (t
       ? `Today's targets: ${Math.round(t.kcal)} kcal, ${Math.round(t.protein_g)} g protein, ${Math.round(t.carbs_g)} g carbs, ${Math.round(t.fat_g)} g fat.\n\n`
       : '') + `What I'm eating today:\n${body.text}`;
@@ -160,7 +197,7 @@ Deno.serve(async (req) => {
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
       // Parsing a food list and recalling nutrition values doesn't need deep reasoning.
-      output_config: { effort: 'low', format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
+      output_config: { effort: 'low', format: { type: 'json_schema', schema: outputSchema(mealKeys) } },
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: userText }],
     });
@@ -205,7 +242,7 @@ Deno.serve(async (req) => {
   }
 
   const items: PlanItem[] = parsed.data.items
-    .map((i) => normalizePlanItem(i as RawPlanItem))
+    .map((i) => normalizePlanItem(i as RawPlanItem, mealKeys))
     .filter((i): i is PlanItem => !!i);
   return json({ items, notes: parsed.data.notes });
 });

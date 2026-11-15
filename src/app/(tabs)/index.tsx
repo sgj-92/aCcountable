@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, RefreshControl, View } from 'react-native';
 
+import { FastingCard } from '@/components/fasting-card';
 import { Ring } from '@/components/ring';
 import {
   Button,
@@ -19,17 +20,16 @@ import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
 import {
-  defaultMealForNow,
   deleteFood,
   getProfile,
   isProfileComplete,
   listFood,
   listSessions,
-  MEAL_LABELS,
-  MEALS,
   type FoodEntry,
 } from '@/lib/api';
 import { addDays, formatDay, isValidISODate, today } from '@/lib/dates';
+import { parseClock } from '@/lib/fasting';
+import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
 import { ACTIVITY_LABELS, sumTotals } from '@/lib/nutrition';
 import { sessionKcal, targetFor } from '@/lib/targets';
 
@@ -73,10 +73,16 @@ export default function TodayScreen() {
   const eaten = sumTotals(food);
   const remaining = target ? target.kcal - eaten.kcal : 0;
 
-  const addFoodManually = () =>
-    router.push({ pathname: '/food', params: { date, meal: isToday ? defaultMealForNow() : 'snack' } });
-  const scan = () =>
-    router.push({ pathname: '/scan', params: { date, meal: isToday ? defaultMealForNow() : 'snack' } });
+  const slots = resolveSlots(profile.meal_slots);
+  const windowStart = parseClock(profile.eating_window_start);
+  const windowEnd = parseClock(profile.eating_window_end);
+  const fastingWindow =
+    windowStart != null && windowEnd != null ? { startMin: windowStart, endMin: windowEnd } : null;
+  const defaultMeal = isToday
+    ? defaultSlotForNow(slots, new Date(), fastingWindow)
+    : slots[slots.length - 1].key;
+  const addFoodManually = () => router.push({ pathname: '/food', params: { date, meal: defaultMeal } });
+  const scan = () => router.push({ pathname: '/scan', params: { date, meal: defaultMeal } });
 
   return (
     <Screen refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}>
@@ -124,6 +130,8 @@ export default function TodayScreen() {
         </>
       )}
 
+      {isToday && fastingWindow ? <FastingCard {...fastingWindow} /> : null}
+
       {/* Actions */}
       <Row>
         <Button title="Scan meal" icon="📷" onPress={scan} style={{ flex: 1 }} />
@@ -157,13 +165,16 @@ export default function TodayScreen() {
       </Card>
 
       {/* Meals */}
-      {MEALS.map((meal) => {
+      {slotsForData(
+        slots,
+        food.map((f) => f.meal),
+      ).map(({ key: meal, label }) => {
         const items = food.filter((f) => f.meal === meal);
         const total = sumTotals(items);
         return (
           <Card key={meal}>
             <Row style={{ justifyContent: 'space-between' }}>
-              <T variant="heading">{MEAL_LABELS[meal]}</T>
+              <T variant="heading">{label}</T>
               <Row gap={Spacing.lg}>
                 {items.length > 0 ? <T variant="muted">{fmt(total.kcal)} kcal</T> : null}
                 <Pressable onPress={() => router.push({ pathname: '/food', params: { date, meal } })} hitSlop={8}>

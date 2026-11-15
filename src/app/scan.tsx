@@ -7,7 +7,9 @@ import { ActivityIndicator, Alert, Pressable, View } from 'react-native';
 import { Button, Card, Chip, ErrorText, Field, fmt, Row, Screen, Segmented, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { addFood, MEAL_LABELS, MEALS, type Meal, type NewFoodEntry } from '@/lib/api';
+import { MealPicker } from '@/components/meal-picker';
+import { addFood, type Meal, type NewFoodEntry } from '@/lib/api';
+import { SLOT_KEYS } from '@/lib/meals';
 import { isValidISODate, today } from '@/lib/dates';
 import { analyzeFoodPhoto, type ScanResult } from '@/lib/scan';
 
@@ -63,7 +65,7 @@ export default function ScanScreen() {
   const [result, setResult] = useState<ScanResult | null>(null);
   const [items, setItems] = useState<EditableItem[]>([]);
   const [meal, setMeal] = useState<Meal>(
-    MEALS.includes(params.meal as Meal) ? (params.meal as Meal) : 'snack',
+    (SLOT_KEYS as readonly string[]).includes(params.meal ?? '') ? (params.meal as Meal) : 'snack',
   );
   const [portion, setPortion] = useState(1);
   const [combine, setCombine] = useState<'items' | 'one'>('items');
@@ -264,7 +266,7 @@ export default function ScanScreen() {
                 ))}
               </Row>
             </View>
-            <Segmented value={meal} onChange={setMeal} options={MEALS.map((m) => ({ label: MEAL_LABELS[m], value: m }))} />
+            <MealPicker value={meal} onChange={setMeal} />
             <Segmented
               value={combine}
               onChange={setCombine}

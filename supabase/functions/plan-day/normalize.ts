@@ -1,7 +1,7 @@
 // Cleans up Claude's parsed plan so every item satisfies the database
 // constraints (ranges ordered, values in bounds) before it reaches the app.
 
-export const MEALS = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
+export const MEALS = ['breakfast', 'lunch', 'dinner', 'snack', 'meal5', 'meal6'] as const;
 export type Meal = (typeof MEALS)[number];
 
 export interface RawPlanItem {
@@ -36,10 +36,13 @@ const finite = (v: unknown, fallback = 0) => (typeof v === 'number' && Number.is
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const r1 = (v: number) => Math.round(v * 10) / 10;
 
-export function normalizePlanItem(raw: RawPlanItem): PlanItem | null {
+/**
+ * @param allowed the person's meal keys in order; anything else lands in the last one.
+ */
+export function normalizePlanItem(raw: RawPlanItem, allowed: readonly Meal[] = MEALS.slice(0, 4)): PlanItem | null {
   const name = String(raw.name ?? '').trim().slice(0, 200);
   if (!name) return null;
-  const meal = (MEALS as readonly string[]).includes(raw.meal) ? (raw.meal as Meal) : 'snack';
+  const meal = (allowed as readonly string[]).includes(raw.meal) ? (raw.meal as Meal) : allowed[allowed.length - 1];
 
   const protein = clamp(finite(raw.protein_100g), 0, 100);
   const carbs = clamp(finite(raw.carbs_100g), 0, 100);
