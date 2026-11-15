@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Alert, View } from 'react-native';
 
+import { AppVersion } from '@/components/app-version';
 import { Button, Card, Chip, ErrorText, Field, fmt, Loading, Row, Screen, Segmented, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
@@ -248,6 +249,7 @@ export default function ProfileScreen() {
       <Button title="Save" onPress={save} loading={saving} disabled={!!validation} />
 
       <View style={{ height: Spacing.lg }} />
+      <AppVersion />
       <Button
         title="Sign out"
         variant="ghost"
