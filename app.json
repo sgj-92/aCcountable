@@ -73,6 +73,12 @@
         "projectId": "ef2a28e9-48eb-4753-bf04-0ad72d558809"
       }
     },
-    "owner": "sgj-92"
+    "owner": "sgj-92",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/ef2a28e9-48eb-4753-bf04-0ad72d558809"
+    }
   }
 }

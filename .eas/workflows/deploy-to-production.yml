@@ -1,0 +1,57 @@
+# Deploy to production (iOS)
+#
+# Runs on every push. If the app's native code (fingerprint) hasn't changed
+# since the last production build, it publishes an over-the-air update that
+# installed copies download on their next launch. If native code changed (a
+# new native library, an Expo SDK upgrade, app.json native config), it builds
+# a new binary and submits it to TestFlight instead.
+#
+# Based on Expo's "Deploy to production" workflow:
+# https://docs.expo.dev/eas/workflows/examples/deploy-to-production/
+
+name: Deploy to production
+
+on:
+  push:
+    branches: ['claude/keen-sagan-zqk0hi', 'main']
+
+jobs:
+  fingerprint:
+    name: Fingerprint
+    type: fingerprint
+
+  get_ios_build:
+    name: Check for an existing iOS build
+    needs: [fingerprint]
+    type: get-build
+    params:
+      fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
+      profile: production
+
+  build_ios:
+    name: Build iOS
+    needs: [get_ios_build]
+    if: ${{ !needs.get_ios_build.outputs.build_id }}
+    type: build
+    params:
+      platform: ios
+      profile: production
+
+  submit_ios:
+    name: Submit to TestFlight
+    needs: [build_ios]
+    type: submit
+    params:
+      build_id: ${{ needs.build_ios.outputs.build_id }}
+
+  publish_ios_update:
+    name: Publish iOS update
+    needs: [get_ios_build]
+    if: ${{ needs.get_ios_build.outputs.build_id }}
+    type: update
+    # Pulls EXPO_PUBLIC_SUPABASE_* from the EAS "production" environment
+    # (there is no .env file in the cloud).
+    environment: production
+    params:
+      branch: production
+      platform: ios
