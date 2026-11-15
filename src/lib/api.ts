@@ -184,6 +184,13 @@ export async function addFood(entries: NewFoodEntry[]): Promise<void> {
   if (res.error) throw new Error(res.error.message);
 }
 
+/** Adds one entry and returns its id. */
+export async function addFoodEntry(entry: NewFoodEntry): Promise<string> {
+  const res = await supabase.from('food_entries').insert(entry).select('id').single();
+  if (res.error) throw new Error(res.error.message);
+  return (res.data as { id: string }).id;
+}
+
 export async function updateFood(id: string, patch: Partial<NewFoodEntry>): Promise<void> {
   const res = await supabase.from('food_entries').update(patch).eq('id', id);
   if (res.error) throw new Error(res.error.message);

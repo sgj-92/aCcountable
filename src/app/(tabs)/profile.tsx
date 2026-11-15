@@ -6,7 +6,7 @@ import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
 import { getProfile, updateProfile, type Profile } from '@/lib/api';
-import { isValidISODate, today } from '@/lib/dates';
+import { dmyToIso, formatDmyInput, isoToDmy, today } from '@/lib/dates';
 import { LIFESTYLE_LABELS, type Goal, type Lifestyle, type Sex } from '@/lib/nutrition';
 import { supabase } from '@/lib/supabase';
 import { targetFor } from '@/lib/targets';
@@ -14,6 +14,7 @@ import { targetFor } from '@/lib/targets';
 type Form = {
   display_name: string;
   sex: Sex | null;
+  /** DD-MM-YYYY as typed; stored as ISO. */
   birth_date: string;
   height_cm: string;
   weight_kg: string;
@@ -28,7 +29,7 @@ type Form = {
 const toForm = (p: Profile): Form => ({
   display_name: p.display_name ?? '',
   sex: p.sex,
-  birth_date: p.birth_date ?? '',
+  birth_date: isoToDmy(p.birth_date),
   height_cm: p.height_cm?.toString() ?? '',
   weight_kg: p.weight_kg?.toString() ?? '',
   lifestyle: p.lifestyle,
@@ -45,7 +46,7 @@ const parseNum = (s: string) => {
 };
 
 function validate(f: Form): string | null {
-  if (f.birth_date && !isValidISODate(f.birth_date)) return 'Birth date must be YYYY-MM-DD';
+  if (f.birth_date && !dmyToIso(f.birth_date)) return 'Enter your birth date as DD-MM-YYYY';
   const h = parseNum(f.height_cm);
   if (h != null && (h < 100 || h > 250)) return 'Height must be 100–250 cm';
   const w = parseNum(f.weight_kg);
@@ -63,7 +64,7 @@ function toPatch(f: Form): Partial<Omit<Profile, 'id'>> {
   return {
     display_name: f.display_name.trim() || null,
     sex: f.sex,
-    birth_date: f.birth_date || null,
+    birth_date: f.birth_date ? dmyToIso(f.birth_date) : null,
     height_cm: parseNum(f.height_cm),
     weight_kg: parseNum(f.weight_kg),
     lifestyle: f.lifestyle,
@@ -138,10 +139,11 @@ export default function ProfileScreen() {
         </View>
         <Field
           label="Birth date"
-          placeholder="YYYY-MM-DD"
+          placeholder="DD-MM-YYYY"
           value={form.birth_date}
-          onChangeText={(v) => set('birth_date', v)}
-          keyboardType="numbers-and-punctuation"
+          onChangeText={(v) => set('birth_date', formatDmyInput(v))}
+          keyboardType="number-pad"
+          maxLength={10}
         />
         <Row gap={Spacing.md}>
           <Field

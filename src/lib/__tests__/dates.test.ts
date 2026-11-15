@@ -1,6 +1,16 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { addDays, ageOn, formatWeekRange, isValidISODate, startOfWeek, weekDates } from '../dates';
+import {
+  addDays,
+  ageOn,
+  dmyToIso,
+  formatDmyInput,
+  formatWeekRange,
+  isoToDmy,
+  isValidISODate,
+  startOfWeek,
+  weekDates,
+} from '../dates';
 
 describe('dates', () => {
   it('adds days across month and year boundaries', () => {
@@ -30,5 +40,32 @@ describe('dates', () => {
   it('computes age on a given day', () => {
     expect(ageOn('1990-11-15', '2026-11-14')).toBe(35);
     expect(ageOn('1990-11-14', '2026-11-14')).toBe(36);
+  });
+});
+
+describe('DD-MM-YYYY entry', () => {
+  it('inserts dashes as digits are typed', () => {
+    expect(formatDmyInput('0')).toBe('0');
+    expect(formatDmyInput('01')).toBe('01');
+    expect(formatDmyInput('010')).toBe('01-0');
+    expect(formatDmyInput('0105')).toBe('01-05');
+    expect(formatDmyInput('01051')).toBe('01-05-1');
+    expect(formatDmyInput('01051992')).toBe('01-05-1992');
+  });
+
+  it('ignores typed or pasted punctuation and caps at 8 digits', () => {
+    expect(formatDmyInput('01/05/1992')).toBe('01-05-1992');
+    expect(formatDmyInput('01-05-19921')).toBe('01-05-1992');
+    // Backspacing over an auto-inserted dash just removes the digit before it.
+    expect(formatDmyInput('01-05')).toBe('01-05');
+    expect(formatDmyInput('01-')).toBe('01');
+  });
+
+  it('converts between DD-MM-YYYY and ISO, rejecting impossible dates', () => {
+    expect(isoToDmy('1992-05-01')).toBe('01-05-1992');
+    expect(isoToDmy(null)).toBe('');
+    expect(dmyToIso('01-05-1992')).toBe('1992-05-01');
+    expect(dmyToIso('31-02-1992')).toBeNull();
+    expect(dmyToIso('01-05-92')).toBeNull();
   });
 });

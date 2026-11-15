@@ -70,3 +70,28 @@ export function ageOn(birthDate: string, on: string): number {
   if (beforeBirthday) age -= 1;
   return age;
 }
+
+// ───────────── DD-MM-YYYY entry (birth date field) ─────────────
+
+/** Formats typed text as DD-MM-YYYY, inserting the dashes itself so only digits need typing. */
+export function formatDmyInput(text: string): string {
+  const d = text.replace(/\D/g, '').slice(0, 8);
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return `${d.slice(0, 2)}-${d.slice(2)}`;
+  return `${d.slice(0, 2)}-${d.slice(2, 4)}-${d.slice(4)}`;
+}
+
+/** 'YYYY-MM-DD' → 'DD-MM-YYYY' (empty string for null/invalid). */
+export function isoToDmy(iso: string | null | undefined): string {
+  if (!iso || !isValidISODate(iso)) return '';
+  const [y, m, d] = iso.split('-');
+  return `${d}-${m}-${y}`;
+}
+
+/** 'DD-MM-YYYY' → 'YYYY-MM-DD', or null if it isn't a real calendar date. */
+export function dmyToIso(dmy: string): string | null {
+  const m = /^(\d{2})-(\d{2})-(\d{4})$/.exec(dmy);
+  if (!m) return null;
+  const iso = `${m[3]}-${m[2]}-${m[1]}`;
+  return isValidISODate(iso) ? iso : null;
+}

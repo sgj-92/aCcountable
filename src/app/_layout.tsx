@@ -24,6 +24,7 @@ function RootNavigator() {
         <Stack.Screen name="scan" options={{ presentation: 'modal', title: 'Scan a meal' }} />
         <Stack.Screen name="food" options={{ presentation: 'modal', title: 'Food' }} />
         <Stack.Screen name="training" options={{ presentation: 'modal', title: 'Training session' }} />
+        <Stack.Screen name="plan-item" options={{ presentation: 'modal', title: 'Planned food' }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="sign-in" options={{ headerShown: false }} />

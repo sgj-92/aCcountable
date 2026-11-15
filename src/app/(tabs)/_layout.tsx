@@ -10,6 +10,10 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Label>Today</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="flame.fill" md="local_fire_department" />
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="plan">
+        <NativeTabs.Trigger.Label>Plan</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="list.bullet.clipboard" md="checklist" />
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="week">
         <NativeTabs.Trigger.Label>Week</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="calendar" md="calendar_month" />

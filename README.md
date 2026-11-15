@@ -4,6 +4,7 @@ A calorie tracker for iOS and Android that **sets each day's target from the tra
 
 - **Today:** calories left, protein/carbs/fat bars, the day's sessions, and meals. Snap a photo, or add food from search, a barcode or by hand.
 - **Food search:** whole foods come from USDA FoodData Central (lab-analysed, per 100 g). Branded and packaged foods come from Open Food Facts, the open database MacroFactor also uses for barcodes. Pick a food, type the weight in grams, and calories and macros scale to match. Weighed entries remember their weight, so you can reopen one and re-weigh it, or re-log it from Recent.
+- **Meal planner (Plan tab):** list what you're eating today, by meal and without amounts, e.g. "oats, whey, blueberries / chicken, rice, broccoli, olive oil". Claude supplies each food's nutrition per 100 g and a realistic portion range. The app's solver then works out the grams of each that hit your calorie and macro targets, usually within 1%. Weigh as you go: log what you actually ate, and the rest of the day re-balances around it. You can fix an amount ("always 2 eggs"), change a food's portion range, or swap in exact values from the food database.
 - **Barcode scanning:** point the camera at a packaged food. The app looks it up in Open Food Facts first, then USDA's branded foods.
 - **Week:** plan sessions for each day, see each day's target and what you ate, and check your week against plan. "Copy last week's training" repeats a regular schedule.
 - **Photo scan:** Claude lists every item on the plate with portion, grams, kcal, macros and a confidence level. Everything is editable, and "How much did you eat?" (¼–2×) scales the whole plate before you save.
@@ -32,7 +33,9 @@ All of this lives in [`src/lib/nutrition.ts`](src/lib/nutrition.ts) as pure func
 ```
 src/app/                 Expo Router screens
   (tabs)/index.tsx       Today
+  (tabs)/plan.tsx        Meal planner: foods → amounts that hit the day's targets
   (tabs)/week.tsx        Week planner
+  plan-item.tsx          Log / fix / edit a planned food
   (tabs)/profile.tsx     Profile + target settings
   scan.tsx               Photo → AI estimate → review → log
   food.tsx               Search / barcode → weigh in grams → log; manual entry; edit
@@ -44,6 +47,8 @@ src/lib/
   api.ts                 Supabase data access
   scan.ts                Image downscale + Edge Function call
   foods.ts               Food search / barcode calls + gram scaling
+  planner.ts             Solver: grams per food to hit kcal/protein/carbs/fat (pure, tested)
+  plans.ts               Meal plan data + plan-day call
 src/components/
   food-search.tsx        Search box, barcode button, results
   barcode-scanner.tsx    Camera barcode reader
@@ -51,6 +56,7 @@ supabase/
   migrations/            Schema + row level security
   functions/analyze-food Edge Function that calls Claude
   functions/food-search  Edge Function: USDA + Open Food Facts search and barcode lookup
+  functions/plan-day     Edge Function: Claude turns a food list into per-100 g values + portion ranges
   functions/tests/       Deno tests, using saved real API responses as fixtures
 ```
 
@@ -98,6 +104,10 @@ supabase functions deploy analyze-food
 
 ```bash
 supabase functions deploy food-search
+```
+
+```bash
+supabase functions deploy plan-day
 ```
 
 You can get an Anthropic API key at [platform.claude.com](https://platform.claude.com). Get a free USDA key at [api.data.gov/signup](https://api.data.gov/signup/). It takes a minute and allows 1,000 requests an hour. Without one, the function falls back to the shared `DEMO_KEY`, which runs out after a few searches. Search still works then, but returns Open Food Facts results only.
