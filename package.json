@@ -39,6 +39,7 @@
     "@types/react": "~19.3.0",
     "eslint": "^9.39.5",
     "jest": "^30.5.2",
+    "patch-package": "^8.0.1",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -49,7 +50,8 @@
     "lint": "expo lint",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "test:functions": "deno test --allow-read supabase/functions/tests/"
+    "test:functions": "deno test --allow-read supabase/functions/tests/",
+    "postinstall": "patch-package"
   },
   "private": true,
   "jest": {

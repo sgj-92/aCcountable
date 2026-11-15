@@ -54,8 +54,7 @@
           "microphonePermission": false,
           "recordAudioAndroid": false
         }
-      ],
-      "./plugins/with-expo-jsi-swift5"
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
