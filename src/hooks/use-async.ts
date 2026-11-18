@@ -34,6 +34,19 @@ export function useAsync<T>(fn: () => Promise<T>, key: string) {
     }
   }, []);
 
+  // Only a pull-to-refresh shows the spinner. Background reloads (e.g. on returning to a tab) must
+  // not: on iOS, setting RefreshControl's `refreshing` from code shifts the content down by the
+  // spinner's height, and React Native can leave that gap behind once loading ends.
+  const [refreshing, setRefreshing] = useState(false);
+  const refresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await reload();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [reload]);
+
   useFocusEffect(
     useCallback(() => {
       reload();
@@ -41,5 +54,5 @@ export function useAsync<T>(fn: () => Promise<T>, key: string) {
     }, [reload, key]),
   );
 
-  return { data, error, loading, reload };
+  return { data, error, loading, reload, refreshing, refresh };
 }

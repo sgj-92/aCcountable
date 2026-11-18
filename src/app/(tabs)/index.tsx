@@ -42,7 +42,7 @@ export default function TodayScreen() {
     if (params.date && isValidISODate(params.date)) setDate(params.date);
   }
 
-  const { data, error, loading, reload } = useAsync(() => loadWeek(date), date);
+  const { data, error, reload, refreshing, refresh } = useAsync(() => loadWeek(date), date);
 
   const isToday = date === today();
   const label = isToday ? `Today · ${formatDay(date)}` : formatDay(date);
@@ -79,7 +79,7 @@ export default function TodayScreen() {
   const scan = () => router.push({ pathname: '/scan', params: { date, meal: defaultMeal } });
 
   return (
-    <Screen refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}>
+    <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
       <Stepper label={label} onPrev={() => setDate(addDays(date, -1))} onNext={() => setDate(addDays(date, 1))} />
       {!isToday ? <Button title="Jump to today" variant="ghost" onPress={() => setDate(today())} /> : null}
       <ErrorText message={error} />

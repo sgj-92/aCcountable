@@ -31,7 +31,7 @@ export default function WeekScreen() {
   const [copying, setCopying] = useState(false);
   const days = weekDates(weekStart);
 
-  const { data, error, loading, reload } = useAsync(() => loadWeek(weekStart), weekStart);
+  const { data, error, reload, refreshing, refresh } = useAsync(() => loadWeek(weekStart), weekStart);
 
   const stepper = (
     <Stepper
@@ -74,7 +74,7 @@ export default function WeekScreen() {
   }
 
   return (
-    <Screen refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}>
+    <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
       {stepper}
       <ErrorText message={error} />
 

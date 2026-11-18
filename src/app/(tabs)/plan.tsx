@@ -34,7 +34,7 @@ export default function PlanScreen() {
   const [notes, setNotes] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
 
-  const { data, error, loading, reload } = useAsync(async () => {
+  const { data, error, reload, refreshing, refresh } = useAsync(async () => {
     const [week, items] = await Promise.all([loadWeek(date), listPlanItems(date)]);
     return { week, items };
   }, date);
@@ -157,7 +157,7 @@ export default function PlanScreen() {
   );
 
   return (
-    <Screen refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}>
+    <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
       {stepper}
       <ErrorText message={error ?? actionError} />
 
