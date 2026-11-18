@@ -23,7 +23,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { computeWeek, loadWeek } from '@/lib/adaptive';
 import { copyPreviousWeek, isProfileComplete } from '@/lib/api';
 import { addDays, dayName, formatWeekRange, parseISODate, startOfWeek, today, weekDates } from '@/lib/dates';
-import { ACTIVITY_LABELS } from '@/lib/nutrition';
+import { sessionLabel } from '@/lib/targets';
 
 export default function WeekScreen() {
   const c = useTheme();
@@ -151,7 +151,7 @@ export default function WeekScreen() {
                       key={s.id}
                       active
                       color={c.training}
-                      label={`${s.actual_kcal != null ? '✓ ' : ''}${ACTIVITY_LABELS[s.activity]} ${s.actual_duration_min ?? s.duration_min}′`}
+                      label={`${s.actual_kcal != null ? '✓ ' : ''}${sessionLabel(s)} ${s.actual_duration_min ?? s.duration_min}′`}
                       onPress={() => router.push({ pathname: '/training', params: { id: s.id, date: r.date } })}
                     />
                   ))}

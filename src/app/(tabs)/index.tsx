@@ -25,8 +25,8 @@ import { deleteFood, isProfileComplete, type FoodEntry } from '@/lib/api';
 import { addDays, formatDay, isValidISODate, today } from '@/lib/dates';
 import { parseClock } from '@/lib/fasting';
 import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
-import { ACTIVITY_LABELS, sumTotals } from '@/lib/nutrition';
-import { sessionKcalDetail } from '@/lib/targets';
+import { sumTotals } from '@/lib/nutrition';
+import { sessionKcalDetail, sessionLabel } from '@/lib/targets';
 
 export default function TodayScreen() {
   const c = useTheme();
@@ -163,7 +163,7 @@ export default function TodayScreen() {
                 <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: Spacing.xs }}>
                   <View style={{ flex: 1, gap: 2 }}>
                     <T>
-                      {ACTIVITY_LABELS[s.activity]} · {s.actual_duration_min ?? s.duration_min} min · {s.intensity}
+                      {sessionLabel(s)} · {s.actual_duration_min ?? s.duration_min} min · {s.intensity}
                     </T>
                     <T variant="small" color={burn?.source === 'actual' ? c.success : c.textMuted}>
                       {burn?.source === 'actual'

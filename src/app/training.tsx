@@ -9,7 +9,7 @@ import { deleteSession, getProfile, getSession, listWhoopWorkouts, saveSession, 
 import { addDays, formatDay, isValidISODate, today } from '@/lib/dates';
 import { ACTIVITY_LABELS, type Activity, type Intensity } from '@/lib/nutrition';
 import { sessionKcalDetail } from '@/lib/targets';
-import { burnRates, ratesForModel, type ActivityRate } from '@/lib/whoop';
+import { ratesForModel, ratesFromRows, type ActivityRate } from '@/lib/whoop';
 
 const ACTIVITIES = Object.keys(ACTIVITY_LABELS) as Activity[];
 
@@ -22,6 +22,8 @@ export default function TrainingEditor() {
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [whoopRates, setWhoopRates] = useState<ActivityRate[]>([]);
+  const [whoopNamed, setWhoopNamed] = useState<ActivityRate[]>([]);
+  const [whoopActivity, setWhoopActivity] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(!id);
   const [date, setDate] = useState(params.date && isValidISODate(params.date) ? params.date : today());
   const [activity, setActivity] = useState<Activity>('run');
@@ -37,18 +39,11 @@ export default function TrainingEditor() {
   useEffect(() => {
     getProfile().then(setProfile, (e) => setError(String(e)));
     listWhoopWorkouts().then(
-      (w) =>
-        setWhoopRates(
-          burnRates(
-            w.map((x) => ({
-              activity: x.activity,
-              activityName: x.activity_name,
-              durationMin: x.duration_min,
-              kcal: x.kcal,
-              startedAt: x.started_at,
-            })),
-          ),
-        ),
+      (w) => {
+        const r = ratesFromRows(w);
+        setWhoopRates(r.byActivity);
+        setWhoopNamed(r.byName);
+      },
       () => {},
     );
     if (id) {
@@ -61,6 +56,7 @@ export default function TrainingEditor() {
           setOverride(s.kcal_override != null ? String(s.kcal_override) : '');
           setActualKcal(s.actual_kcal != null ? String(s.actual_kcal) : '');
           setActualDuration(s.actual_duration_min != null ? String(s.actual_duration_min) : '');
+          setWhoopActivity(s.whoop_activity);
           setNotes(s.notes ?? '');
           setLoaded(true);
         },
@@ -83,7 +79,10 @@ export default function TrainingEditor() {
           ? 'Actual duration must be 1–1440 minutes'
           : null;
 
-  const rate = whoopRates.find((r) => r.activity === activity);
+  const named = whoopActivity
+    ? whoopNamed.find((r) => r.label.toLowerCase() === whoopActivity.toLowerCase())
+    : undefined;
+  const rate = named ?? whoopRates.find((r) => r.activity === activity);
   const detail =
     profile && !invalid
       ? sessionKcalDetail(
@@ -97,9 +96,10 @@ export default function TrainingEditor() {
             kcal_override: kcalOverride,
             actual_kcal: canConfirm ? actual : null,
             actual_duration_min: canConfirm ? actualMin : null,
+            whoop_activity: whoopActivity,
             notes: null,
           },
-          ratesForModel(whoopRates),
+          ratesForModel(whoopRates, whoopNamed),
         )
       : null;
 
@@ -110,7 +110,7 @@ export default function TrainingEditor() {
       : detail.source === 'manual'
         ? 'Your estimate'
         : detail.source === 'history'
-          ? `Estimated from your ${detail.samples} WHOOP ${rate?.label.toLowerCase() ?? ''} session${detail.samples === 1 ? '' : 's'}`
+          ? `Estimated from your ${detail.samples} WHOOP “${rate?.label ?? ''}” session${detail.samples === 1 ? '' : 's'}`
           : 'Generic estimate. Import WHOOP history for your own rates';
 
   async function save() {
@@ -127,6 +127,7 @@ export default function TrainingEditor() {
           kcal_override: kcalOverride == null ? null : Math.round(kcalOverride),
           actual_kcal: canConfirm && actual != null ? Math.round(actual) : null,
           actual_duration_min: canConfirm && actualMin != null ? actualMin : null,
+          whoop_activity: whoopActivity,
           notes: notes.trim() || null,
         },
         id,
@@ -157,6 +158,12 @@ export default function TrainingEditor() {
     ]);
   }
 
+  // WHOOP activities, most-logged first; keep an edited session's own name even if it's not in the history.
+  const whoopChoices =
+    whoopActivity && !whoopNamed.some((r) => r.label.toLowerCase() === whoopActivity.toLowerCase())
+      ? [...whoopNamed, { label: whoopActivity, activity, kcalPerMin: 0, samples: 0, typicalMin: durationMin }]
+      : whoopNamed;
+
   if (!loaded) {
     return <Screen padTop={false}>{error ? <ErrorText message={error} /> : <Loading />}</Screen>;
   }
@@ -169,17 +176,48 @@ export default function TrainingEditor() {
       </Card>
 
       <Card style={{ gap: Spacing.md }}>
-        <T variant="heading">Activity</T>
+        {whoopChoices.length > 0 ? (
+          <>
+            <T variant="heading">Your WHOOP activities</T>
+            <Row style={{ flexWrap: 'wrap' }}>
+              {whoopChoices.map((r) => (
+                <Chip
+                  key={r.label}
+                  label={r.label}
+                  active={whoopActivity?.toLowerCase() === r.label.toLowerCase()}
+                  color={c.training}
+                  onPress={() => {
+                    setWhoopActivity(r.label);
+                    setActivity(r.activity);
+                    // Start from the person's usual session length for this activity.
+                    if (!id && r.samples > 0) setDuration(String(r.typicalMin));
+                  }}
+                />
+              ))}
+            </Row>
+            {named ? (
+              <T variant="small">
+                Usually {named.typicalMin} min · about {fmt(named.kcalPerMin * named.typicalMin)} kcal on WHOOP ·{' '}
+                {named.samples} session{named.samples === 1 ? '' : 's'}
+              </T>
+            ) : null}
+            <T variant="heading" style={{ marginTop: Spacing.sm }}>
+              Other activities
+            </T>
+          </>
+        ) : (
+          <T variant="heading">Activity</T>
+        )}
         <Row style={{ flexWrap: 'wrap' }}>
           {ACTIVITIES.map((a) => (
             <Chip
               key={a}
               label={ACTIVITY_LABELS[a]}
-              active={activity === a}
+              active={!whoopActivity && activity === a}
               color={c.training}
               onPress={() => {
+                setWhoopActivity(null);
                 setActivity(a);
-                // Suggest the person's usual session length for this activity on new sessions.
                 const r = whoopRates.find((x) => x.activity === a);
                 if (!id && r) setDuration(String(r.typicalMin));
               }}

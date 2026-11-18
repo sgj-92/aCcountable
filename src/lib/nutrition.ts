@@ -62,6 +62,13 @@ export interface SessionInput {
   actualKcal?: number | null;
   /** Confirmed duration, if different from the plan. */
   actualDurationMin?: number | null;
+  /** Exact WHOOP activity name it was picked as ("Running"), for that activity's own rate. */
+  whoopActivity?: string | null;
+}
+
+export interface Rate {
+  kcalPerMin: number;
+  samples: number;
 }
 
 /**
@@ -73,7 +80,13 @@ export interface SessionInput {
 export interface BurnContext {
   weightKg: number;
   bmr?: number;
-  rates?: Partial<Record<Activity, { kcalPerMin: number; samples: number }>>;
+  rates?: RateTables;
+}
+
+/** Personal rates by app activity type, and by exact WHOOP activity name (lower-case). */
+export interface RateTables {
+  byActivity?: Partial<Record<Activity, Rate>>;
+  byName?: Record<string, Rate>;
 }
 
 export type BurnSource = 'actual' | 'manual' | 'history' | 'formula';
@@ -188,7 +201,9 @@ export function sessionBurnDetail(session: SessionInput, ctx: BurnContext | numb
     return { net: Math.max(0, session.kcalOverride - resting), source: 'manual' };
   }
   const met = METS[session.activity]?.[session.intensity] ?? METS.other.moderate;
-  const rate = c.rates?.[session.activity];
+  const rate =
+    (session.whoopActivity ? c.rates?.byName?.[session.whoopActivity.trim().toLowerCase()] : undefined) ??
+    c.rates?.byActivity?.[session.activity];
   if (rate && rate.samples > 0 && rate.kcalPerMin > 0) {
     // Personal moderate-intensity rate, scaled by how much harder/easier this intensity is.
     const scale = met / (METS[session.activity]?.moderate ?? met);

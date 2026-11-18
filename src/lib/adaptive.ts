@@ -16,11 +16,11 @@ import {
 } from './api';
 import { addDays, startOfWeek, weekDates } from './dates';
 import { buildInsights, type Insight } from './insights';
-import { ACTIVITY_LABELS, macroTargets, sumTotals, type DayTarget } from './nutrition';
-import { settingsFor, statsFor, targetFor, type Rates } from './targets';
+import { macroTargets, sumTotals, type DayTarget } from './nutrition';
+import { sessionLabel, settingsFor, statsFor, targetFor, type Rates } from './targets';
 import { balanceWeek, type WeekBalance, type WeekDay } from './weekly';
 import { judgePace, weeklyRate, weightTrend, type PaceVerdict, type TrendPoint } from './weight';
-import { burnRates, ratesForModel, type ActivityRate } from './whoop';
+import { ratesForModel, ratesFromRows, type ActivityRate } from './whoop';
 
 export interface WeekData {
   profile: Profile;
@@ -29,6 +29,8 @@ export interface WeekData {
   food: FoodEntry[];
   weighIns: WeighInRow[];
   whoopRates: ActivityRate[];
+  /** Per exact WHOOP activity name, most-logged first. */
+  whoopNamed: ActivityRate[];
 }
 
 /** Loads the week containing `date`, plus recent weigh-ins and WHOOP history. */
@@ -42,16 +44,8 @@ export async function loadWeek(date: string): Promise<WeekData> {
     listWeighIns(addDays(date, -90)).catch(() => [] as WeighInRow[]),
     listWhoopWorkouts().catch(() => []),
   ]);
-  const whoopRates = burnRates(
-    whoop.map((w) => ({
-      activity: w.activity,
-      activityName: w.activity_name,
-      durationMin: w.duration_min,
-      kcal: w.kcal,
-      startedAt: w.started_at,
-    })),
-  );
-  return { profile, weekStart, sessions, food, weighIns, whoopRates };
+  const rates = ratesFromRows(whoop);
+  return { profile, weekStart, sessions, food, weighIns, whoopRates: rates.byActivity, whoopNamed: rates.byName };
 }
 
 export interface AdjustedDay extends WeekDay {
@@ -79,7 +73,7 @@ export function computeWeek(data: WeekData, today: string): WeekView | null {
   const stats = statsFor(profile, today);
   if (!stats) return null;
   const settings = settingsFor(profile);
-  const rates = ratesForModel(data.whoopRates);
+  const rates = ratesForModel(data.whoopRates, data.whoopNamed);
 
   const dates = weekDates(weekStart);
   const raws = dates.map((d) => targetFor(profile, d, sessions, rates)!);
@@ -112,7 +106,7 @@ export function computeWeek(data: WeekData, today: string): WeekView | null {
   const todayDay = days[today];
   const unconfirmed = sessions
     .filter((s) => s.date < today && s.actual_kcal == null)
-    .map((s) => ({ id: s.id, date: s.date, label: ACTIVITY_LABELS[s.activity] }));
+    .map((s) => ({ id: s.id, date: s.date, label: sessionLabel(s) }));
   const insights = todayDay
     ? buildInsights({
         today,

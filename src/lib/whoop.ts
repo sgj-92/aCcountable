@@ -208,17 +208,30 @@ const median = (xs: number[]) => {
  * sessions so fitness changes show through, and ignores sessions under 10
  * minutes (too noisy).
  */
-export function burnRates(
-  workouts: Pick<WhoopWorkout, 'activity' | 'activityName' | 'durationMin' | 'kcal' | 'startedAt'>[],
-  maxPerActivity = 30,
-): ActivityRate[] {
-  const groups = new Map<Activity, typeof workouts>();
+type RateInput = Pick<WhoopWorkout, 'activity' | 'activityName' | 'durationMin' | 'kcal' | 'startedAt'>;
+
+export function burnRates(workouts: RateInput[], maxPerActivity = 30): ActivityRate[] {
+  return groupRates(workouts, (w) => w.activity, maxPerActivity);
+}
+
+/**
+ * Rates per exact WHOOP activity name ("Running", "Padel", "Functional
+ * Fitness"), most-logged first. These are what the session picker offers.
+ */
+export function burnRatesByName(workouts: RateInput[], maxPerActivity = 30): ActivityRate[] {
+  return groupRates(workouts, (w) => w.activityName.trim(), maxPerActivity);
+}
+
+function groupRates(workouts: RateInput[], keyOf: (w: RateInput) => string, maxPerActivity: number): ActivityRate[] {
+  const groups = new Map<string, RateInput[]>();
   for (const w of workouts) {
     if (w.durationMin < 10 || w.kcal <= 0) continue;
-    groups.set(w.activity, [...(groups.get(w.activity) ?? []), w]);
+    const key = keyOf(w);
+    groups.set(key, [...(groups.get(key) ?? []), w]);
   }
   const out: ActivityRate[] = [];
-  for (const [activity, list] of groups) {
+  for (const [, list] of groups) {
+    const activity = list[0].activity;
     const recent = [...list].sort((a, b) => b.startedAt.localeCompare(a.startedAt)).slice(0, maxPerActivity);
     const names = new Map<string, number>();
     for (const w of recent) names.set(w.activityName, (names.get(w.activityName) ?? 0) + 1);
@@ -234,11 +247,27 @@ export function burnRates(
   return out.sort((a, b) => b.samples - a.samples);
 }
 
-/** Rates in the shape the burn model takes. */
-export function ratesForModel(rates: ActivityRate[]) {
-  const out: Partial<Record<Activity, { kcalPerMin: number; samples: number }>> = {};
-  for (const r of rates) out[r.activity] = { kcalPerMin: r.kcalPerMin, samples: r.samples };
-  return out;
+/** Rates in the shape the burn model takes: by app activity type, and by exact WHOOP name. */
+export function ratesForModel(byActivity: ActivityRate[], byName: ActivityRate[] = []) {
+  const activity: Partial<Record<Activity, { kcalPerMin: number; samples: number }>> = {};
+  for (const r of byActivity) activity[r.activity] = { kcalPerMin: r.kcalPerMin, samples: r.samples };
+  const name: Record<string, { kcalPerMin: number; samples: number }> = {};
+  for (const r of byName) name[r.label.toLowerCase()] = { kcalPerMin: r.kcalPerMin, samples: r.samples };
+  return { byActivity: activity, byName: name };
+}
+
+/** Rates from stored WHOOP rows (as the API returns them). */
+export function ratesFromRows(
+  rows: { activity: Activity; activity_name: string; duration_min: number; kcal: number; started_at: string }[],
+) {
+  const input = rows.map((w) => ({
+    activity: w.activity,
+    activityName: w.activity_name,
+    durationMin: w.duration_min,
+    kcal: w.kcal,
+    startedAt: w.started_at,
+  }));
+  return { byActivity: burnRates(input), byName: burnRatesByName(input) };
 }
 
 /**
@@ -246,15 +275,19 @@ export function ratesForModel(rates: ActivityRate[]) {
  * activity that haven't been confirmed yet (closest duration wins), so a
  * re-import fills in actual burns automatically.
  */
-export function matchToSessions<S extends { id: string; date: string; activity: Activity; duration_min: number }>(
-  workouts: WhoopWorkout[],
-  sessions: S[],
-): { sessionId: string; workout: WhoopWorkout }[] {
+export function matchToSessions<
+  S extends { id: string; date: string; activity: Activity; duration_min: number; whoop_activity?: string | null },
+>(workouts: WhoopWorkout[], sessions: S[]): { sessionId: string; workout: WhoopWorkout }[] {
   const used = new Set<string>();
   const out: { sessionId: string; workout: WhoopWorkout }[] = [];
   for (const s of sessions) {
+    // A session picked from the WHOOP list matches that exact name; others match by type.
+    const same = (w: WhoopWorkout) =>
+      s.whoop_activity
+        ? w.activityName.trim().toLowerCase() === s.whoop_activity.trim().toLowerCase()
+        : w.activity === s.activity;
     const candidates = workouts
-      .filter((w) => w.date === s.date && w.activity === s.activity && !used.has(w.startedAt))
+      .filter((w) => w.date === s.date && same(w) && !used.has(w.startedAt))
       .sort((a, b) => Math.abs(a.durationMin - s.duration_min) - Math.abs(b.durationMin - s.duration_min));
     if (candidates[0]) {
       used.add(candidates[0].startedAt);

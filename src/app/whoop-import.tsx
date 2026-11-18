@@ -12,7 +12,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { confirmSession, listUnconfirmedSessions, listWhoopWorkouts, upsertWhoopWorkouts } from '@/lib/api';
 import { formatDay } from '@/lib/dates';
 import { ACTIVITY_LABELS } from '@/lib/nutrition';
-import { burnRates, matchToSessions, parseWhoopWorkouts, type ParsedExport } from '@/lib/whoop';
+import { burnRatesByName, matchToSessions, parseWhoopWorkouts, ratesFromRows, type ParsedExport } from '@/lib/whoop';
 
 /** Reads workouts.csv out of a WHOOP export (.zip) or takes a CSV as is. */
 async function readWorkoutsCsv(uri: string, name: string): Promise<string> {
@@ -38,17 +38,7 @@ export default function WhoopImport() {
   const [done, setDone] = useState<{ imported: number; confirmed: number } | null>(null);
 
   const existing = useAsync(listWhoopWorkouts, 'whoop');
-  const existingRates = existing.data
-    ? burnRates(
-        existing.data.map((w) => ({
-          activity: w.activity,
-          activityName: w.activity_name,
-          durationMin: w.duration_min,
-          kcal: w.kcal,
-          startedAt: w.started_at,
-        })),
-      )
-    : [];
+  const existingRates = existing.data ? ratesFromRows(existing.data).byName : [];
 
   async function pick() {
     setError(null);
@@ -110,7 +100,7 @@ export default function WhoopImport() {
     }
   }
 
-  const preview = parsed ? burnRates(parsed.workouts) : [];
+  const preview = parsed ? burnRatesByName(parsed.workouts) : [];
   const dates = parsed ? parsed.workouts.map((w) => w.date).sort() : [];
 
   return (
@@ -119,6 +109,7 @@ export default function WhoopImport() {
 
       <Card style={{ gap: Spacing.sm }}>
         <T variant="heading">Import from WHOOP</T>
+        <T variant="small">Your WHOOP activities then appear first when you add a session.</T>
         <T variant="muted">
           In the WHOOP app: Profile → Settings → Data Export. WHOOP emails you a .zip. Save it to Files, then pick it
           here (or pick the workouts.csv inside it).
@@ -175,7 +166,7 @@ export default function WhoopImport() {
   );
 }
 
-function RatesCard({ title, rates }: { title: string; rates: ReturnType<typeof burnRates> }) {
+function RatesCard({ title, rates }: { title: string; rates: ReturnType<typeof burnRatesByName> }) {
   return (
     <Card style={{ gap: 0 }}>
       <T variant="heading" style={{ marginBottom: Spacing.xs }}>

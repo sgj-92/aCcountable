@@ -1,6 +1,7 @@
 import { isProfileComplete, type Profile, type TrainingSession } from './api';
 import { ageOn } from './dates';
 import {
+  ACTIVITY_LABELS,
   baseTarget,
   dayTarget,
   sessionBurnDetail,
@@ -41,7 +42,13 @@ export const toInput = (s: TrainingSession) => ({
   kcalOverride: s.kcal_override,
   actualKcal: s.actual_kcal,
   actualDurationMin: s.actual_duration_min,
+  whoopActivity: s.whoop_activity,
 });
+
+/** How a session is named on screen: its WHOOP activity if it has one. */
+export function sessionLabel(s: Pick<TrainingSession, 'activity' | 'whoop_activity'>): string {
+  return s.whoop_activity || ACTIVITY_LABELS[s.activity];
+}
 
 /** Target for one day given that day's sessions; null until the profile is filled in. */
 export function targetFor(

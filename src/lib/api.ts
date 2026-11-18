@@ -35,6 +35,8 @@ export interface TrainingSession {
   /** Total calories WHOOP recorded, once the session is done. */
   actual_kcal: number | null;
   actual_duration_min: number | null;
+  /** Exact WHOOP activity name it was picked as, e.g. "Running". */
+  whoop_activity: string | null;
   notes: string | null;
 }
 
@@ -123,7 +125,8 @@ export async function updateProfile(id: string, patch: Partial<Omit<Profile, 'id
 
 // ───────────── training ─────────────
 
-const SESSION_COLUMNS = 'id,date,activity,duration_min,intensity,kcal_override,actual_kcal,actual_duration_min,notes';
+const SESSION_COLUMNS =
+  'id,date,activity,duration_min,intensity,kcal_override,actual_kcal,actual_duration_min,whoop_activity,notes';
 
 export async function listSessions(from: string, to: string): Promise<TrainingSession[]> {
   const res = await supabase

@@ -3,7 +3,16 @@ import { describe, expect, it } from '@jest/globals';
 import { dayTarget, DEFAULT_SETTINGS, sessionBurnDetail, type BodyStats } from '../nutrition';
 import { balanceWeek, type WeekDayInput } from '../weekly';
 import { judgePace, weeklyRate, weightTrend } from '../weight';
-import { burnRates, mapWhoopActivity, matchToSessions, normaliseStart, parseCsv, parseWhoopWorkouts, ratesForModel } from '../whoop';
+import {
+  burnRates,
+  burnRatesByName,
+  mapWhoopActivity,
+  matchToSessions,
+  normaliseStart,
+  parseCsv,
+  parseWhoopWorkouts,
+  ratesForModel,
+} from '../whoop';
 
 // Shaped like WHOOP's workouts.csv (Settings → Data Export).
 const WHOOP_CSV = [
@@ -71,6 +80,47 @@ describe('WHOOP import', () => {
       { id: 's2', date: '2026-11-03', activity: 'run' as const, duration_min: 30 },
     ]);
     expect(m).toEqual([{ sessionId: 's1', workout: expect.objectContaining({ kcal: 790 }) }]);
+  });
+});
+
+describe('WHOOP activity names', () => {
+  const csv = [
+    'Workout start time,Duration (min),Activity name,Energy burned (cal)',
+    '2026-11-01 07:00:00,45,Spin,600',
+    '2026-11-02 07:00:00,45,Spin,630',
+    '2026-11-03 07:00:00,60,Cycling,500',
+    '2026-11-04 07:00:00,60,Cycling,520',
+    '2026-11-05 07:00:00,60,Cycling,480',
+  ].join('\n');
+  const workouts = parseWhoopWorkouts(csv).workouts;
+
+  it('keeps each WHOOP activity separate, most-logged first', () => {
+    const named = burnRatesByName(workouts);
+    expect(named.map((r) => [r.label, r.samples])).toEqual([
+      ['Cycling', 3],
+      ['Spin', 2],
+    ]);
+    // Both map to the same app type, which blends them.
+    expect(burnRates(workouts)).toHaveLength(1);
+  });
+
+  it('estimates from the exact WHOOP activity picked, not the blended type', () => {
+    const rates = ratesForModel(burnRates(workouts), burnRatesByName(workouts));
+    const ctx = { weightKg: 80, bmr: 1912, rates };
+    const spin = sessionBurnDetail({ activity: 'cycle', durationMin: 45, intensity: 'moderate', whoopActivity: 'Spin' }, ctx);
+    const generic = sessionBurnDetail({ activity: 'cycle', durationMin: 45, intensity: 'moderate' }, ctx);
+    expect(spin.samples).toBe(2);
+    expect(spin.net).toBeCloseTo(13.67 * 45 - (1912 / 1440) * 45, -1); // Spin burns ~13.7 kcal/min
+    expect(generic.samples).toBe(5);
+    expect(spin.net).toBeGreaterThan(generic.net);
+  });
+
+  it('matches re-imported workouts by WHOOP name when the session has one', () => {
+    const m = matchToSessions(workouts, [
+      { id: 'a', date: '2026-11-01', activity: 'cycle' as const, duration_min: 60, whoop_activity: 'Cycling' },
+      { id: 'b', date: '2026-11-02', activity: 'cycle' as const, duration_min: 45, whoop_activity: 'spin' },
+    ]);
+    expect(m.map((x) => x.sessionId)).toEqual(['b']); // no Cycling on the 1st, only Spin
   });
 });
 
