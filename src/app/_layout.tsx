@@ -27,6 +27,8 @@ function RootNavigator() {
         <Stack.Screen name="food" options={{ presentation: 'modal', title: 'Food' }} />
         <Stack.Screen name="training" options={{ presentation: 'modal', title: 'Training session' }} />
         <Stack.Screen name="plan-item" options={{ presentation: 'modal', title: 'Planned food' }} />
+        <Stack.Screen name="weigh-in" options={{ presentation: 'modal', title: 'Weight' }} />
+        <Stack.Screen name="whoop-import" options={{ presentation: 'modal', title: 'WHOOP history' }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="sign-in" options={{ headerShown: false }} />

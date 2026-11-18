@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Alert, Pressable, RefreshControl, View } from 'react-native';
 
 import { FastingCard } from '@/components/fasting-card';
+import { InsightsCard } from '@/components/insights-card';
 import { Ring } from '@/components/ring';
 import {
   Button,
@@ -19,19 +20,13 @@ import {
 import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
-import {
-  deleteFood,
-  getProfile,
-  isProfileComplete,
-  listFood,
-  listSessions,
-  type FoodEntry,
-} from '@/lib/api';
+import { computeWeek, loadWeek } from '@/lib/adaptive';
+import { deleteFood, isProfileComplete, type FoodEntry } from '@/lib/api';
 import { addDays, formatDay, isValidISODate, today } from '@/lib/dates';
 import { parseClock } from '@/lib/fasting';
 import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
 import { ACTIVITY_LABELS, sumTotals } from '@/lib/nutrition';
-import { sessionKcal, targetFor } from '@/lib/targets';
+import { sessionKcalDetail } from '@/lib/targets';
 
 export default function TodayScreen() {
   const c = useTheme();
@@ -47,14 +42,7 @@ export default function TodayScreen() {
     if (params.date && isValidISODate(params.date)) setDate(params.date);
   }
 
-  const { data, error, loading, reload } = useAsync(async () => {
-    const [profile, sessions, food] = await Promise.all([
-      getProfile(),
-      listSessions(date, date),
-      listFood(date, date),
-    ]);
-    return { profile, sessions, food };
-  }, date);
+  const { data, error, loading, reload } = useAsync(() => loadWeek(date), date);
 
   const isToday = date === today();
   const label = isToday ? `Today · ${formatDay(date)}` : formatDay(date);
@@ -68,10 +56,16 @@ export default function TodayScreen() {
     );
   }
 
-  const { profile, sessions, food } = data;
-  const target = targetFor(profile, date, sessions);
+  const { profile } = data;
+  const sessions = data.sessions.filter((s) => s.date === date);
+  const food = data.food.filter((f) => f.date === date);
+  // Targets come from the whole week, so they include the weekly balancing.
+  const view = computeWeek(data, today());
+  const day = view?.days[date];
+  const target = day ? { ...day.raw, kcal: day.adjusted, proteinG: day.proteinG, carbsG: day.carbsG, fatG: day.fatG } : null;
   const eaten = sumTotals(food);
   const remaining = target ? target.kcal - eaten.kcal : 0;
+  const latestTrend = view?.trend.at(-1);
 
   const slots = resolveSlots(profile.meal_slots);
   const windowStart = parseClock(profile.eating_window_start);
@@ -114,6 +108,14 @@ export default function TodayScreen() {
                 <Stat label="Target" value={fmt(target.kcal)} />
                 <Stat label="Base" value={fmt(target.base)} small />
                 <Stat label="Training" value={`+${fmt(target.training)}`} color={c.training} small />
+                {day && day.adjustment !== 0 ? (
+                  <Stat
+                    label="Week balance"
+                    value={`${day.adjustment > 0 ? '+' : '−'}${fmt(Math.abs(day.adjustment))}`}
+                    color={day.adjustment < 0 ? c.fat : c.success}
+                    small
+                  />
+                ) : null}
               </View>
             </Row>
             <Row style={{ justifyContent: 'space-around' }}>
@@ -129,6 +131,8 @@ export default function TodayScreen() {
           </Card>
         </>
       )}
+
+      {isToday && view ? <InsightsCard insights={view.insights} /> : null}
 
       {isToday && fastingWindow ? <FastingCard {...fastingWindow} /> : null}
 
@@ -149,20 +153,56 @@ export default function TodayScreen() {
         {sessions.length === 0 ? (
           <T variant="muted">Rest day. No sessions planned.</T>
         ) : (
-          sessions.map((s) => (
-            <Pressable
-              key={s.id}
-              onPress={() => router.push({ pathname: '/training', params: { id: s.id, date } })}>
-              <Row style={{ justifyContent: 'space-between', paddingVertical: Spacing.xs }}>
-                <T>
-                  {ACTIVITY_LABELS[s.activity]} · {s.duration_min} min · {s.intensity}
-                </T>
-                <T color={c.training}>+{fmt(sessionKcal(profile, s) ?? 0)}</T>
-              </Row>
-            </Pressable>
-          ))
+          sessions.map((s) => {
+            const burn = sessionKcalDetail(profile, s, view?.rates);
+            const needsConfirm = s.date <= today() && s.actual_kcal == null;
+            return (
+              <Pressable
+                key={s.id}
+                onPress={() => router.push({ pathname: '/training', params: { id: s.id, date } })}>
+                <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: Spacing.xs }}>
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <T>
+                      {ACTIVITY_LABELS[s.activity]} · {s.actual_duration_min ?? s.duration_min} min · {s.intensity}
+                    </T>
+                    <T variant="small" color={burn?.source === 'actual' ? c.success : c.textMuted}>
+                      {burn?.source === 'actual'
+                        ? '✓ WHOOP confirmed'
+                        : burn?.source === 'history'
+                          ? `Estimate from your WHOOP history${needsConfirm ? ' · tap to confirm' : ''}`
+                          : `Estimate${needsConfirm ? ' · tap to confirm with WHOOP' : ''}`}
+                    </T>
+                  </View>
+                  <T color={c.training}>
+                    {burn?.source === 'actual' ? '' : '≈ '}+{fmt(burn?.added ?? 0)}
+                  </T>
+                </Row>
+              </Pressable>
+            );
+          })
         )}
       </Card>
+
+      {/* Weight */}
+      {isToday ? (
+        <Pressable onPress={() => router.push('/weigh-in')} accessibilityRole="button">
+          <Card>
+            <Row style={{ justifyContent: 'space-between' }}>
+              <View style={{ gap: 2 }}>
+                <T variant="heading">Weight</T>
+                <T variant="small">
+                  {latestTrend
+                    ? `Trend ${latestTrend.trend.toFixed(1)} kg${
+                        view?.rate != null ? ` · ${view.rate < 0 ? '−' : '+'}${Math.abs(view.rate).toFixed(2)} kg/week` : ''
+                      }`
+                    : 'No weigh-ins yet'}
+                </T>
+              </View>
+              <T color={c.primary}>{latestTrend?.date === today() ? 'Logged ✓' : '+ Log'}</T>
+            </Row>
+          </Card>
+        </Pressable>
+      ) : null}
 
       {/* Meals */}
       {slotsForData(

@@ -32,6 +32,9 @@ export interface TrainingSession {
   duration_min: number;
   intensity: Intensity;
   kcal_override: number | null;
+  /** Total calories WHOOP recorded, once the session is done. */
+  actual_kcal: number | null;
+  actual_duration_min: number | null;
   notes: string | null;
 }
 
@@ -120,10 +123,12 @@ export async function updateProfile(id: string, patch: Partial<Omit<Profile, 'id
 
 // ───────────── training ─────────────
 
+const SESSION_COLUMNS = 'id,date,activity,duration_min,intensity,kcal_override,actual_kcal,actual_duration_min,notes';
+
 export async function listSessions(from: string, to: string): Promise<TrainingSession[]> {
   const res = await supabase
     .from('training_sessions')
-    .select('id,date,activity,duration_min,intensity,kcal_override,notes')
+    .select(SESSION_COLUMNS)
     .gte('date', from)
     .lte('date', to)
     .order('date')
@@ -134,7 +139,7 @@ export async function listSessions(from: string, to: string): Promise<TrainingSe
 export async function getSession(id: string): Promise<TrainingSession> {
   const res = await supabase
     .from('training_sessions')
-    .select('id,date,activity,duration_min,intensity,kcal_override,notes')
+    .select(SESSION_COLUMNS)
     .eq('id', id)
     .single();
   return unwrap(res) as TrainingSession;
@@ -221,4 +226,85 @@ export async function recentFoods(limit = 15): Promise<FoodEntry[]> {
     if (out.length >= limit) break;
   }
   return out;
+}
+
+
+// ───────────── weigh-ins ─────────────
+
+export interface WeighInRow {
+  id: string;
+  date: string;
+  weight_kg: number;
+}
+
+export async function listWeighIns(from: string): Promise<WeighInRow[]> {
+  const res = await supabase.from('weigh_ins').select('id,date,weight_kg').gte('date', from).order('date');
+  if (res.error) throw new Error(res.error.message);
+  return (res.data as unknown as WeighInRow[]).map((w) => ({ ...w, weight_kg: Number(w.weight_kg) }));
+}
+
+/** One weigh-in per day: logging again replaces that day's value. */
+export async function saveWeighIn(date: string, weightKg: number): Promise<void> {
+  const res = await supabase
+    .from('weigh_ins')
+    .upsert({ date, weight_kg: weightKg }, { onConflict: 'user_id,date' });
+  if (res.error) throw new Error(res.error.message);
+}
+
+export async function deleteWeighIn(id: string): Promise<void> {
+  const res = await supabase.from('weigh_ins').delete().eq('id', id);
+  if (res.error) throw new Error(res.error.message);
+}
+
+// ───────────── WHOOP history ─────────────
+
+export interface WhoopWorkoutRow {
+  started_at: string;
+  date: string;
+  activity_name: string;
+  activity: Activity;
+  duration_min: number;
+  kcal: number;
+}
+
+/** Recent imported workouts (enough to learn burn rates). */
+export async function listWhoopWorkouts(limit = 400): Promise<WhoopWorkoutRow[]> {
+  const res = await supabase
+    .from('whoop_workouts')
+    .select('started_at,date,activity_name,activity,duration_min,kcal')
+    .order('started_at', { ascending: false })
+    .limit(limit);
+  if (res.error) throw new Error(res.error.message);
+  return (res.data as unknown as WhoopWorkoutRow[]).map((w) => ({ ...w, duration_min: Number(w.duration_min) }));
+}
+
+export async function upsertWhoopWorkouts(
+  rows: (Omit<WhoopWorkoutRow, 'started_at'> & { started_at: string; strain: number | null; avg_hr: number | null })[],
+): Promise<void> {
+  for (let i = 0; i < rows.length; i += 500) {
+    const res = await supabase
+      .from('whoop_workouts')
+      .upsert(rows.slice(i, i + 500), { onConflict: 'user_id,started_at' });
+    if (res.error) throw new Error(res.error.message);
+  }
+}
+
+/** Sessions in a date range that haven't been confirmed with an actual burn. */
+export async function listUnconfirmedSessions(from: string, to: string): Promise<TrainingSession[]> {
+  const res = await supabase
+    .from('training_sessions')
+    .select(SESSION_COLUMNS)
+    .gte('date', from)
+    .lte('date', to)
+    .is('actual_kcal', null);
+  if (res.error) throw new Error(res.error.message);
+  return res.data as unknown as TrainingSession[];
+}
+
+export async function confirmSession(id: string, actualKcal: number, actualDurationMin: number | null): Promise<void> {
+  const res = await supabase
+    .from('training_sessions')
+    .update({ actual_kcal: Math.round(actualKcal), actual_duration_min: actualDurationMin })
+    .eq('id', id);
+  if (res.error) throw new Error(res.error.message);
 }

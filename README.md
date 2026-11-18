@@ -4,6 +4,16 @@ A calorie tracker for iOS and Android that **sets each day's target from the tra
 
 - **Today:** calories left, protein/carbs/fat bars, the day's sessions, and meals. Snap a photo, or add food from search, a barcode or by hand.
 - **Food search:** whole foods come from USDA FoodData Central (lab-analysed, per 100 g). Branded and packaged foods come from Open Food Facts, the open database MacroFactor also uses for barcodes. Pick a food, type the weight in grams, and calories and macros scale to match. Weighed entries remember their weight, so you can reopen one and re-weigh it, or re-log it from Recent.
+- **Adapts to your day and week:**
+  - Every week (Mon–Sun) has a calorie budget. When a day goes over or under, the remaining days adjust to keep the week on budget: at most 400 kcal less per day, never below BMR, and at most 200 kcal given back for under-eating.
+  - A day with nothing logged counts as untracked, not as zero eaten.
+  - Add an unplanned session and that day's target rises (mostly as carbs).
+- **WHOOP-based burn estimates:**
+  - Import your WHOOP data export (Profile → WHOOP history), either the .zip or workouts.csv. Session estimates then use your own median burn rate per activity.
+  - After a session, enter WHOOP's calories, or re-import and planned sessions are matched and confirmed automatically.
+  - WHOOP totals include resting burn for that time, which the base target already covers, so that part is subtracted.
+- **Weigh-ins:** log your weight and the app shows a smoothed trend, your weekly rate against your goal, and a chart. Your profile weight follows the trend.
+- **On track?** Today lists warnings and nudges: over today's target, week finishing over budget, losing slower or faster than planned, sessions to confirm, time to weigh in.
 - **Meal planner (Plan tab):** list what you're eating today, by meal and without amounts, e.g. "oats, whey, blueberries / chicken, rice, broccoli, olive oil". Claude supplies each food's nutrition per 100 g and a realistic portion range. The app's solver then works out the grams of each that hit your calorie and macro targets, usually within 1%. Weigh as you go: log what you actually ate, and the rest of the day re-balances around it. You can fix an amount ("always 2 eggs"), change a food's portion range, or swap in exact values from the food database.
 - **Barcode scanning:** point the camera at a packaged food. The app looks it up in Open Food Facts first, then USDA's branded foods.
 - **Week:** plan sessions for each day, see each day's target and what you ate, and check your week against plan. "Copy last week's training" repeats a regular schedule.
@@ -48,6 +58,11 @@ src/lib/
   scan.ts                Image downscale + Edge Function call
   foods.ts               Food search / barcode calls + gram scaling
   planner.ts             Solver: grams per food to hit kcal/protein/carbs/fat (pure, tested)
+  weekly.ts              Weekly budget balancing (pure, tested)
+  weight.ts              Weight trend, weekly rate, pace vs goal (pure, tested)
+  whoop.ts               WHOOP export parsing, personal burn rates, session matching (pure, tested)
+  insights.ts            "On track?" warnings (pure)
+  adaptive.ts            Loads a week and computes balanced targets, trend and insights for every screen
   plans.ts               Meal plan data + plan-day call
 src/components/
   food-search.tsx        Search box, barcode button, results

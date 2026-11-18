@@ -6,7 +6,8 @@ import { Button, Card, Divider, ErrorText, fmt, Loading, Row, Screen, Stepper, T
 import { Radius, Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
-import { getProfile, isProfileComplete, listFood, listSessions } from '@/lib/api';
+import { computeWeek, loadWeek } from '@/lib/adaptive';
+import { isProfileComplete } from '@/lib/api';
 import { resolveSlots, slotsForData } from '@/lib/meals';
 import { addDays, formatDay, today } from '@/lib/dates';
 import { sumTotals } from '@/lib/nutrition';
@@ -20,7 +21,6 @@ import {
   toPlanFood,
   type PlanItem,
 } from '@/lib/plans';
-import { targetFor } from '@/lib/targets';
 
 const EXAMPLE =
   'Breakfast: oats, whey, blueberries\nLunch: chicken, rice, broccoli, olive oil\nSnack: Greek yoghurt, honey\nDinner: salmon, potatoes, green beans';
@@ -35,13 +35,8 @@ export default function PlanScreen() {
   const [adding, setAdding] = useState(false);
 
   const { data, error, loading, reload } = useAsync(async () => {
-    const [profile, sessions, food, items] = await Promise.all([
-      getProfile(),
-      listSessions(date, date),
-      listFood(date, date),
-      listPlanItems(date),
-    ]);
-    return { profile, sessions, food, items };
+    const [week, items] = await Promise.all([loadWeek(date), listPlanItems(date)]);
+    return { week, items };
   }, date);
 
   const stepper = (
@@ -61,11 +56,14 @@ export default function PlanScreen() {
     );
   }
 
-  const { profile, sessions, food, items } = data;
+  const { week: weekData, items } = data;
+  const profile = weekData.profile;
+  const food = weekData.food.filter((f) => f.date === date);
   const slots = resolveSlots(profile.meal_slots);
-  const dayTarget = targetFor(profile, date, sessions);
-  const target: Macros | null = dayTarget
-    ? { kcal: dayTarget.kcal, protein_g: dayTarget.proteinG, carbs_g: dayTarget.carbsG, fat_g: dayTarget.fatG }
+  // Same target as Today: base + training, after weekly balancing.
+  const day = computeWeek(weekData, today())?.days[date];
+  const target: Macros | null = day
+    ? { kcal: day.adjusted, protein_g: day.proteinG, carbs_g: day.carbsG, fat_g: day.fatG }
     : null;
 
   // Everything already logged today (planned or not) counts; the rest of the plan fills the gap.

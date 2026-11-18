@@ -26,6 +26,8 @@ export type Activity =
   | 'hiit'
   | 'row'
   | 'sport'
+  | 'padel'
+  | 'tennis'
   | 'walk'
   | 'yoga'
   | 'other';
@@ -54,8 +56,34 @@ export interface SessionInput {
   activity: Activity;
   durationMin: number;
   intensity: Intensity;
-  /** If set (e.g. "active calories" from a watch), used instead of the MET estimate. */
+  /** Planned estimate typed in by hand (total calories, as WHOOP shows them). */
   kcalOverride?: number | null;
+  /** Confirmed after the session: total calories from WHOOP. Beats every estimate. */
+  actualKcal?: number | null;
+  /** Confirmed duration, if different from the plan. */
+  actualDurationMin?: number | null;
+}
+
+/**
+ * What a burn estimate can draw on. `bmr` lets total (gross) calories from
+ * WHOOP be converted to the net extra burn the targets need; `rates` are the
+ * person's own total kcal per minute per activity at moderate intensity,
+ * learned from their WHOOP history.
+ */
+export interface BurnContext {
+  weightKg: number;
+  bmr?: number;
+  rates?: Partial<Record<Activity, { kcalPerMin: number; samples: number }>>;
+}
+
+export type BurnSource = 'actual' | 'manual' | 'history' | 'formula';
+
+export interface BurnDetail {
+  /** Net kcal the session adds on top of resting burn. */
+  net: number;
+  source: BurnSource;
+  /** WHOOP sessions the personal rate came from (source 'history'). */
+  samples?: number;
 }
 
 export interface MacroTargets {
@@ -96,6 +124,8 @@ export const METS: Record<Activity, Record<Intensity, number>> = {
   hiit: { easy: 6.0, moderate: 8.0, hard: 10.0 },
   row: { easy: 4.8, moderate: 7.0, hard: 8.5 },
   sport: { easy: 5.0, moderate: 7.0, hard: 9.0 },
+  padel: { easy: 5.0, moderate: 6.5, hard: 8.0 },
+  tennis: { easy: 5.0, moderate: 7.0, hard: 8.0 },
   walk: { easy: 3.5, moderate: 4.5, hard: 6.0 },
   yoga: { easy: 2.5, moderate: 3.0, hard: 4.0 },
   other: { easy: 4.0, moderate: 6.0, hard: 8.0 },
@@ -108,7 +138,9 @@ export const ACTIVITY_LABELS: Record<Activity, string> = {
   strength: 'Strength',
   hiit: 'HIIT',
   row: 'Row',
-  sport: 'Sport',
+  sport: 'Team sport',
+  padel: 'Padel',
+  tennis: 'Tennis / racket',
   walk: 'Walk / hike',
   yoga: 'Yoga / mobility',
   other: 'Other',
@@ -138,14 +170,40 @@ export function goalAdjustment(goal: Goal, rateKgPerWeek: number): number {
   return goal === 'lose' ? -daily : daily;
 }
 
-/** Net kcal for one session (before the eat-back percentage). */
-export function sessionBurn(session: SessionInput, weightKg: number): number {
+/**
+ * Net kcal for one session (before the eat-back percentage), and where the
+ * number came from. Preference: confirmed WHOOP calories → a hand-typed
+ * estimate → the person's own WHOOP history for that activity → METs.
+ */
+export function sessionBurnDetail(session: SessionInput, ctx: BurnContext | number): BurnDetail {
+  const c: BurnContext = typeof ctx === 'number' ? { weightKg: ctx } : ctx;
+  const minutes = Math.max(0, session.actualDurationMin ?? session.durationMin);
+  // Resting burn during the session is already in BMR, so take it out of totals.
+  const resting = c.bmr ? (c.bmr / 1440) * minutes : 0;
+
+  if (session.actualKcal != null && session.actualKcal >= 0) {
+    return { net: Math.max(0, session.actualKcal - resting), source: 'actual' };
+  }
   if (session.kcalOverride != null && session.kcalOverride >= 0) {
-    return session.kcalOverride;
+    return { net: Math.max(0, session.kcalOverride - resting), source: 'manual' };
   }
   const met = METS[session.activity]?.[session.intensity] ?? METS.other.moderate;
-  const hours = Math.max(0, session.durationMin) / 60;
-  return Math.max(0, (met - 1) * weightKg * hours);
+  const rate = c.rates?.[session.activity];
+  if (rate && rate.samples > 0 && rate.kcalPerMin > 0) {
+    // Personal moderate-intensity rate, scaled by how much harder/easier this intensity is.
+    const scale = met / (METS[session.activity]?.moderate ?? met);
+    return {
+      net: Math.max(0, rate.kcalPerMin * scale * minutes - resting),
+      source: 'history',
+      samples: rate.samples,
+    };
+  }
+  return { net: Math.max(0, (met - 1) * c.weightKg * (minutes / 60)), source: 'formula' };
+}
+
+/** Net kcal for one session (before the eat-back percentage). */
+export function sessionBurn(session: SessionInput, ctx: BurnContext | number): number {
+  return sessionBurnDetail(session, ctx).net;
 }
 
 export function baseTarget(stats: BodyStats, settings: TargetSettings) {
@@ -178,9 +236,11 @@ export function dayTarget(
   stats: BodyStats,
   settings: TargetSettings,
   sessions: SessionInput[],
+  rates?: BurnContext['rates'],
 ): DayTarget {
   const { bmr: b, base, flooredAtBmr } = baseTarget(stats, settings);
-  const rawTraining = sessions.reduce((sum, s) => sum + sessionBurn(s, stats.weightKg), 0);
+  const ctx: BurnContext = { weightKg: stats.weightKg, bmr: b, rates };
+  const rawTraining = sessions.reduce((sum, s) => sum + sessionBurn(s, ctx), 0);
   const training = (rawTraining * settings.trainingEatBackPct) / 100;
   const kcal = base + training;
   const macros = macroTargets(kcal, base, stats.weightKg, settings);

@@ -16,29 +16,22 @@ import {
   Stepper,
   T,
 } from '@/components/ui';
+import { WeightChart } from '@/components/weight-chart';
 import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
-import { copyPreviousWeek, getProfile, isProfileComplete, listFood, listSessions } from '@/lib/api';
+import { computeWeek, loadWeek } from '@/lib/adaptive';
+import { copyPreviousWeek, isProfileComplete } from '@/lib/api';
 import { addDays, dayName, formatWeekRange, parseISODate, startOfWeek, today, weekDates } from '@/lib/dates';
-import { ACTIVITY_LABELS, sumTotals } from '@/lib/nutrition';
-import { targetFor } from '@/lib/targets';
+import { ACTIVITY_LABELS } from '@/lib/nutrition';
 
 export default function WeekScreen() {
   const c = useTheme();
   const [weekStart, setWeekStart] = useState(() => startOfWeek(today()));
   const [copying, setCopying] = useState(false);
   const days = weekDates(weekStart);
-  const weekEnd = days[6];
 
-  const { data, error, loading, reload } = useAsync(async () => {
-    const [profile, sessions, food] = await Promise.all([
-      getProfile(),
-      listSessions(weekStart, weekEnd),
-      listFood(weekStart, weekEnd),
-    ]);
-    return { profile, sessions, food };
-  }, weekStart);
+  const { data, error, loading, reload } = useAsync(() => loadWeek(weekStart), weekStart);
 
   const stepper = (
     <Stepper
@@ -57,21 +50,15 @@ export default function WeekScreen() {
     );
   }
 
-  const { profile, sessions, food } = data;
+  const { profile, sessions } = data;
   const todayStr = today();
-  const rows = days.map((d) => {
-    const daySessions = sessions.filter((s) => s.date === d);
-    const target = targetFor(profile, d, sessions);
-    const eaten = sumTotals(food.filter((f) => f.date === d)).kcal;
-    return { date: d, sessions: daySessions, target, eaten };
-  });
+  const view = computeWeek(data, todayStr);
+  const rows = days.map((d) => ({ date: d, sessions: sessions.filter((s) => s.date === d), day: view?.days[d] }));
 
-  const weekTarget = rows.reduce((s, r) => s + (r.target?.kcal ?? 0), 0);
-  const weekEaten = rows.reduce((s, r) => s + r.eaten, 0);
-  const weekTraining = rows.reduce((s, r) => s + (r.target?.training ?? 0), 0);
-  // Balance only over days that are finished (before today) and have something logged.
-  const closedDays = rows.filter((r) => r.date < todayStr && r.eaten > 0 && r.target);
-  const balance = closedDays.reduce((s, r) => s + (r.eaten - (r.target?.kcal ?? 0)), 0);
+  const week = view?.week;
+  const weekEaten = rows.reduce((s, r) => s + (r.day?.eaten ?? 0), 0);
+  const weekTraining = rows.reduce((s, r) => s + (r.day?.raw.training ?? 0), 0);
+  const projectedDiff = week ? week.projected - week.budget : 0;
 
   async function copyLastWeek() {
     setCopying(true);
@@ -97,32 +84,33 @@ export default function WeekScreen() {
           <T variant="muted">Targets appear once your profile is complete.</T>
           <Button title="Go to profile" onPress={() => router.navigate('/profile')} />
         </Card>
-      ) : (
+      ) : week ? (
         <Card style={{ gap: Spacing.md }}>
           <Row style={{ justifyContent: 'space-between' }}>
             <View>
-              <T variant="small">Week target</T>
-              <T variant="heading">{fmt(weekTarget)} kcal</T>
+              <T variant="small">Week budget</T>
+              <T variant="heading">{fmt(week.budget)} kcal</T>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
-              <T variant="small">Eaten</T>
+              <T variant="small">Eaten so far</T>
               <T variant="heading">{fmt(weekEaten)} kcal</T>
             </View>
           </Row>
-          <ProgressBar value={weekEaten} max={weekTarget} />
-          <Row style={{ justifyContent: 'space-between' }}>
-            <T variant="small" color={c.training}>
-              Training adds {fmt(weekTraining)} kcal this week
-            </T>
-            {closedDays.length > 0 ? (
-              <T variant="small" color={balance > 0 ? c.danger : c.success}>
-                {balance > 0 ? '+' : '−'}
-                {fmt(Math.abs(balance))} vs plan
-              </T>
-            ) : null}
-          </Row>
+          <ProgressBar value={weekEaten} max={week.budget} />
+          <T variant="small" color={c.training}>
+            Training adds {fmt(weekTraining)} kcal this week
+          </T>
+          <T variant="muted" color={Math.abs(projectedDiff) <= 150 ? c.success : projectedDiff > 0 ? c.danger : c.fat}>
+            {Math.abs(projectedDiff) <= 150
+              ? week.carried !== 0
+                ? `On course: ${week.carried > 0 ? 'overs' : 'unders'} so far are balanced across the remaining days.`
+                : 'On course for the week.'
+              : projectedDiff > 0
+                ? `On course to finish ${fmt(projectedDiff)} kcal over. The remaining days are already at their limit.`
+                : `On course to finish ${fmt(-projectedDiff)} kcal under.`}
+          </T>
         </Card>
-      )}
+      ) : null}
 
       <Card style={{ gap: 0, paddingVertical: Spacing.sm }}>
         {rows.map((r, i) => {
@@ -139,22 +127,31 @@ export default function WeekScreen() {
                       </T>
                       {isToday ? <T variant="small" color={c.primary}>today</T> : null}
                     </Row>
-                    {r.target ? (
-                      <T variant="muted">
-                        {r.eaten > 0 ? `${fmt(r.eaten)} / ` : ''}
-                        {fmt(r.target.kcal)} kcal
-                      </T>
+                    {r.day ? (
+                      <Row gap={Spacing.sm}>
+                        {r.day.adjustment !== 0 ? (
+                          <T variant="small" color={r.day.adjustment < 0 ? c.fat : c.success}>
+                            {r.day.adjustment > 0 ? '+' : '−'}
+                            {fmt(Math.abs(r.day.adjustment))}
+                          </T>
+                        ) : null}
+                        <T variant="muted">
+                          {r.day.eaten > 0 ? `${fmt(r.day.eaten)} / ` : ''}
+                          {fmt(r.day.adjusted)} kcal
+                        </T>
+                      </Row>
                     ) : null}
                   </Row>
                 </Pressable>
-                {r.target && r.eaten > 0 ? <ProgressBar value={r.eaten} max={r.target.kcal} height={5} /> : null}
+                {r.day?.status === 'untracked' ? <T variant="small">Nothing logged: not counted in the balance</T> : null}
+                {r.day && r.day.eaten > 0 ? <ProgressBar value={r.day.eaten} max={r.day.adjusted} height={5} /> : null}
                 <Row style={{ flexWrap: 'wrap' }} gap={Spacing.xs}>
                   {r.sessions.map((s) => (
                     <Chip
                       key={s.id}
                       active
                       color={c.training}
-                      label={`${ACTIVITY_LABELS[s.activity]} ${s.duration_min}′`}
+                      label={`${s.actual_kcal != null ? '✓ ' : ''}${ACTIVITY_LABELS[s.activity]} ${s.actual_duration_min ?? s.duration_min}′`}
                       onPress={() => router.push({ pathname: '/training', params: { id: s.id, date: r.date } })}
                     />
                   ))}
@@ -167,6 +164,21 @@ export default function WeekScreen() {
       </Card>
 
       <Button title="Copy last week’s training" variant="secondary" onPress={copyLastWeek} loading={copying} />
+
+      {view && view.trend.length > 0 ? (
+        <Pressable onPress={() => router.push('/weigh-in')} accessibilityRole="button">
+          <Card style={{ gap: Spacing.sm }}>
+            <Row style={{ justifyContent: 'space-between' }}>
+              <T variant="heading">Weight trend</T>
+              <T variant="muted">
+                {view.trend.at(-1)!.trend.toFixed(1)} kg
+                {view.rate != null ? ` · ${view.rate < 0 ? '−' : '+'}${Math.abs(view.rate).toFixed(2)}/wk` : ''}
+              </T>
+            </Row>
+            <WeightChart points={view.trend} height={110} />
+          </Card>
+        </Pressable>
+      ) : null}
     </Screen>
   );
 }

@@ -5,11 +5,15 @@ import { Alert, View } from 'react-native';
 import { Button, Card, Chip, ErrorText, Field, fmt, Loading, Row, Screen, Segmented, Stepper, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { deleteSession, getProfile, getSession, saveSession, type Profile } from '@/lib/api';
+import { deleteSession, getProfile, getSession, listWhoopWorkouts, saveSession, type Profile } from '@/lib/api';
 import { addDays, formatDay, isValidISODate, today } from '@/lib/dates';
-import { ACTIVITY_LABELS, sessionBurn, type Activity, type Intensity } from '@/lib/nutrition';
+import { ACTIVITY_LABELS, type Activity, type Intensity } from '@/lib/nutrition';
+import { sessionKcalDetail } from '@/lib/targets';
+import { burnRates, ratesForModel, type ActivityRate } from '@/lib/whoop';
 
 const ACTIVITIES = Object.keys(ACTIVITY_LABELS) as Activity[];
+
+const parseOptional = (s: string) => (s.trim() === '' ? null : Number(s.replace(',', '.')));
 
 export default function TrainingEditor() {
   const c = useTheme();
@@ -17,18 +21,36 @@ export default function TrainingEditor() {
   const id = params.id;
 
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [whoopRates, setWhoopRates] = useState<ActivityRate[]>([]);
   const [loaded, setLoaded] = useState(!id);
   const [date, setDate] = useState(params.date && isValidISODate(params.date) ? params.date : today());
   const [activity, setActivity] = useState<Activity>('run');
   const [duration, setDuration] = useState('45');
   const [intensity, setIntensity] = useState<Intensity>('moderate');
   const [override, setOverride] = useState('');
+  const [actualKcal, setActualKcal] = useState('');
+  const [actualDuration, setActualDuration] = useState('');
   const [notes, setNotes] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     getProfile().then(setProfile, (e) => setError(String(e)));
+    listWhoopWorkouts().then(
+      (w) =>
+        setWhoopRates(
+          burnRates(
+            w.map((x) => ({
+              activity: x.activity,
+              activityName: x.activity_name,
+              durationMin: x.duration_min,
+              kcal: x.kcal,
+              startedAt: x.started_at,
+            })),
+          ),
+        ),
+      () => {},
+    );
     if (id) {
       getSession(id).then(
         (s) => {
@@ -37,6 +59,8 @@ export default function TrainingEditor() {
           setDuration(String(s.duration_min));
           setIntensity(s.intensity);
           setOverride(s.kcal_override != null ? String(s.kcal_override) : '');
+          setActualKcal(s.actual_kcal != null ? String(s.actual_kcal) : '');
+          setActualDuration(s.actual_duration_min != null ? String(s.actual_duration_min) : '');
           setNotes(s.notes ?? '');
           setLoaded(true);
         },
@@ -46,20 +70,48 @@ export default function TrainingEditor() {
   }, [id]);
 
   const durationMin = Number(duration);
-  const kcalOverride = override.trim() === '' ? null : Number(override);
+  const kcalOverride = parseOptional(override);
+  const actual = parseOptional(actualKcal);
+  const actualMin = parseOptional(actualDuration);
+  const canConfirm = date <= today();
   const invalid =
     !Number.isInteger(durationMin) || durationMin < 1 || durationMin > 1440
       ? 'Duration must be 1–1440 minutes'
-      : kcalOverride != null && (!Number.isFinite(kcalOverride) || kcalOverride < 0)
-        ? 'Calories must be a positive number'
-        : null;
+      : [kcalOverride, actual].some((v) => v != null && (!Number.isFinite(v) || v < 0 || v > 10000))
+        ? 'Calories must be between 0 and 10,000'
+        : actualMin != null && (!Number.isInteger(actualMin) || actualMin < 1 || actualMin > 1440)
+          ? 'Actual duration must be 1–1440 minutes'
+          : null;
 
-  const estimate =
-    profile?.weight_kg && !invalid
-      ? (sessionBurn({ activity, durationMin, intensity, kcalOverride }, profile.weight_kg) *
-          profile.training_eat_back_pct) /
-        100
+  const rate = whoopRates.find((r) => r.activity === activity);
+  const detail =
+    profile && !invalid
+      ? sessionKcalDetail(
+          profile,
+          {
+            id: id ?? 'new',
+            date,
+            activity,
+            duration_min: durationMin,
+            intensity,
+            kcal_override: kcalOverride,
+            actual_kcal: canConfirm ? actual : null,
+            actual_duration_min: canConfirm ? actualMin : null,
+            notes: null,
+          },
+          ratesForModel(whoopRates),
+        )
       : null;
+
+  const sourceText = !detail
+    ? null
+    : detail.source === 'actual'
+      ? 'Confirmed from WHOOP'
+      : detail.source === 'manual'
+        ? 'Your estimate'
+        : detail.source === 'history'
+          ? `Estimated from your ${detail.samples} WHOOP ${rate?.label.toLowerCase() ?? ''} session${detail.samples === 1 ? '' : 's'}`
+          : 'Generic estimate. Import WHOOP history for your own rates';
 
   async function save() {
     if (invalid) return;
@@ -73,6 +125,8 @@ export default function TrainingEditor() {
           duration_min: durationMin,
           intensity,
           kcal_override: kcalOverride == null ? null : Math.round(kcalOverride),
+          actual_kcal: canConfirm && actual != null ? Math.round(actual) : null,
+          actual_duration_min: canConfirm && actualMin != null ? actualMin : null,
           notes: notes.trim() || null,
         },
         id,
@@ -86,7 +140,7 @@ export default function TrainingEditor() {
 
   function remove() {
     if (!id) return;
-    Alert.alert('Delete session?', undefined, [
+    Alert.alert('Delete session?', 'Use this if the session didn’t happen; the day’s target drops back.', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete',
@@ -104,11 +158,7 @@ export default function TrainingEditor() {
   }
 
   if (!loaded) {
-    return (
-      <Screen padTop={false}>
-        {error ? <ErrorText message={error} /> : <Loading />}
-      </Screen>
-    );
+    return <Screen padTop={false}>{error ? <ErrorText message={error} /> : <Loading />}</Screen>;
   }
 
   return (
@@ -122,7 +172,18 @@ export default function TrainingEditor() {
         <T variant="heading">Activity</T>
         <Row style={{ flexWrap: 'wrap' }}>
           {ACTIVITIES.map((a) => (
-            <Chip key={a} label={ACTIVITY_LABELS[a]} active={activity === a} color={c.training} onPress={() => setActivity(a)} />
+            <Chip
+              key={a}
+              label={ACTIVITY_LABELS[a]}
+              active={activity === a}
+              color={c.training}
+              onPress={() => {
+                setActivity(a);
+                // Suggest the person's usual session length for this activity on new sessions.
+                const r = whoopRates.find((x) => x.activity === a);
+                if (!id && r) setDuration(String(r.typicalMin));
+              }}
+            />
           ))}
         </Row>
         <Field label="Duration (minutes)" value={duration} onChangeText={setDuration} keyboardType="number-pad" />
@@ -138,27 +199,60 @@ export default function TrainingEditor() {
             ]}
           />
         </View>
+        <Field label="Notes (optional)" value={notes} onChangeText={setNotes} placeholder="e.g. doubles, 2 sets" />
+      </Card>
+
+      {canConfirm ? (
+        <Card style={{ gap: Spacing.md }}>
+          <T variant="heading">How did it go?</T>
+          <T variant="small">
+            After the session, enter what WHOOP recorded. The day’s target and the rest of the week re-balance on the
+            real number. Re-importing your WHOOP export fills this in automatically.
+          </T>
+          <Row gap={Spacing.md}>
+            <Field
+              style={{ flex: 1 }}
+              label="WHOOP calories"
+              placeholder="e.g. 820"
+              value={actualKcal}
+              onChangeText={setActualKcal}
+              keyboardType="number-pad"
+            />
+            <Field
+              style={{ flex: 1 }}
+              label="Actual minutes"
+              placeholder={duration}
+              value={actualDuration}
+              onChangeText={setActualDuration}
+              keyboardType="number-pad"
+            />
+          </Row>
+        </Card>
+      ) : null}
+
+      {detail ? (
+        <Card>
+          <T variant="small">Adds to {formatDay(date)}’s target</T>
+          <T variant="big" color={c.training}>
+            +{fmt(detail.added)} kcal
+          </T>
+          <T variant="small">{sourceText}</T>
+          <T variant="small">
+            WHOOP calories include your resting burn for that time, which your base target already covers, so that part
+            is taken off.
+            {profile && profile.training_eat_back_pct !== 100 ? ` Includes your ${profile.training_eat_back_pct}% eat-back setting.` : ''}
+          </T>
+        </Card>
+      ) : null}
+
+      {detail?.source !== 'actual' ? (
         <Field
-          label="Calories burned (optional)"
-          placeholder="e.g. active kcal from your watch"
+          label="Override the estimate (optional)"
+          placeholder="Total calories you expect, as WHOOP would show them"
           value={override}
           onChangeText={setOverride}
           keyboardType="number-pad"
-          hint="Leave blank to estimate from activity, duration and intensity."
         />
-        <Field label="Notes (optional)" value={notes} onChangeText={setNotes} placeholder="e.g. 6×800m intervals" />
-      </Card>
-
-      {estimate != null ? (
-        <Card>
-          <T variant="small">Adds to this day’s target</T>
-          <T variant="big" color={c.training}>
-            +{fmt(estimate)} kcal
-          </T>
-          {profile && profile.training_eat_back_pct !== 100 ? (
-            <T variant="small">Includes your {profile.training_eat_back_pct}% eat-back setting.</T>
-          ) : null}
-        </Card>
       ) : null}
 
       <ErrorText message={invalid ?? error} />

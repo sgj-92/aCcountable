@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, Switch, TextInput, View } from 'react-native';
 
@@ -376,6 +377,16 @@ export default function ProfileScreen() {
             ) : null}
           </>
         ) : null}
+      </Card>
+
+      <Card style={{ gap: Spacing.sm }}>
+        <T variant="heading">Training data</T>
+        <T variant="small">
+          Import your WHOOP export so session estimates use your own burn rates, and planned sessions get confirmed
+          automatically.
+        </T>
+        <Button title="WHOOP history" variant="secondary" onPress={() => router.push('/whoop-import')} />
+        <Button title="Weight & trend" variant="secondary" onPress={() => router.push('/weigh-in')} />
       </Card>
 
       <Card style={{ gap: Spacing.md }}>
