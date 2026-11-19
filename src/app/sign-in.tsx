@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { View } from 'react-native';
 
 import { Button, Card, ErrorText, Field, Screen, Segmented, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
@@ -36,7 +36,7 @@ export default function SignIn() {
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <>
       <Screen>
         <View style={{ marginTop: Spacing.xxl * 2, marginBottom: Spacing.xl, gap: Spacing.sm }}>
           <T variant="title" style={{ fontSize: 36 }}>
@@ -91,6 +91,6 @@ export default function SignIn() {
           />
         </Card>
       </Screen>
-    </KeyboardAvoidingView>
+    </>
   );
 }

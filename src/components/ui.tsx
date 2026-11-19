@@ -44,6 +44,9 @@ export function Screen({
       // tab's scroll view as well, so that tab started lower than the others.
       contentInsetAdjustmentBehavior="never"
       automaticallyAdjustContentInsets={false}
+      // Make room for the keyboard and keep the focused text box above it (iOS); drag down to dismiss.
+      automaticallyAdjustKeyboardInsets
+      keyboardDismissMode="interactive"
       refreshControl={refreshControl}>
       {children}
     </ScrollView>

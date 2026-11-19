@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, TextInput, View } from 'react-native';
 
 import { Button, Card, Chip, ErrorText, Field, fmt, Row, Screen, Segmented, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
@@ -11,7 +11,7 @@ import { MealPicker } from '@/components/meal-picker';
 import { addFood, type Meal, type NewFoodEntry } from '@/lib/api';
 import { SLOT_KEYS } from '@/lib/meals';
 import { isValidISODate, today } from '@/lib/dates';
-import { analyzeFoodPhoto, type ScanResult } from '@/lib/scan';
+import { analyzeFood, prepareImage, type ScanResult, type ScanTurn } from '@/lib/scan';
 
 interface EditableItem {
   include: boolean;
@@ -63,6 +63,11 @@ export default function ScanScreen() {
   const [note, setNote] = useState('');
   const [analysing, setAnalysing] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
+  // The photo as sent to the AI (prepared once, reused for follow-ups), and the conversation so far.
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [turns, setTurns] = useState<ScanTurn[]>([]);
+  const [reply, setReply] = useState('');
+  const [refining, setRefining] = useState(false);
   const [items, setItems] = useState<EditableItem[]>([]);
   const [meal, setMeal] = useState<Meal>(
     (SLOT_KEYS as readonly string[]).includes(params.meal ?? '') ? (params.meal as Meal) : 'snack',
@@ -90,6 +95,9 @@ export default function ScanScreen() {
       setPhoto(res.assets[0].uri);
       setResult(null);
       setItems([]);
+      setImageBase64(null);
+      setTurns([]);
+      setReply('');
     }
   }
 
@@ -98,7 +106,9 @@ export default function ScanScreen() {
     setAnalysing(true);
     setError(null);
     try {
-      const r = await analyzeFoodPhoto(photo, note);
+      const b64 = imageBase64 ?? (await prepareImage(photo));
+      setImageBase64(b64);
+      const r = await analyzeFood(b64, note);
       if (!r.is_food || r.items.length === 0) {
         setError("That doesn't look like food. Try another photo, or add the meal manually.");
         return;
@@ -110,6 +120,47 @@ export default function ScanScreen() {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setAnalysing(false);
+    }
+  }
+
+  /** The estimate as it stands now, including any numbers edited by hand. */
+  function currentEstimate(): ScanResult {
+    return {
+      ...result!,
+      items: items
+        .filter((i) => i.include && i.name.trim())
+        .map((i) => ({
+          name: i.name.trim(),
+          portion: i.portion,
+          grams: i.grams,
+          kcal: n(i.kcal),
+          protein_g: n(i.protein),
+          carbs_g: n(i.carbs),
+          fat_g: n(i.fat),
+          confidence: i.confidence,
+        })),
+    };
+  }
+
+  async function refine() {
+    if (!result || !imageBase64 || !reply.trim()) return;
+    setRefining(true);
+    setError(null);
+    const next = [...turns, { previous: currentEstimate(), reply: reply.trim() }];
+    try {
+      const r = await analyzeFood(imageBase64, note, next);
+      if (r.items.length === 0) {
+        setError('The updated estimate came back empty. Try rephrasing, or edit the items directly.');
+        return;
+      }
+      setTurns(next);
+      setResult(r);
+      setItems(toEditable(r));
+      setReply('');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setRefining(false);
     }
   }
 
@@ -229,10 +280,40 @@ export default function ScanScreen() {
 
       {result ? (
         <>
-          <Card>
+          <Card style={{ gap: Spacing.sm }}>
             <T variant="heading">{result.meal_name}</T>
             {result.notes ? <T variant="muted">{result.notes}</T> : null}
-            <T variant="small">Check the estimates and adjust anything that looks off before saving.</T>
+            {turns.map((t, i) => (
+              <T key={i} variant="small" color={c.primary}>
+                You: {t.reply}
+              </T>
+            ))}
+            <T variant="small">Got something wrong? Tell it, and it’ll update the estimate. Or edit the items below.</T>
+            <TextInput
+              value={reply}
+              onChangeText={setReply}
+              placeholder="e.g. the 288 g was raw weight, no butter used"
+              placeholderTextColor={c.textMuted}
+              multiline
+              accessibilityLabel="Reply to the estimate"
+              style={{
+                minHeight: 64,
+                backgroundColor: c.input,
+                color: c.text,
+                borderRadius: Radius.sm,
+                padding: Spacing.md,
+                fontSize: 16,
+                textAlignVertical: 'top',
+              }}
+            />
+            {refining ? (
+              <Row style={{ justifyContent: 'center', paddingVertical: Spacing.sm }} gap={Spacing.md}>
+                <ActivityIndicator color={c.primary} />
+                <T variant="muted">Updating the estimate…</T>
+              </Row>
+            ) : (
+              <Button title="Update estimate" variant="secondary" onPress={refine} disabled={!reply.trim()} />
+            )}
           </Card>
 
           {items.map((it, idx) => (

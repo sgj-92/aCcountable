@@ -23,6 +23,11 @@ const RequestSchema = z.object({
   imageBase64: z.string().min(100).max(MAX_IMAGE_BASE64_CHARS),
   mediaType: z.enum(['image/jpeg', 'image/png', 'image/webp']).default('image/jpeg'),
   note: z.string().max(500).optional(),
+  // Follow-ups: each earlier estimate and the person's reply to it, oldest first.
+  turns: z
+    .array(z.object({ previous: z.unknown(), reply: z.string().trim().min(1).max(1000) }))
+    .max(6)
+    .optional(),
 });
 
 // JSON Schema handed to Claude's structured outputs, so the reply is always parseable.
@@ -90,7 +95,8 @@ How to estimate:
 - If packaging with a nutrition label is visible, use the label values.
 - Confidence: "high" when the food and portion are clear, "medium" for typical uncertainty, "low" when the item or amount is largely guessed.
 - If the user adds a note (e.g. weights, ingredients, "I ate half"), treat it as more reliable than the photo.
-- If the image does not contain food or drink, set is_food to false and return an empty items list.`;
+- If the image does not contain food or drink, set is_food to false and return an empty items list.
+- The person may reply to correct an estimate ("the 288 g was raw weight", "no butter", "that's cheese, not egg"). Their reply is more reliable than the photo or your earlier assumptions: apply it, keep everything they didn't dispute, and return the complete updated list (not just the changes). Use notes to say briefly what you changed.`;
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -141,6 +147,15 @@ Deno.serve(async (req) => {
     ? `Estimate the nutrition of this meal. Note from me: ${body.note.trim()}`
     : 'Estimate the nutrition of this meal.';
 
+  // The conversation so far: the photo, then each earlier estimate and the reply to it.
+  const followUps: Anthropic.Beta.BetaMessageParam[] = [];
+  for (const t of body.turns ?? []) {
+    const prev = ResultSchema.safeParse(t.previous);
+    if (!prev.success) return json({ error: 'Invalid earlier estimate in follow-up' }, 400);
+    followUps.push({ role: 'assistant', content: [{ type: 'text', text: JSON.stringify(prev.data) }] });
+    followUps.push({ role: 'user', content: [{ type: 'text', text: t.reply }] });
+  }
+
   let response: Anthropic.Beta.BetaMessage;
   try {
     response = await client.beta.messages.create({
@@ -164,6 +179,7 @@ Deno.serve(async (req) => {
             { type: 'text', text: userText },
           ],
         },
+        ...followUps,
       ],
     });
   } catch (err) {

@@ -33,10 +33,24 @@ export async function prepareImage(uri: string): Promise<string> {
   return out.base64;
 }
 
-export async function analyzeFoodPhoto(uri: string, note?: string): Promise<ScanResult> {
-  const imageBase64 = await prepareImage(uri);
+/** One round of feedback: the estimate the person replied to, and their reply. */
+export interface ScanTurn {
+  previous: ScanResult;
+  reply: string;
+}
+
+/**
+ * Estimates a meal from an already-prepared photo. With `turns`, the AI sees
+ * its earlier estimates and the person's replies, and returns an updated one.
+ */
+export async function analyzeFood(imageBase64: string, note?: string, turns: ScanTurn[] = []): Promise<ScanResult> {
   const { data, error } = await supabase.functions.invoke<ScanResult>('analyze-food', {
-    body: { imageBase64, mediaType: 'image/jpeg', note: note?.trim() || undefined },
+    body: {
+      imageBase64,
+      mediaType: 'image/jpeg',
+      note: note?.trim() || undefined,
+      turns: turns.length ? turns : undefined,
+    },
   });
   if (error) {
     // Surface the function's own error message when it sent one.
@@ -53,4 +67,8 @@ export async function analyzeFoodPhoto(uri: string, note?: string): Promise<Scan
   }
   if (!data) throw new Error('Photo analysis returned nothing');
   return data;
+}
+
+export async function analyzeFoodPhoto(uri: string, note?: string): Promise<ScanResult> {
+  return analyzeFood(await prepareImage(uri), note);
 }
