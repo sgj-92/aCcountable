@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Week tab · states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1835px; height: 1160px; box-sizing: border-box; padding: 48px; background: {{c.board}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; gap: 24px">
+
+<header style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">TAB · WEEK</span>
+<h1 style="margin: 0; font-family: Archivo, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -0.5px">Week</h1>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{themeName}} · The week’s budget, how each day balances it, and whether the weight is following</span>
+</header>
+
+<div style="display: flex; gap: 40px; align-items: flex-start">
+
+<!-- 1 THIS WEEK -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="padding: 62px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.4px">Week</h2>
+<div style="display: flex; align-items: center; height: 44px; border-radius: 22px; background: {{c.raised}}">
+<button aria-label="Previous week" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"></path></svg></button>
+<span style="flex: 1; text-align: center; font-size: 15px; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums">16 – 22 Nov <span style="font-weight: 500; color: {{c.text2}}">· this week</span></span>
+<button aria-label="Next week" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; color: {{c.text3}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg></button>
+</div>
+
+<section aria-label="Week summary" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, sans-serif; font-size: 22px; line-height: 26px; font-weight: 800; font-variant-numeric: tabular-nums">14,990</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">week budget</span></div>
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, sans-serif; font-size: 22px; line-height: 26px; font-weight: 800; font-variant-numeric: tabular-nums">7,707</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">eaten so far</span></div>
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, sans-serif; font-size: 22px; line-height: 26px; font-weight: 800; font-variant-numeric: tabular-nums; color: {{c.training}}">+1,122</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">training adds</span></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px">
+<sc-for list="{{strip}}" as="d" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 5px 0 4px; border-radius: 10px; background: {{d.colBg}}">
+<div style="position: relative; width: 10px; height: 36px; border-radius: 5px; background: {{d.trackBg}}; border: {{d.trackBorder}}; box-sizing: border-box; overflow: hidden">
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: {{d.fillH}}; background: {{d.fillCol}}"></div>
+<div style="position: absolute; left: 0; right: 0; bottom: {{d.tickB}}; height: 2px; background: {{d.tickCol}}"></div>
+</div>
+<span style="font-size: 11px; line-height: 13px; font-weight: 700; color: {{d.labelCol}}">{{d.d}}</span>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 14px; background: {{c.warnBg}}">
+<span style="flex: none; display: flex; color: {{c.warn}}; margin-top: 1px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Warning"><path d="M12 4l9 16H3z"></path><path d="M12 10v4.5M12 17.2v.3"></path></svg></span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; line-height: 20px; font-weight: 600">On course to finish 481 kcal over</span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Fri–Sun already drop 160 a day to absorb it.</span>
+</div>
+</div>
+</section>
+
+<section aria-label="Days" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 6px; display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{rows1}}" as="d" hint-placeholder-count="4">
+<a href="#" style="display: flex; gap: 12px; padding: 12px 10px; border-radius: 18px; background: {{d.rowBg}}; color: {{d.c.text}}; text-decoration: none">
+<div style="flex: none; width: 46px; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 15px; line-height: 20px; font-weight: 700; color: {{d.labelCol}}">{{d.day}}</span>
+<span style="font-size: 12px; line-height: 16px; color: {{d.c.text2}}; font-variant-numeric: tabular-nums">{{d.date}}</span>
+</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-family: Archivo, sans-serif; font-size: 15px; line-height: 20px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{d.valCol}}">{{d.val}}</span>
+<sc-if value="{{d.hasAdj}}" hint-placeholder-val="{{true}}"><span style="height: 22px; padding: 0 8px; border-radius: 11px; background: {{d.adjBg}}; color: {{d.c.text2}}; display: flex; align-items: center; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums">{{d.adj}}</span></sc-if>
+<span style="flex: 1"></span>
+<span style="font-family: Archivo, sans-serif; font-size: 13px; line-height: 18px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{d.diffCol}}">{{d.diff}}</span>
+</div>
+<div style="height: 4px; border-radius: 2px; background: {{d.trackBg}}; border: {{d.trackBorder}}; box-sizing: border-box; overflow: hidden"><div style="height: 100%; width: {{d.barW}}; background: {{d.barCol}}"></div></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{d.chips}}" as="ch" hint-placeholder-count="1">
+<span style="height: 26px; padding: 0 10px; border-radius: 13px; background: {{ch.bg}}; border: {{ch.border}}; box-sizing: border-box; color: {{ch.col}}; display: flex; align-items: center; font-size: 12px; font-weight: 600">{{ch.label}}</span>
+</sc-for>
+</div>
+</div>
+</a>
+</sc-for>
+</section>
+</div>
+<nav aria-label="Tab bar (native)" style="position: absolute; left: 20px; right: 20px; top: 770px; height: 62px; box-sizing: border-box; border-radius: 31px; background: {{c.tabBar}}; border: 1px solid {{c.tabBorder}}; box-shadow: {{c.floatShadow}}; display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.66 6.34A8 8 0 1 0 17.66 17.66"></path></svg>Today</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>Plan</a>
+<a href="#" aria-current="page" style="flex: 1; height: 52px; border-radius: 26px; background: {{c.tabPill}}; color: {{c.tabActive}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.6"></circle><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5"></path></svg>Profile</a>
+</nav>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">1 · This week</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Budget, projection, then a row per day. Today is raised.</span>
+</div>
+
+<!-- 2 SCROLLED -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 0; right: 0; top: 0; height: 98px; z-index: 2; background: {{c.bg}}; border-bottom: 1px solid {{c.line}}; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; box-sizing: border-box">
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">Week</span>
+</div>
+<div style="padding: 70px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<section aria-label="Days, continued" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 6px; display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{rows2}}" as="d" hint-placeholder-count="4">
+<a href="#" style="display: flex; gap: 12px; padding: 12px 10px; border-radius: 18px; background: {{d.rowBg}}; color: {{d.c.text}}; text-decoration: none">
+<div style="flex: none; width: 46px; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 15px; line-height: 20px; font-weight: 700; color: {{d.labelCol}}">{{d.day}}</span>
+<span style="font-size: 12px; line-height: 16px; color: {{d.c.text2}}; font-variant-numeric: tabular-nums">{{d.date}}</span>
+</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-family: Archivo, sans-serif; font-size: 15px; line-height: 20px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{d.valCol}}">{{d.val}}</span>
+<sc-if value="{{d.hasAdj}}" hint-placeholder-val="{{true}}"><span style="height: 22px; padding: 0 8px; border-radius: 11px; background: {{d.adjBg}}; color: {{d.c.text2}}; display: flex; align-items: center; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums">{{d.adj}}</span></sc-if>
+<span style="flex: 1"></span>
+<span style="font-family: Archivo, sans-serif; font-size: 13px; line-height: 18px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{d.diffCol}}">{{d.diff}}</span>
+</div>
+<div style="height: 4px; border-radius: 2px; background: {{d.trackBg}}; border: {{d.trackBorder}}; box-sizing: border-box; overflow: hidden"><div style="height: 100%; width: {{d.barW}}; background: {{d.barCol}}"></div></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{d.chips}}" as="ch" hint-placeholder-count="1">
+<span style="height: 26px; padding: 0 10px; border-radius: 13px; background: {{ch.bg}}; border: {{ch.border}}; box-sizing: border-box; color: {{ch.col}}; display: flex; align-items: center; font-size: 12px; font-weight: 600">{{ch.label}}</span>
+</sc-for>
+</div>
+</div>
+</a>
+</sc-for>
+</section>
+
+<button style="height: 44px; border-radius: 14px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg>Copy last week’s training</button>
+
+<section aria-label="Weight trend" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<h3 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">Weight trend</h3>
+<a href="#" style="padding: 10px 0 10px 12px; font-size: 15px; font-weight: 600; color: {{c.accentText}}; text-decoration: none">Log</a>
+</div>
+<div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap">
+<span style="font-family: Archivo, sans-serif; font-size: 28px; line-height: 32px; font-weight: 800; font-variant-numeric: tabular-nums">98.3<span style="font-family: -apple-system, Inter, sans-serif; font-size: 15px; font-weight: 500; color: {{c.text2}}"> kg</span></span>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600; color: {{c.warn}}; font-variant-numeric: tabular-nums">−0.21 kg/week</span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">goal −1.0</span>
+</div>
+<svg width="329" height="166" viewBox="0 0 329 166" role="img" aria-label="Weight trend over 4 weeks: 99.1 to 98.3 kg, slower than the 1 kg a week goal line">
+<path d="{{chart.grid}}" fill="none" stroke="{{c.line}}" stroke-width="1"></path>
+<text x="0" y="{{chart.y99}}" font-size="10" fill="{{c.text3}}" font-family="Archivo, sans-serif">99</text>
+<text x="0" y="{{chart.y98}}" font-size="10" fill="{{c.text3}}" font-family="Archivo, sans-serif">98</text>
+<text x="0" y="{{chart.y97}}" font-size="10" fill="{{c.text3}}" font-family="Archivo, sans-serif">97</text>
+<path d="{{chart.goal}}" fill="none" stroke="{{c.text3}}" stroke-width="1.5" stroke-dasharray="4 4"></path>
+<path d="{{chart.dots}}" fill="{{c.text3}}"></path>
+<path d="{{chart.trend}}" fill="none" stroke="{{c.accentLine}}" stroke-width="2.5" stroke-linecap="round"></path>
+<circle cx="{{chart.lastX}}" cy="{{chart.lastY}}" r="4.5" fill="{{c.accentLine}}"></circle>
+<text x="30" y="160" font-size="10" fill="{{c.text3}}">23 Oct</text>
+<text x="{{chart.x7}}" y="160" font-size="10" fill="{{c.text3}}" text-anchor="middle">30 Oct</text>
+<text x="{{chart.x14}}" y="160" font-size="10" fill="{{c.text3}}" text-anchor="middle">6 Nov</text>
+<text x="{{chart.x21}}" y="160" font-size="10" fill="{{c.text3}}" text-anchor="middle">13 Nov</text>
+<text x="321" y="160" font-size="10" fill="{{c.text3}}" text-anchor="end">19 Nov</text>
+</svg>
+<div style="display: flex; gap: 14px; font-size: 12px; line-height: 16px; color: {{c.text2}}">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{c.text3}}"></span>weigh-in</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 3px; border-radius: 2px; background: {{c.accentLine}}"></span>trend</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 0; border-top: 2px dashed {{c.text3}}"></span>1 kg/week goal</span>
+</div>
+</section>
+</div>
+<nav aria-label="Tab bar (native)" style="position: absolute; left: 20px; right: 20px; top: 770px; height: 62px; box-sizing: border-box; border-radius: 31px; background: {{c.tabBar}}; border: 1px solid {{c.tabBorder}}; box-shadow: {{c.floatShadow}}; display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.66 6.34A8 8 0 1 0 17.66 17.66"></path></svg>Today</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>Plan</a>
+<a href="#" aria-current="page" style="flex: 1; height: 52px; border-radius: 26px; background: {{c.tabPill}}; color: {{c.tabActive}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.6"></circle><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5"></path></svg>Profile</a>
+</nav>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">2 · Scrolled</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Future days show targets and planned sessions, then the weight trend.</span>
+</div>
+
+<!-- 3 PAST WEEK -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="padding: 62px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between">
+<h2 style="margin: 0; font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.4px">Week</h2>
+<button style="height: 32px; padding: 0 12px; margin-bottom: 4px; border-radius: 16px; border: 0; background: {{c.goodBg}}; color: {{c.accentText}}; font: inherit; font-size: 13px; font-weight: 700">↩ Back to this week</button>
+</div>
+<div style="display: flex; align-items: center; height: 44px; border-radius: 22px; background: {{c.raised}}">
+<button aria-label="Previous week" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"></path></svg></button>
+<span style="flex: 1; text-align: center; font-size: 15px; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums">9 – 15 Nov</span>
+<button aria-label="Next week" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg></button>
+</div>
+<section aria-label="Week summary" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, sans-serif; font-size: 22px; line-height: 26px; font-weight: 800; font-variant-numeric: tabular-nums">12,690</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">budget · 6 days</span></div>
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, sans-serif; font-size: 22px; line-height: 26px; font-weight: 800; font-variant-numeric: tabular-nums">12,478</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">eaten</span></div>
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, sans-serif; font-size: 22px; line-height: 26px; font-weight: 800; font-variant-numeric: tabular-nums; color: {{c.training}}">+1,540</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">training added</span></div>
+</div>
+<div style="display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 14px; background: {{c.goodBg}}">
+<span style="flex: none; display: flex; color: {{c.good}}; margin-top: 1px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Good"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.3l2.8 2.8L16.2 9.6"></path></svg></span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; line-height: 20px; font-weight: 600">Finished 212 kcal under</span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Tue wasn’t logged, so it isn’t counted either way.</span>
+</div>
+</div>
+</section>
+<section aria-label="Days" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 6px; display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{rows3}}" as="d" hint-placeholder-count="5">
+<a href="#" style="display: flex; gap: 12px; padding: 12px 10px; border-radius: 18px; background: {{d.rowBg}}; color: {{d.c.text}}; text-decoration: none">
+<div style="flex: none; width: 46px; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 15px; line-height: 20px; font-weight: 700; color: {{d.labelCol}}">{{d.day}}</span>
+<span style="font-size: 12px; line-height: 16px; color: {{d.c.text2}}; font-variant-numeric: tabular-nums">{{d.date}}</span>
+</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-family: Archivo, sans-serif; font-size: 15px; line-height: 20px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{d.valCol}}">{{d.val}}</span>
+<sc-if value="{{d.hasAdj}}" hint-placeholder-val="{{false}}"><span style="height: 22px; padding: 0 8px; border-radius: 11px; background: {{d.adjBg}}; color: {{d.c.text2}}; display: flex; align-items: center; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums">{{d.adj}}</span></sc-if>
+<span style="flex: 1"></span>
+<span style="font-family: Archivo, sans-serif; font-size: 13px; line-height: 18px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{d.diffCol}}">{{d.diff}}</span>
+</div>
+<div style="height: 4px; border-radius: 2px; background: {{d.trackBg}}; border: {{d.trackBorder}}; box-sizing: border-box; overflow: hidden"><div style="height: 100%; width: {{d.barW}}; background: {{d.barCol}}"></div></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{d.chips}}" as="ch" hint-placeholder-count="0">
+<span style="height: 26px; padding: 0 10px; border-radius: 13px; background: {{ch.bg}}; border: {{ch.border}}; box-sizing: border-box; color: {{ch.col}}; display: flex; align-items: center; font-size: 12px; font-weight: 600">{{ch.label}}</span>
+</sc-for>
+</div>
+</div>
+</a>
+</sc-for>
+</section>
+</div>
+<nav aria-label="Tab bar (native)" style="position: absolute; left: 20px; right: 20px; top: 770px; height: 62px; box-sizing: border-box; border-radius: 31px; background: {{c.tabBar}}; border: 1px solid {{c.tabBorder}}; box-shadow: {{c.floatShadow}}; display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.66 6.34A8 8 0 1 0 17.66 17.66"></path></svg>Today</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>Plan</a>
+<a href="#" aria-current="page" style="flex: 1; height: 52px; border-radius: 26px; background: {{c.tabPill}}; color: {{c.tabActive}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.6"></circle><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5"></path></svg>Profile</a>
+</nav>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">3 · Past week, one day untracked</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Untracked days drop out of the budget instead of counting as zero.</span>
+</div>
+
+<aside aria-label="Spec" style="width: 400px; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 20px 24px; box-sizing: border-box; max-height: 900px; overflow: hidden; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 8px; font-size: 17px; line-height: 22px; font-weight: 700">Spec</h2>
+<sc-for list="{{spec}}" as="s" hint-placeholder-count="16">
+<div style="padding: 8px 0; border-top: 1px solid {{s.c.line}}; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">{{s.k}}</span>
+<span style="font-size: 12px; line-height: 17px; color: {{s.c.text2}}">{{s.d}}</span>
+</div>
+</sc-for>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1835,"height":1160}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257', board: '#050604', phoneEdge: '#2A2D27', behind: '#000000', peek: '#1B1D18', keyboard: '#2C2D2A', pressed: '#2C2F29', onAlert: '#1A0705' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194', board: '#E4E6DE', phoneEdge: '#CFD2C7', behind: '#B9BCB2', peek: '#D9DBD3', keyboard: '#D3D5CC', pressed: '#DFE2D8', onAlert: '#FFFFFF' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const c = this.palette()[theme];
+    const f = (n) => Math.round(Math.abs(n)).toLocaleString('en-GB');
+    const chip = {
+      done: (l) => ({ label: '✓ ' + l, bg: c.trainingBg, col: c.training, border: '0' }),
+      est: (l) => ({ label: '≈ ' + l + ' · confirm', bg: c.trainingBg, col: c.training, border: '0' }),
+      planned: (l) => ({ label: l + ' planned', bg: 'transparent', col: c.training, border: '1.5px dashed ' + c.training }),
+      add: () => ({ label: '+ Session', bg: 'transparent', col: c.text2, border: '1.5px dashed ' + c.text3 })
+    };
+    const row = (day, date, e, t, adj, chips, o) => {
+      o = o || {};
+      const today = !!o.today, future = !!o.future, untracked = !!o.untracked;
+      const over = e > t;
+      let val, diff, diffCol, valCol;
+      if (untracked) { val = 'Nothing logged'; diff = 'not counted'; diffCol = c.text3; valCol = c.text3; }
+      else if (future) { val = 'target ' + f(t); diff = ''; diffCol = c.text2; valCol = c.text2; }
+      else { val = f(e) + ' / ' + f(t); diff = today ? f(t - e) + ' left' : (over ? '+' + f(e - t) : '−' + f(t - e)); diffCol = over ? c.alert : c.text2; valCol = c.text; }
+      return {
+        day, date, val, valCol, diff, diffCol, adj, hasAdj: !!adj, adjBg: today ? c.surface : c.raised,
+        barW: (future || untracked) ? '0%' : Math.min(100, e / t * 100).toFixed(1) + '%',
+        barCol: over ? c.alert : c.accentLine,
+        trackBg: (future || untracked) ? 'transparent' : c.track,
+        trackBorder: (future || untracked) ? '1px dashed ' + c.text3 : '0',
+        rowBg: today ? c.raised : 'transparent', labelCol: today ? c.accentText : c.text,
+        chips, c
+      };
+    };
+    const rows1 = [
+      row('Mon', '16 Nov', 2480, 2250, '', [chip.done('Padel 90′')]),
+      row('Tue', '17 Nov', 1997, 2100, '−90', [chip.add()]),
+      row('Wed', '18 Nov', 2710, 2356, '−40', [chip.done('Gym 60′')]),
+      row('Thu', '19 Nov', 520, 2301, '−172', [chip.est('Padel 90′')], { today: true })
+    ];
+    const rows2 = [
+      row('Wed', '18 Nov', 2710, 2356, '−40', [chip.done('Gym 60′')]),
+      row('Thu', '19 Nov', 520, 2301, '−172', [chip.est('Padel 90′')], { today: true }),
+      row('Fri', '20 Nov', 0, 1830, '−160', [chip.add()], { future: true }),
+      row('Sat', '21 Nov', 0, 2410, '−160', [chip.planned('Run 45′')], { future: true }),
+      row('Sun', '22 Nov', 0, 1743, '−160', [chip.add()], { future: true })
+    ];
+    const rows3 = [
+      row('Mon', '9 Nov', 2140, 2120, '', []),
+      row('Tue', '10 Nov', 0, 2180, '', [], { untracked: true }),
+      row('Wed', '11 Nov', 2380, 2410, '', [chip.done('Padel 90′')]),
+      row('Thu', '12 Nov', 1960, 2050, '', []),
+      row('Fri', '13 Nov', 2005, 2080, '', [chip.done('Gym 60′')]),
+      row('Sat', '14 Nov', 2190, 2230, '', [])
+    ];
+    const SCALE = 2900, H = 36;
+    const strip = [
+      { d: 'M', e: 2480, t: 2250, k: 'past' }, { d: 'T', e: 1997, t: 2100, k: 'past' }, { d: 'W', e: 2710, t: 2356, k: 'past' },
+      { d: 'T', e: 520, t: 2301, k: 'today' }, { d: 'F', e: 0, t: 1830, k: 'future' }, { d: 'S', e: 0, t: 2410, k: 'future' }, { d: 'S', e: 0, t: 1743, k: 'future' }
+    ].map((x) => {
+      const isToday = x.k === 'today', future = x.k === 'future', dayOver = x.e > x.t;
+      return {
+        d: x.d,
+        fillH: Math.round(Math.min(x.e, SCALE) / SCALE * H) + 'px',
+        tickB: Math.round(x.t / SCALE * H) + 'px',
+        fillCol: dayOver ? c.alert : (isToday ? c.accentLine : c.pastFill),
+        tickCol: future ? c.text3 : c.text,
+        trackBg: future ? 'transparent' : c.track,
+        trackBorder: future ? '1.5px dashed ' + c.text3 : '0',
+        colBg: isToday ? c.raised : 'transparent',
+        labelCol: isToday ? c.accentText : c.text2
+      };
+    });
+    const X0 = 30, X1 = 321, Y0 = 8, YH = 132, KMAX = 99.8, KMIN = 96.8;
+    const X = (d) => X0 + d / 27 * (X1 - X0);
+    const Y = (kg) => Y0 + (KMAX - kg) / (KMAX - KMIN) * YH;
+    const r1 = (n) => n.toFixed(1);
+    const weigh = [[0, 99.4], [3, 98.9], [7, 99.2], [10, 98.7], [14, 99.0], [17, 98.5], [21, 98.8], [24, 98.2], [27, 98.3]];
+    const dots = weigh.slice(0, -1).map((p) => { const x = X(p[0]), y = Y(p[1]); return 'M' + r1(x - 3.5) + ' ' + r1(y) + 'a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0'; }).join('');
+    const tp = [[0, 99.12], [7, 98.95], [14, 98.73], [21, 98.52], [27, 98.33]].map((p) => [X(p[0]), Y(p[1])]);
+    let trend = 'M' + r1(tp[0][0]) + ' ' + r1(tp[0][1]);
+    for (let i = 0; i < tp.length - 1; i++) {
+      const p0 = tp[i - 1] || tp[i], p1 = tp[i], p2 = tp[i + 1], p3 = tp[i + 2] || tp[i + 1];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      trend += 'C' + r1(c1[0]) + ' ' + r1(c1[1]) + ' ' + r1(c2[0]) + ' ' + r1(c2[1]) + ' ' + r1(p2[0]) + ' ' + r1(p2[1]);
+    }
+    const goalEndD = (99.12 - KMIN) * 7;
+    const grid = [99, 98, 97].map((k) => 'M' + X0 + ' ' + r1(Y(k)) + 'H' + X1).join('');
+    const chart = {
+      grid, dots, trend,
+      goal: 'M' + r1(X(0)) + ' ' + r1(Y(99.12)) + 'L' + r1(X(goalEndD)) + ' ' + r1(Y(KMIN)),
+      lastX: r1(X(27)), lastY: r1(Y(98.3)),
+      y99: r1(Y(99) + 3.5), y98: r1(Y(98) + 3.5), y97: r1(Y(97) + 3.5),
+      x7: r1(X(7)), x14: r1(X(14)), x21: r1(X(21))
+    };
+    const S = (k, d) => ({ k, d, c });
+    const spec = [
+      S('Screen + large title', 'Screen (ScrollView) · native large title collapses to the 17/600 inline title with a hairline once scrolled · gutter 16 · card gap 12.'),
+      S('WeekStepper', 'Stepper · 44 pill raised · arrows 44×44 · label 15/600 tabular · swipe the summary card to change week too.'),
+      S('Back to this week', 'S chip 32 · goodBg + accentText · only when not on the current week · cross-fade 180 ms on change.'),
+      S('WeekSummary', 'Card r24 pad 16 · 3 stats num.m 22/26 + caption · training adds in training colour.'),
+      S('Mini strip', 'WeekStrip (same as Today) · bar 10×36 · fill = eaten, 2 pt tick = target · over = alert · future = dashed track.'),
+      S('Projection', 'StatusLine on its tint r14 · warn “On course to finish 481 kcal over” · good “On course” · info when under by > 300.'),
+      S('DayRow', 'Pressable min 76 · pad 12/10 · r18 · day 15/700 + date 12 · eaten / target num.xs 15 · diff num 13 right.'),
+      S('Today row', 'raised background, day label in accentText, diff reads “1,781 left”.'),
+      S('Adjustment chip', '22 pill · raised (surface on today) · 12/600 tabular · signed with − / + · tap opens the “why” sheet.'),
+      S('Day bar', 'ProgressBar 4 · r2 · accentLine ≤ target, alert when over (full width, no overflow) · future/untracked = 1 pt dashed track.'),
+      S('SessionChip', '26 pill 12/600 · done ✓ trainingBg · estimate “≈ … · confirm” · planned dashed training · “+ Session” dashed text3 → Training sheet.'),
+      S('Untracked day', '“Nothing logged” text3 + “not counted” · budget and summary exclude it.'),
+      S('Copy last week', 'Button M secondary full width · confirm alert lists the sessions it will add, then chips appear with FadeIn.'),
+      S('WeightTrendChart', 'Card pad 16 · svg 329×166 · plot pad L30 R8 T8 B26 · grid 1 pt line · dots r3.5 text3 · latest r4.5 accentLine.'),
+      S('Trend line', '2.5 pt accentLine, Catmull-Rom → cubic path · goal 1.5 pt dashed 4/4 text3 · draws in with strokeDashoffset 700 ms out(cubic).'),
+      S('Tab bar', 'NativeTabs · Week = calendar (tint only when selected).')
+    ];
+    return { c, themeName: theme === 'light' ? 'Light' : 'Dark', rows1, rows2, rows3, strip, chart, spec };
+  }
+}
+</script>
+</body>
+</html>

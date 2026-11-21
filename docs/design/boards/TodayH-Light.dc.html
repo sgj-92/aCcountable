@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Today · Hybrid · Light</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 393px; height: 2300px; background: #F3F4EE">
+<dc-import name="TodayH" theme="light" day-state="{{dayState}}" show-fold="{{showFold}}" hint-size="393px,2300px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dayState":{"editor":"enum","options":["under","on","over","fresh","past","loading"],"default":"under"},"showFold":{"editor":"boolean","default":true},"$preview":{"width":393,"height":2300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { dayState: this.props.dayState ?? 'under', showFold: this.props.showFold ?? true };
+  }
+}
+</script>
+</body>
+</html>

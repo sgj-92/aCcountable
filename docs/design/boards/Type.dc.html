@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>aCcountable · Type, spacing, motion</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; height: 1500px; box-sizing: border-box; padding: 56px 64px; background: #0C0D0B; color: #F2F4EC; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 32px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #C6F24E">DESIGN SYSTEM · 02</span>
+<h1 style="margin: 0; font-family: Archivo, sans-serif; font-size: 48px; line-height: 52px; font-weight: 800; letter-spacing: -1px">Type, spacing, radii, elevation, motion</h1>
+</div>
+<p style="margin: 0; max-width: 520px; font-size: 15px; line-height: 22px; color: #A9AD9F"><b style="color: #F2F4EC">SF Pro</b> (system) for all words, so Dynamic Type and native sheets match. <b style="color: #F2F4EC">Archivo</b> (free, SIL OFL) for every number, always tabular. Embed it with <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px">@expo-google-fonts/archivo</span> 700 and 800 through the expo-font config plugin.</p>
+</header>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 32px">
+<section style="border-radius: 28px; background: #161814; padding: 24px 28px; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; color: #A9AD9F">TYPE SCALE · size / line height · weight · tracking</h2>
+<sc-for list="{{type}}" as="t" hint-placeholder-count="14">
+<div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 230px; align-items: center; gap: 16px; min-height: 48px; padding: 6px 0; border-top: 1px solid #2A2D27">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: {{t.keyCol}}">{{t.k}}</span>
+<span style="font-family: {{t.fam}}; font-size: {{t.size}}px; line-height: {{t.lh}}px; font-weight: {{t.w}}; letter-spacing: {{t.ls}}px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden">{{t.sample}}</span>
+<span style="font-size: 12px; line-height: 16px; color: #A9AD9F">{{t.spec}}</span>
+</div>
+</sc-for>
+<p style="margin: 12px 0 0; font-size: 13px; line-height: 19px; color: #878B7E">RN: numbers get <span style="font-family: 'JetBrains Mono', monospace">fontVariant: ['tabular-nums']</span> and <span style="font-family: 'JetBrains Mono', monospace">maxFontSizeMultiplier: 1.3</span> so hero numbers scale with Dynamic Type without breaking the ring. Word styles scale to 1.6×.</p>
+</section>
+
+<div style="display: flex; flex-direction: column; gap: 24px">
+<section style="border-radius: 28px; background: #161814; padding: 24px 28px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; color: #A9AD9F">SPACING · 4 pt base</h2>
+<sc-for list="{{space}}" as="s" hint-placeholder-count="9">
+<div style="display: grid; grid-template-columns: 70px 40px minmax(0, 1fr); align-items: center; gap: 12px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">{{s.k}}</span>
+<span style="font-size: 13px; color: #A9AD9F; font-variant-numeric: tabular-nums">{{s.v}}</span>
+<div style="display: flex; align-items: center; gap: 12px"><span style="height: 14px; width: {{s.v}}px; border-radius: 3px; background: #C6F24E"></span><span style="font-size: 12px; color: #878B7E">{{s.use}}</span></div>
+</div>
+</sc-for>
+</section>
+<section style="border-radius: 28px; background: #161814; padding: 24px 28px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; color: #A9AD9F">RADII</h2>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{radii}}" as="r" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="width: 56px; height: 56px; border-radius: {{r.css}}; background: #21241F; border: 1.5px solid #878B7E; box-sizing: border-box"></span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px">{{r.k}}</span>
+<span style="font-size: 11px; line-height: 14px; color: #A9AD9F; text-align: center">{{r.use}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+<section style="border-radius: 28px; background: #161814; padding: 24px 28px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; color: #A9AD9F">ELEVATION · surfaces step up in dark, shadows only in light</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="border-radius: 18px; background: #0C0D0B; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; color: #A9AD9F">DARK</span>
+<span style="height: 34px; border-radius: 10px; background: #161814; display: flex; align-items: center; padding: 0 10px; font-size: 12px">e1 card · surface</span>
+<span style="height: 34px; border-radius: 10px; background: #21241F; display: flex; align-items: center; padding: 0 10px; font-size: 12px">raised · inputs, chips</span>
+<span style="height: 34px; border-radius: 17px; background: #21241F; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 30px rgba(0,0,0,0.55); display: flex; align-items: center; padding: 0 10px; font-size: 12px">e2 float · dock, tab bar</span>
+</div>
+<div style="border-radius: 18px; background: #F3F4EE; color: #11130E; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; color: #55594E">LIGHT</span>
+<span style="height: 34px; border-radius: 10px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(17,19,14,0.07); display: flex; align-items: center; padding: 0 10px; font-size: 12px">e1 · y1 blur3 α.07</span>
+<span style="height: 34px; border-radius: 10px; background: #EBEDE5; display: flex; align-items: center; padding: 0 10px; font-size: 12px">raised · no shadow</span>
+<span style="height: 34px; border-radius: 17px; background: #FFFFFF; box-shadow: 0 8px 24px rgba(17,19,14,0.14); display: flex; align-items: center; padding: 0 10px; font-size: 12px">e2 · y8 blur24 α.14</span>
+</div>
+</div>
+<p style="margin: 0; font-size: 12px; line-height: 17px; color: #878B7E">One shadow per element (RN shadowColor #11130E / shadowOffset / shadowRadius / shadowOpacity; Android elevation 1 and 6). Sheets are native (pageSheet), no custom elevation.</p>
+</section>
+</div>
+</div>
+
+<section style="border-radius: 28px; background: #161814; padding: 24px 28px; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; color: #A9AD9F">MOTION · Reanimated 3 · all honour useReducedMotion()</h2>
+<div style="display: grid; grid-template-columns: 200px 200px minmax(0, 1fr); gap: 16px; padding: 8px 0; font-size: 12px; font-weight: 700; letter-spacing: 0.6px; color: #878B7E"><span>MOMENT</span><span>TIMING</span><span>IMPLEMENTATION</span></div>
+<sc-for list="{{motion}}" as="m" hint-placeholder-count="8">
+<div style="display: grid; grid-template-columns: 200px 200px minmax(0, 1fr); gap: 16px; padding: 10px 0; border-top: 1px solid #2A2D27; font-size: 14px; line-height: 20px">
+<span style="font-weight: 600">{{m.k}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #C6F24E">{{m.t}}</span>
+<span style="color: #A9AD9F">{{m.d}}</span>
+</div>
+</sc-for>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const NUM = "Archivo, -apple-system, Inter, sans-serif";
+    const UI = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, sans-serif";
+    const T = (k, fam, size, lh, w, ls, sample, spec) => ({ k, fam, size, lh, w, ls, sample, spec, keyCol: fam === NUM ? '#C6F24E' : '#F2F4EC' });
+    const type = [
+      T('num.display', NUM, 72, 76, 800, -2.5, '1,781', 'Archivo 800 · 96/100 · −3.5 (shown at 72). Direction B hero only'),
+      T('num.hero', NUM, 56, 60, 800, -1.5, '1,781', 'Archivo 800 · 56/60 · −1.5. Ring / gauge centre'),
+      T('num.l', NUM, 28, 32, 800, -0.5, '117 g', 'Archivo 800 · 28/32 · −0.5. Macro left, weight tile'),
+      T('num.m', NUM, 22, 26, 800, 0, '98.3 kg', 'Archivo 800 · 22/26. Card stats'),
+      T('num.s', NUM, 17, 22, 700, 0, '+561  −172  2,301', 'Archivo 700 · 17/22. Ledger, burn'),
+      T('num.xs', NUM, 15, 20, 700, 0, '125  340 kcal', 'Archivo 700 · 15/20. Row kcal'),
+      T('largeTitle', UI, 34, 41, 700, -0.4, 'Today', 'SF Pro 700 · 34/41 · −0.4. Tab screen titles'),
+      T('title', UI, 20, 25, 700, 0, 'Meals', 'SF Pro 700 · 20/25. Section headers'),
+      T('headline', UI, 17, 22, 600, 0, 'On track?', 'SF Pro 600 · 17/22. Card titles, meal names'),
+      T('body', UI, 15, 20, 400, 0, 'Oat milk latte', 'SF Pro 400 · 15/20. Rows, insight titles at 600'),
+      T('footnote', UI, 13, 18, 400, 0, '1 small cup · 240 ml · P 4 · C 14 · F 6', 'SF Pro 400 · 13/18. Meta lines, details'),
+      T('caption', UI, 12, 16, 600, 0, 'Protein   base   week balance', 'SF Pro 600 · 12/16. Labels under numbers'),
+      T('overline', UI, 12, 16, 700, 0.8, 'EATING WINDOW OPEN', 'SF Pro 700 · 12/16 · +0.8 caps. Use sparingly'),
+      T('tab', UI, 10, 12, 600, 0, 'Today   Plan   Week   Profile', 'System tab bar label, not styled by us')
+    ];
+    const space = [
+      { k: 'xxs', v: 2, use: 'number to unit' }, { k: 'xs', v: 4, use: 'label to value' }, { k: 'sm', v: 8, use: 'icon to label, chip gap' },
+      { k: 'md', v: 12, use: 'gap between cards' }, { k: 'lg', v: 16, use: 'screen gutter, card padding' }, { k: 'xl', v: 20, use: 'hero card padding' },
+      { k: '2xl', v: 24, use: 'section break' }, { k: '3xl', v: 32, use: 'big section break' }, { k: '4xl', v: 40, use: 'empty-state padding' }
+    ];
+    const radii = [
+      { k: 'xs 3', css: '3px', use: 'bars' }, { k: 'sm 10', css: '10px', use: 'badges, swatch' }, { k: 'md 14', css: '14px', use: 'inputs, icon tiles' },
+      { k: 'lg 18', css: '18px', use: 'big buttons' }, { k: 'xl 22', css: '22px', use: 'cards' }, { k: '2xl 24', css: '24px', use: 'hero card' }, { k: 'pill', css: '28px', use: 'chips, dock' }
+    ];
+    const motion = [
+      { k: 'Ring / gauge fill', t: '700 ms · out(cubic)', d: 'AnimatedCircle strokeDasharray via useAnimatedProps + withTiming. Animate from the previous value, not from 0. First mount: from 0 with a 120 ms delay.' },
+      { k: 'Number count-up', t: '600 ms · out(cubic)', d: 'kcal left and eaten. Shared value drives a read-only TextInput through animatedProps (text), tabular figures so width never jumps.' },
+      { k: 'Crossing the target', t: '240 ms colour', d: 'interpolateColor accentLine → alert on ring, number and unit; unit copy swaps to “kcal over”. One Haptics.notificationAsync(Warning) the first time it crosses.' },
+      { k: 'Insight appears', t: '220 ms · stagger 40', d: 'entering={FadeInDown.duration(220).delay(i * 40)}, exiting={FadeOut.duration(160)}, layout={LinearTransition}. Most important first.' },
+      { k: 'Press', t: '90 ms in · spring out', d: 'Pressable scale 0.97 (withTiming 90) then withSpring({ damping: 18 }). Primary log buttons add Haptics.selectionAsync().' },
+      { k: 'Entry logged', t: '600 ms', d: 'New row FadeIn + background flash raised → transparent. The meal total and ring count up at the same time.' },
+      { k: 'Change day', t: '180 ms', d: 'Swipe the hero or tap ‹ ›. Content cross-fades, the date label slides 12 pt in the swipe direction. “Back to today” chip appears when not today.' },
+      { k: 'Reduce Motion', t: '0 ms', d: 'useReducedMotion(): values jump to final, keep the colour change, keep the haptic.' }
+    ];
+    return { type, space, radii, motion };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Today · Hybrid</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="position: relative; width: 393px; height: 2300px; overflow: hidden; background: {{c.bg}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+<div style="padding: 62px 16px 200px; display: flex; flex-direction: column; gap: 12px">
+
+<header style="display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 2px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; line-height: 18px; font-weight: 600; color: {{c.text2}}">{{hdr.sub}}</span>
+<h1 style="margin: 0; font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.4px">{{hdr.title}}</h1>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<sc-if value="{{hdr.notToday}}" hint-placeholder-val="{{false}}"><button style="height: 32px; padding: 0 12px; border-radius: 16px; border: 0; background: {{c.goodBg}}; color: {{c.accentText}}; font: inherit; font-size: 13px; font-weight: 700">↩ Today</button></sc-if>
+<button aria-label="Previous day" style="width: 44px; height: 44px; border-radius: 22px; border: 0; padding: 0; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"></path></svg></button>
+<button aria-label="Next day" style="width: 44px; height: 44px; border-radius: 22px; border: 0; padding: 0; background: {{c.raised}}; color: {{hdr.nextCol}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg></button>
+</div>
+</header>
+
+<sc-if value="{{loading}}" hint-placeholder-val="{{false}}">
+<section aria-label="Loading today" aria-busy="true" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 16px 16px 14px; display: flex; flex-direction: column; align-items: center; gap: 12px">
+<div style="position: relative; width: 208px; height: 208px">
+<svg width="208" height="208" viewBox="0 0 208 208" aria-hidden="true"><circle cx="104" cy="104" r="96" fill="none" stroke="{{c.raised}}" stroke-width="16" stroke-linecap="round" stroke-dasharray="{{ring.track}}" transform="rotate(45 104 104)"></circle></svg>
+<div style="position: absolute; left: 0; top: 0; width: 208px; height: 208px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px"><span style="width: 112px; height: 40px; border-radius: 12px; background: {{c.raised}}"></span><span style="width: 64px; height: 12px; border-radius: 6px; background: {{c.raised}}"></span></div>
+</div>
+<div style="width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px"><span style="height: 34px; border-radius: 8px; background: {{c.raised}}"></span><span style="height: 34px; border-radius: 8px; background: {{c.raised}}"></span><span style="height: 34px; border-radius: 8px; background: {{c.raised}}"></span><span style="height: 34px; border-radius: 8px; background: {{c.raised}}"></span></div>
+<div style="width: 100%; height: 1px; background: {{c.line}}"></div>
+<div style="width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px"><span style="height: 40px; border-radius: 8px; background: {{c.raised}}"></span><span style="height: 40px; border-radius: 8px; background: {{c.raised}}"></span><span style="height: 40px; border-radius: 8px; background: {{c.raised}}"></span></div>
+<div style="width: 100%; height: 1px; background: {{c.line}}"></div>
+<div style="width: 100%; height: 62px; border-radius: 10px; background: {{c.raised}}"></div>
+</section>
+<section aria-hidden="true" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<span style="width: 96px; height: 14px; border-radius: 7px; background: {{c.raised}}"></span>
+<div style="display: flex; gap: 12px; align-items: center"><span style="width: 32px; height: 32px; border-radius: 16px; background: {{c.raised}}"></span><span style="flex: 1; height: 14px; border-radius: 7px; background: {{c.raised}}"></span></div>
+<div style="display: flex; gap: 12px; align-items: center"><span style="width: 32px; height: 32px; border-radius: 16px; background: {{c.raised}}"></span><span style="width: 60%; height: 14px; border-radius: 7px; background: {{c.raised}}"></span></div>
+</section>
+</sc-if>
+
+<sc-if value="{{ready}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<section aria-label="Calories and this week" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 16px 16px 14px; display: flex; flex-direction: column; align-items: center; gap: 12px">
+<div style="position: relative; width: 208px; height: 208px">
+<svg width="208" height="208" viewBox="0 0 208 208" role="img" aria-label="{{hero.aria}}">
+<circle cx="104" cy="104" r="96" fill="none" stroke="{{c.track}}" stroke-width="16" stroke-linecap="round" stroke-dasharray="{{ring.track}}" transform="rotate(45 104 104)"></circle>
+<circle cx="104" cy="104" r="96" fill="none" stroke="{{ring.trainCol}}" stroke-width="16" stroke-linecap="round" stroke-dasharray="{{ring.train}}" stroke-dashoffset="{{ring.trainOff}}" transform="rotate(45 104 104)"></circle>
+<circle cx="104" cy="104" r="96" fill="none" stroke="{{ring.col}}" stroke-width="16" stroke-linecap="round" stroke-dasharray="{{ring.fill}}" transform="rotate(45 104 104)"></circle>
+</svg>
+<div style="position: absolute; left: 0; top: 0; width: 208px; height: 208px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+<span style="font-family: Archivo, -apple-system, 'SF Pro Display', Inter, sans-serif; font-size: 52px; line-height: 56px; font-weight: 800; letter-spacing: -1.5px; font-variant-numeric: tabular-nums; color: {{hero.col}}">{{hero.num}}</span>
+<span style="font-size: 15px; line-height: 20px; font-weight: 600; color: {{hero.unitCol}}">{{hero.unit}}</span>
+<span style="margin-top: 4px; font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">{{hero.sub}}</span>
+</div>
+</div>
+
+<div style="width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; text-align: center">
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; line-height: 22px; font-weight: 700; font-variant-numeric: tabular-nums">1,912</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">base</span></div>
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; line-height: 22px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{eq.trainCol}}">{{eq.train}}</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">{{eq.trainLbl}}</span></div>
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; line-height: 22px; font-weight: 700; font-variant-numeric: tabular-nums">{{eq.week}}</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">week balance</span></div>
+<div style="display: flex; flex-direction: column; gap: 1px; border-left: 1px solid {{c.line}}"><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; line-height: 22px; font-weight: 800; font-variant-numeric: tabular-nums">{{eq.target}}</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">target</span></div>
+</div>
+
+<div style="width: 100%; height: 1px; background: {{c.line}}"></div>
+
+<div style="width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+<sc-for list="{{macros}}" as="m" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 5px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 4px">
+<span style="display: flex; align-items: center; gap: 5px; font-size: 12px; line-height: 16px; font-weight: 600; color: {{m.c.text2}}"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{m.col}}"></span>{{m.label}}</span>
+<span style="font-size: 12px; line-height: 16px; font-weight: 600; color: {{m.leftCol}}; font-variant-numeric: tabular-nums">{{m.leftShort}}</span>
+</div>
+<div style="height: 6px; border-radius: 3px; background: {{m.c.track}}; overflow: hidden"><div style="height: 6px; border-radius: 3px; width: {{m.w}}; background: {{m.col}}"></div></div>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 14px; line-height: 18px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{m.numCol}}">{{m.v}}<span style="font-weight: 600; color: {{m.c.text2}}"> / {{m.t}} g</span></span>
+</div>
+</sc-for>
+</div>
+
+<div style="width: 100%; height: 1px; background: {{c.line}}"></div>
+
+<a href="#" aria-label="This week: {{weekHead}}. Opens Week" style="width: 100%; display: flex; flex-direction: column; gap: 8px; color: {{c.text}}; text-decoration: none">
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px">
+<sc-for list="{{week}}" as="d" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 5px 0 4px; border-radius: 10px; background: {{d.colBg}}">
+<div style="position: relative; width: 10px; height: 36px; border-radius: 5px; background: {{d.trackBg}}; border: {{d.trackBorder}}; box-sizing: border-box; overflow: hidden">
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: {{d.fillH}}; background: {{d.fillCol}}"></div>
+<div style="position: absolute; left: 0; right: 0; bottom: {{d.tickB}}; height: 2px; background: {{d.tickCol}}"></div>
+</div>
+<span style="font-size: 11px; line-height: 13px; font-weight: 700; color: {{d.labelCol}}">{{d.d}}</span>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="width: 8px; height: 8px; border-radius: 4px; background: {{c.warn}}"></span>
+<span style="flex: 1; font-size: 13px; line-height: 18px; font-variant-numeric: tabular-nums"><span style="font-weight: 600; color: {{c.warn}}">Week {{weekHead}}</span> <span style="color: {{c.text2}}">{{weekTail}}</span></span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{c.text3}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg>
+</div>
+</a>
+</section>
+
+<section aria-label="On track" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 14px 16px 4px; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 4px">
+<h2 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">On track?</h2>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{insightCount}}</span>
+</div>
+<sc-for list="{{insights}}" as="i" hint-placeholder-count="3">
+<div style="display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid {{i.c.line}}">
+<div style="flex: none; width: 32px; height: 32px; border-radius: 16px; background: {{i.bg}}; color: {{i.col}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{i.isAlert}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Alert" role="img"><path d="M8.3 3h7.4L21 8.3v7.4L15.7 21H8.3L3 15.7V8.3z"></path><path d="M12 7.5v5.5M12 16.3v.3"></path></svg></sc-if>
+<sc-if value="{{i.isWarn}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Warning" role="img"><path d="M12 4l9 16H3z"></path><path d="M12 10v4.5M12 17.2v.3"></path></svg></sc-if>
+<sc-if value="{{i.isInfo}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Info" role="img"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5.5M12 7.8v.3"></path></svg></sc-if>
+<sc-if value="{{i.isGood}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Good" role="img"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.3l2.8 2.8L16.2 9.6"></path></svg></sc-if>
+</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; line-height: 20px; font-weight: 600">{{i.t}}</span>
+<sc-if value="{{i.hasD}}" hint-placeholder-val="{{true}}"><span style="font-size: 13px; line-height: 18px; color: {{i.c.text2}}">{{i.d}}</span></sc-if>
+<sc-if value="{{i.hasA}}" hint-placeholder-val="{{false}}"><a href="#" style="align-self: flex-start; margin-top: 2px; padding: 4px 0; font-size: 14px; line-height: 18px; font-weight: 600; color: {{i.c.accentText}}; text-decoration: none">{{i.a}} ›</a></sc-if>
+</div>
+</div>
+</sc-for>
+</section>
+
+<sc-if value="{{fast.show}}" hint-placeholder-val="{{true}}">
+<section aria-label="Fasting" style="border-radius: 20px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 12px 16px; display: flex; align-items: center; gap: 12px">
+<span style="display: flex; color: {{fast.col}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; font-size: 13px; line-height: 18px; font-variant-numeric: tabular-nums"><span style="font-weight: 600">{{fast.label}} · <span style="color: {{fast.col}}">{{fast.time}}</span></span><span style="color: {{c.text2}}">{{fast.right}}</span></div>
+<div style="height: 6px; border-radius: 3px; background: {{c.track}}; overflow: hidden"><div style="height: 6px; width: {{fast.w}}; border-radius: 3px; background: {{fast.bar}}"></div></div>
+</div>
+</section>
+</sc-if>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<sc-if value="{{tr.has}}" hint-placeholder-val="{{true}}">
+<a href="#" aria-label="Padel session, estimate, tap to confirm" style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 14px; display: flex; flex-direction: column; gap: 4px; color: {{c.text}}; text-decoration: none">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.6px; color: {{c.training}}">TRAINING</span>
+<span style="font-size: 16px; line-height: 21px; font-weight: 600">Padel · 90′</span>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 24px; line-height: 28px; font-weight: 800; font-variant-numeric: tabular-nums; color: {{c.training}}">≈ +748</span>
+<span style="margin-top: 4px; display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; color: {{c.text2}}"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{c.info}}"></span>Estimate · tap to confirm</span>
+</a>
+</sc-if>
+<sc-if value="{{tr.none}}" hint-placeholder-val="{{false}}">
+<a href="#" aria-label="{{tr.title}}. Add a session" style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 14px; display: flex; flex-direction: column; gap: 4px; color: {{c.text}}; text-decoration: none">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.6px; color: {{c.training}}">TRAINING</span>
+<span style="font-size: 16px; line-height: 21px; font-weight: 600">{{tr.title}}</span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{tr.sub}}</span>
+<span style="margin-top: 6px; align-self: flex-start; height: 28px; padding: 0 10px; border-radius: 14px; border: 1.5px dashed {{c.text3}}; display: flex; align-items: center; font-size: 12px; font-weight: 600; color: {{c.text2}}">+ Session</span>
+</a>
+</sc-if>
+<a href="#" aria-label="Weight, {{wt.num}} kg. Log weight" style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 14px; display: flex; flex-direction: column; gap: 4px; color: {{c.text}}; text-decoration: none">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.6px; color: {{c.text2}}">WEIGHT</span>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 24px; line-height: 28px; font-weight: 800; font-variant-numeric: tabular-nums">{{wt.num}}<span style="font-family: -apple-system, Inter, sans-serif; font-size: 14px; font-weight: 500; color: {{c.text2}}"> kg</span></span>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600; color: {{wt.noteCol}}; font-variant-numeric: tabular-nums">{{wt.note}}</span>
+<svg width="140" height="26" viewBox="0 0 140 26" aria-hidden="true" style="margin-top: 2px"><path d="M3 6 C 30 7, 50 12, 72 15 S 118 20, 136 21" fill="none" stroke="{{c.text2}}" stroke-width="2" stroke-linecap="round"></path><circle cx="136" cy="21" r="3.5" fill="{{c.accentLine}}"></circle></svg>
+</a>
+</div>
+
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding: 12px 4px 0">
+<h2 style="margin: 0; font-size: 20px; line-height: 25px; font-weight: 700">Meals</h2>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">{{eatenTxt}}</span>
+</div>
+<sc-for list="{{meals}}" as="m" hint-placeholder-count="5">
+<section style="background: {{m.c.surface}}; box-shadow: {{m.c.shadow}}; border-radius: 20px; padding: 4px 8px 4px 16px; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 8px; min-height: 52px">
+<div style="flex: 1; display: flex; flex-direction: column">
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">{{m.name}}</span>
+<sc-if value="{{m.empty}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px; line-height: 18px; color: {{m.c.text3}}">Nothing logged</span></sc-if>
+</div>
+<sc-if value="{{m.has}}" hint-placeholder-val="{{true}}"><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 15px; line-height: 20px; font-weight: 700; color: {{m.c.text2}}; font-variant-numeric: tabular-nums">{{m.total}}</span></sc-if>
+<button aria-label="Add food to {{m.name}}" style="width: 44px; height: 44px; border-radius: 22px; border: 0; padding: 0; background: transparent; color: {{m.c.accentText}}; display: flex; align-items: center; justify-content: center"><span style="width: 32px; height: 32px; border-radius: 16px; background: {{m.c.raised}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span></button>
+</div>
+<sc-for list="{{m.entries}}" as="e" hint-placeholder-count="2">
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 8px 10px 0; border-top: 1px solid {{m.c.line}}">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 15px; line-height: 20px">
+<sc-if value="{{e.photo}}" hint-placeholder-val="{{false}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{m.c.text2}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Logged from a photo"><path d="M3.5 8.5h3.2l1.8-2.5h7l1.8 2.5h3.2v10.5h-17z"></path><circle cx="12" cy="13.5" r="3.6"></circle></svg></sc-if>
+{{e.name}}</span>
+<span style="font-size: 13px; line-height: 18px; color: {{m.c.text2}}; font-variant-numeric: tabular-nums">{{e.meta}}</span>
+</div>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 15px; line-height: 20px; font-weight: 700; font-variant-numeric: tabular-nums">{{e.kcal}}</span>
+</div>
+</sc-for>
+</section>
+</sc-for>
+</div>
+</sc-if>
+</div>
+
+<sc-if value="{{showFold}}" hint-placeholder-val="{{true}}">
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 852px; border-top: 1px dashed {{c.fold}}">
+<span style="position: absolute; right: 8px; top: 4px; font-size: 10px; line-height: 12px; font-weight: 700; letter-spacing: 0.6px; color: {{c.text3}}">852 PT · FIRST SCREEN ENDS</span>
+</div>
+</sc-if>
+
+<div aria-label="Quick log" role="group" style="position: absolute; left: 16px; right: 16px; top: 692px; height: 66px; box-sizing: border-box; padding: 7px; border-radius: 33px; background: {{c.tabBar}}; border: 1px solid {{c.tabBorder}}; box-shadow: {{c.floatShadow}}; display: flex; gap: 6px">
+<button style="flex: 1.4; height: 52px; border-radius: 26px; border: 0; padding: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5h3.2l1.8-2.5h7l1.8 2.5h3.2v10.5h-17z"></path><circle cx="12" cy="13.5" r="3.6"></circle></svg>Scan meal</button>
+<button style="flex: 1; height: 52px; border-radius: 26px; border: 0; padding: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>Add food</button>
+<button aria-label="More: log a session or weight" style="width: 52px; height: 52px; border-radius: 26px; border: 0; padding: 0; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div>
+
+<nav aria-label="Tab bar (native)" style="position: absolute; left: 20px; right: 20px; top: 770px; height: 62px; box-sizing: border-box; border-radius: 31px; background: {{c.tabBar}}; border: 1px solid {{c.tabBorder}}; box-shadow: {{c.floatShadow}}; display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+<a href="#" aria-current="page" style="flex: 1; height: 52px; border-radius: 26px; background: {{c.tabPill}}; color: {{c.tabActive}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M17.66 6.34A8 8 0 1 0 17.66 17.66"></path></svg>Today</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>Plan</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.6"></circle><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5"></path></svg>Profile</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"dayState":{"editor":"enum","options":["under","on","over","fresh","past","loading"],"default":"under"},"showFold":{"editor":"boolean","default":true},"$preview":{"width":393,"height":2300}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const STATES = ['under', 'on', 'over', 'fresh', 'past', 'loading'];
+    const st = STATES.indexOf(this.props.dayState) >= 0 ? this.props.dayState : 'under';
+    const showFold = !(this.props.showFold === false || this.props.showFold === 'false');
+    const c = this.palette()[theme];
+    const f = (n) => Math.round(Math.abs(n)).toLocaleString('en-GB');
+    const sgn = (n) => (n < 0 ? '−' : '+') + f(n);
+    const CFG = {
+      under: { sub: 'Thursday 19 November', title: 'Today', today: true, T: 2301, train: 561, week: -172, MT: { p: 147, c: 308, f: 53 }, plan: 'under', session: true, fast: 'open', wt: 'trend', viewIdx: 3 },
+      on: { sub: 'Thursday 19 November', title: 'Today', today: true, T: 2301, train: 561, week: -172, MT: { p: 147, c: 308, f: 53 }, plan: 'on', session: true, fast: 'open', wt: 'trend', viewIdx: 3 },
+      over: { sub: 'Thursday 19 November', title: 'Today', today: true, T: 2301, train: 561, week: -172, MT: { p: 147, c: 308, f: 53 }, plan: 'over', session: true, fast: 'open', wt: 'trend', viewIdx: 3 },
+      loading: { sub: 'Thursday 19 November', title: 'Today', today: true, T: 2301, train: 561, week: -172, MT: { p: 147, c: 308, f: 53 }, plan: 'under', session: true, fast: 'open', wt: 'trend', viewIdx: 3 },
+      fresh: { sub: 'Friday 20 November', title: 'Today', today: true, T: 1830, train: 0, week: -82, MT: { p: 147, c: 191, f: 53 }, plan: 'none', session: false, fast: 'fasting', wt: 'due', viewIdx: 4 },
+      past: { sub: 'Tuesday 17 November', title: 'Tue 17 Nov', today: false, T: 2100, train: 0, week: 188, MT: { p: 147, c: 258, f: 53 }, plan: 'past', session: false, fast: 'none', wt: 'logged', viewIdx: 1 }
+    };
+    const k = CFG[st];
+    const T = k.T, TRAIN = k.train, MT = k.MT;
+    const E = (name, serving, kcal, p, cb, fa, photo) => ({ name, meta: serving + ' · P ' + p + ' · C ' + cb + ' · F ' + fa, kcal: f(kcal), n: kcal, p, c: cb, f: fa, photo: !!photo });
+    const m1 = [E('Oat milk latte', '1 small cup · 240 ml', 125, 4, 14, 6, true), E('Greek yoghurt 0%', '170 g', 97, 17, 6, 0), E('Almond butter', '20 g', 118, 4, 2, 11)];
+    const m2 = [E('Apple with peanut butter', '1 apple · 15 g PB', 180, 5, 18, 7, true)];
+    const m3 = [E('Chicken, rice & broccoli', '1 bowl · 520 g', 759, 74, 88, 10, true), E('Olive oil', '15 g', 135, 0, 0, 15)];
+    const m4 = [E('Salmon fillet', '160 g', 330, 33, 0, 20), E('Sweet potato', '300 g', 258, 5, 60, 0)];
+    const sn = [E('Protein bar', '1 bar · 50 g', 194, 20, 18, 7), E('Banana', '1 medium · 118 g', 105, 1, 27, 0)];
+    const snx = [E('Margherita pizza', '1 slice · 120 g', 320, 13, 36, 12, true), E('Dark chocolate 70%', '55 g', 330, 4, 19, 26)];
+    const plan = { under: [m1, m2, [], [], []], on: [m1, m2, m3, m4, sn], over: [m1, m2, m3, m4, sn.concat(snx)], none: [[], [], [], [], []], past: [m1, m2, m3, m4, []] }[k.plan];
+    const names = ['Meal 1', 'Meal 2', 'Meal 3', 'Meal 4', 'Snacks'];
+    const meals = names.map((nm, i) => {
+      const es = plan[i];
+      const tot = es.reduce((s, e) => s + e.n, 0);
+      return { name: nm, entries: es, has: es.length > 0, empty: es.length === 0, total: f(tot) + ' kcal', c };
+    });
+    const all = [].concat.apply([], plan);
+    const sum = (key) => all.reduce((s, e) => s + e[key], 0);
+    const eaten = sum('n');
+    const left = T - eaten;
+    const over = left < 0, done = left === 0, closedUnder = !k.today && left > 0;
+    const mk = (key, label, col) => {
+      const v = sum(key), t = MT[key], d = t - v;
+      return { label, col, v: f(v), t: f(t), w: Math.min(100, v / t * 100).toFixed(1) + '%', leftShort: d >= 0 ? f(d) + ' left' : '+' + f(d) + ' over', leftCol: d >= 0 ? c.text2 : c.alert, numCol: d >= 0 ? c.text : c.alert, c };
+    };
+    const macros = [mk('p', 'Protein', c.protein), mk('c', 'Carbs', c.carbs), mk('f', 'Fat', c.fat)];
+    const I = (lv, t, d, a) => ({ t, d, a, hasD: !!d, hasA: !!a, col: c[lv], bg: c[lv + 'Bg'], isAlert: lv === 'alert', isWarn: lv === 'warn', isInfo: lv === 'info', isGood: lv === 'good', c });
+    const confirm = I('info', 'Confirm today’s padel burn', '≈ 748 kcal, estimated from your 38 WHOOP padel sessions.', 'Confirm');
+    const weight = I('warn', 'Losing 0.21 kg a week, slower than your 1 kg goal', 'Trend from 9 weigh-ins over 4 weeks.', 'See trend');
+    const insights = {
+      under: [confirm, weight],
+      loading: [confirm, weight],
+      on: [I('good', 'Right on today’s target', 'Fat ran 23 g over; protein and carbs had room.', ''), confirm, weight],
+      over: [I('alert', '650 kcal over today’s target', 'Trained more than you logged? Add the session. Otherwise Fri–Sun drop about 217 a day.', 'Add a session'), confirm],
+      fresh: [I('info', 'Log your weight to check you’re really losing', 'Last weigh-in was 3 days ago.', 'Log weight'), I('info', 'Rest day: no session planned', 'Training after all? Add it and today’s target goes up.', 'Add a session')],
+      past: [I('good', 'Closed ' + f(left) + ' under target', 'Counted in the week balance: Fri–Sun get a little more.', '')]
+    }[st];
+    const R = 96, ARC = 2 * Math.PI * R * 0.75;
+    const fl = (over || done) ? ARC : ARC * eaten / T;
+    const tl = ARC * TRAIN / T;
+    const ring = {
+      track: ARC.toFixed(1) + ' 2000',
+      fill: (fl > 0 ? fl : 0.01).toFixed(2) + ' 2000',
+      train: (tl > 0 ? tl : 0.01).toFixed(2) + ' 2000',
+      trainOff: (-(ARC - tl)).toFixed(1),
+      trainCol: TRAIN > 0 ? c.trainingSeg : 'transparent',
+      col: eaten === 0 ? 'transparent' : (over ? c.alert : c.accentLine)
+    };
+    const hero = {
+      num: over ? f(-left) : f(left),
+      unit: over ? 'kcal over' : (closedUnder ? 'kcal under' : 'kcal left'),
+      col: over ? c.alert : (closedUnder ? c.good : c.text),
+      unitCol: over ? c.alert : (closedUnder ? c.good : c.text2),
+      sub: done ? 'On target' : f(eaten) + ' eaten of ' + f(T),
+      aria: over ? f(-left) + ' kcal over a target of ' + f(T) : f(left) + ' kcal ' + (closedUnder ? 'under' : 'left of') + ' ' + f(T)
+    };
+    const eq = { train: TRAIN > 0 ? '+' + f(TRAIN) : '0', trainLbl: TRAIN > 0 ? 'padel' : 'rest day', trainCol: TRAIN > 0 ? c.training : c.text3, week: sgn(k.week), target: f(T) };
+    const SCALE = 2900, H = 36;
+    const days = [
+      { d: 'M', e: 2480, t: 2250, k: 'past' }, { d: 'T', e: 1997, t: 2100, k: 'past' }, { d: 'W', e: 2710, t: 2356, k: 'past' },
+      { d: 'T', e: st === 'fresh' ? 2296 : (st === 'past' ? 520 : eaten), t: 2301, k: st === 'fresh' ? 'past' : 'today' },
+      { d: 'F', e: 0, t: 1830, k: st === 'fresh' ? 'today' : 'future' }, { d: 'S', e: 0, t: 2410, k: 'future' }, { d: 'S', e: 0, t: 1790, k: 'future' }
+    ];
+    const week = days.map((x, i) => {
+      const isToday = x.k === 'today', future = x.k === 'future', dayOver = x.e > x.t, viewed = i === k.viewIdx;
+      return {
+        d: x.d,
+        fillH: Math.round(Math.min(x.e, SCALE) / SCALE * H) + 'px',
+        tickB: Math.round(x.t / SCALE * H) + 'px',
+        fillCol: dayOver ? c.alert : (isToday ? c.accentLine : c.pastFill),
+        tickCol: future ? c.text3 : c.text,
+        trackBg: future ? 'transparent' : c.track,
+        trackBorder: future ? '1.5px dashed ' + c.text3 : '0',
+        colBg: viewed ? c.raised : 'transparent',
+        labelCol: isToday ? c.accentText : (viewed ? c.text : c.text2)
+      };
+    });
+    const weekOver = st === 'over' ? 1131 : (st === 'fresh' ? 476 : 481);
+    const fast = {
+      show: k.fast !== 'none',
+      label: k.fast === 'fasting' ? 'Fasting' : 'Eating window',
+      time: k.fast === 'fasting' ? '14h 05m fasted' : '3h 46m left',
+      right: k.fast === 'fasting' ? 'opens 12:00' : 'until 20:00',
+      w: k.fast === 'fasting' ? '88%' : '53%',
+      col: k.fast === 'fasting' ? c.info : c.accentText,
+      bar: k.fast === 'fasting' ? c.info : c.accentLine
+    };
+    const tr = { has: k.session, none: !k.session, title: k.today ? 'Rest day' : 'No session logged', sub: k.today ? 'Nothing planned today' : 'Tue 17 Nov' };
+    const wt = {
+      trend: { num: '98.3', note: '−0.21 kg/wk', noteCol: c.warn },
+      due: { num: '98.3', note: 'Not logged today', noteCol: c.info },
+      logged: { num: '98.6', note: 'Logged ✓ that morning', noteCol: c.good }
+    }[k.wt];
+    return {
+      c, showFold, macros, meals, insights, insightCount: insights.length + (insights.length === 1 ? ' check' : ' checks'), ring, hero, eq, week, fast, tr, wt,
+      loading: st === 'loading', ready: st !== 'loading',
+      hdr: { sub: k.sub, title: k.title, notToday: !k.today, nextCol: k.today ? c.text3 : c.text },
+      eatenTxt: f(eaten) + ' kcal eaten',
+      weekHead: f(weekOver) + ' over pace',
+      weekTail: '· Fri–Sun −' + (st === 'over' ? 217 : 160) + ' a day'
+    };
+  }
+}
+</script>
+</body>
+</html>

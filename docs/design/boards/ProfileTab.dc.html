@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Profile tab</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1835px; height: 1160px; box-sizing: border-box; padding: 48px; background: {{c.board}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; gap: 24px">
+
+<header style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">TAB · PROFILE</span>
+<h1 style="margin: 0; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -0.5px">Profile</h1>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{themeName}} · one long settings scroll shown at top, middle and end · Save lives in the nav bar</span>
+</header>
+
+<div style="display: flex; gap: 40px; align-items: flex-start">
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="padding: 62px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between">
+<h2 style="margin: 0; font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.4px">Profile</h2>
+<button disabled="" style="height: 44px; padding: 0 4px; border: 0; background: transparent; color: {{c.text3}}; font: inherit; font-size: 17px; font-weight: 600">Save</button>
+</div>
+
+<section aria-label="Rest-day target" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Rest-day target</span>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 48px; line-height: 52px; font-weight: 800; letter-spacing: -1.2px; font-variant-numeric: tabular-nums">1,912<span style="font-family: -apple-system, Inter, sans-serif; font-size: 17px; font-weight: 600; letter-spacing: 0; color: {{c.text2}}"> kcal</span></span>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">
+<span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{c.protein}}"></span>P 147 g</span>
+<span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{c.carbs}}"></span>C 211 g</span>
+<span style="display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{c.fat}}"></span>F 53 g</span>
+<span>· BMR 1,912</span>
+</div>
+<span style="margin-top: 4px; font-size: 13px; line-height: 18px; color: {{c.text2}}">Training days add each session’s estimated burn on top, mostly as carbs.</span>
+</section>
+
+<section aria-label="About you" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<h3 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">About you</h3>
+<label style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Name (optional)</span><input value="SGJ" style="width: 100%; height: 44px; border-radius: 12px; border: 0; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; box-sizing: border-box"></label>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Sex (for BMR)</span>
+<div role="radiogroup" aria-label="Sex" style="height: 44px; border-radius: 12px; background: {{c.raised}}; padding: 3px; box-sizing: border-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px">
+<sc-for list="{{segSex}}" as="s" hint-placeholder-count="2"><button role="radio" aria-checked="{{s.on}}" style="border: 0; border-radius: 9px; background: {{s.bg}}; box-shadow: {{s.shadow}}; color: {{s.col}}; font: inherit; font-size: 15px; font-weight: {{s.w}}">{{s.label}}</button></sc-for>
+</div></div>
+<label style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Birth date</span><input value="20-10-1992" style="width: 100%; height: 44px; border-radius: 12px; border: 0; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; box-sizing: border-box"></label>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Height (cm)</span><input value="175" inputmode="decimal" style="width: 100%; height: 44px; border-radius: 12px; border: 0; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; box-sizing: border-box"></label>
+<label style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Weight (kg)</span><input value="98.3" inputmode="decimal" style="width: 100%; height: 44px; border-radius: 12px; border: 0; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; box-sizing: border-box"></label>
+</div>
+</section>
+
+<section aria-label="Daily activity" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<h3 style="margin: 0 0 2px; font-size: 17px; line-height: 22px; font-weight: 600">Daily activity <span style="font-weight: 400; color: {{c.text2}}">(excluding training)</span></h3>
+<sc-for list="{{activity}}" as="a" hint-placeholder-count="4">
+<button role="radio" aria-checked="{{a.on}}" style="min-height: 52px; border-radius: 14px; border: 0; padding: 7px 14px; background: {{a.bg}}; color: {{a.col}}; font: inherit; text-align: left; display: flex; flex-direction: column; justify-content: center; gap: 1px">
+<span style="font-size: 15px; line-height: 20px; font-weight: 600">{{a.t}}</span>
+<span style="font-size: 13px; line-height: 17px; color: {{a.sub}}">{{a.d}}</span>
+</button>
+</sc-for>
+</section>
+</div>
+<nav aria-label="Tab bar (native)" style="position: absolute; left: 20px; right: 20px; top: 770px; height: 62px; box-sizing: border-box; border-radius: 31px; background: {{c.tabBar}}; border: 1px solid {{c.tabBorder}}; box-shadow: {{c.floatShadow}}; display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.66 6.34A8 8 0 1 0 17.66 17.66"></path></svg>Today</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>Plan</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+<a href="#" aria-current="page" style="flex: 1; height: 52px; border-radius: 26px; background: {{c.tabPill}}; color: {{c.tabActive}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.6"></circle><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5"></path></svg>Profile</a>
+</nav>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; width: 393px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">1 · Top</span><span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Target preview first, so every edit below shows its effect. Save stays disabled until something changes.</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 0; right: 0; top: 106px; padding: 0 16px; display: flex; flex-direction: column; gap: 12px">
+
+<section aria-label="Goal" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<h3 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">Goal</h3>
+<div role="radiogroup" aria-label="Goal" style="height: 40px; border-radius: 12px; background: {{c.raised}}; padding: 3px; box-sizing: border-box; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px">
+<sc-for list="{{segGoal}}" as="s" hint-placeholder-count="3"><button role="radio" aria-checked="{{s.on}}" style="border: 0; border-radius: 9px; background: {{s.bg}}; box-shadow: {{s.shadow}}; color: {{s.col}}; font: inherit; font-size: 15px; font-weight: {{s.w}}">{{s.label}}</button></sc-for>
+</div>
+<span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Rate (kg per week)</span>
+<div style="display: flex; gap: 8px">
+<sc-for list="{{rates}}" as="r" hint-placeholder-count="4"><button aria-pressed="{{r.on}}" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{r.bg}}; color: {{r.col}}; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 15px; font-weight: {{r.w}}; font-variant-numeric: tabular-nums">{{r.label}}</button></sc-for>
+</div>
+</section>
+
+<section aria-label="Fine-tuning" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<h3 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">Fine-tuning</h3>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<label style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Protein g/kg</span><input value="1.5" inputmode="decimal" style="width: 100%; height: 44px; border-radius: 12px; border: 0; padding: 0 12px; background: {{c.raised}}; color: {{c.text}}; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; box-sizing: border-box"></label>
+<label style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Fat % of base</span><input value="25" inputmode="numeric" style="width: 100%; height: 44px; border-radius: 12px; border: 0; padding: 0 12px; background: {{c.raised}}; color: {{c.text}}; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; box-sizing: border-box"></label>
+<label style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Eat-back %</span><input value="75" inputmode="numeric" style="width: 100%; height: 44px; border-radius: 12px; border: 2px solid {{c.accentLine}}; padding: 0 10px; background: {{c.raised}}; color: {{c.text}}; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; box-sizing: border-box"></label>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Eat-back is how much of each session’s estimated burn joins that day’s target. Lower it if estimates run high.</span>
+</section>
+
+<section aria-label="Meals" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<h3 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">Meals</h3>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Pick a preset, then rename any meal. Up to 6.</span>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">Breakfast · Lunch · Dinner</button>
+<button aria-pressed="true" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 15px; font-weight: 600">Meal 1 · 2 · 3…</button>
+</div>
+<sc-for list="{{meals}}" as="m" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; gap: 8px">
+<label style="flex: 1; display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Meal {{m.n}} name</span><input value="{{m.name}}" style="width: 100%; height: 44px; border-radius: 12px; border: 0; padding: 0 14px; background: {{m.c.raised}}; color: {{m.c.text}}; font: inherit; font-size: 17px; box-sizing: border-box"></label>
+<button style="height: 44px; padding: 0 6px; border: 0; background: transparent; color: {{m.c.alert}}; font: inherit; font-size: 15px; font-weight: 600">Remove</button>
+</div>
+</sc-for>
+<a href="#" style="min-height: 44px; display: flex; align-items: center; font-size: 15px; font-weight: 600; color: {{c.accentText}}; text-decoration: none">+ Add meal (5 of 6)</a>
+</section>
+</div>
+
+<div style="position: absolute; left: 0; right: 0; top: 0; height: 98px; background: {{c.bg}}; border-bottom: 1px solid {{c.line}}; display: flex; align-items: flex-end; justify-content: center; box-sizing: border-box">
+<span style="height: 44px; display: flex; align-items: center; font-size: 17px; font-weight: 600">Profile</span>
+<a href="#" style="position: absolute; right: 12px; bottom: 0; height: 44px; display: flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 600; color: {{c.accentText}}; text-decoration: none"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{c.accentLine}}"></span>Save</a>
+</div>
+<nav aria-label="Tab bar (native)" style="position: absolute; left: 20px; right: 20px; top: 770px; height: 62px; box-sizing: border-box; border-radius: 31px; background: {{c.tabBar}}; border: 1px solid {{c.tabBorder}}; box-shadow: {{c.floatShadow}}; display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.66 6.34A8 8 0 1 0 17.66 17.66"></path></svg>Today</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>Plan</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+<a href="#" aria-current="page" style="flex: 1; height: 52px; border-radius: 26px; background: {{c.tabPill}}; color: {{c.tabActive}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.6"></circle><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5"></path></svg>Profile</a>
+</nav>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; width: 393px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">2 · Middle · editing</span><span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Title collapsed to the inline nav bar. Eat-back field focused; Save turns on with an unsaved-change dot.</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 0; right: 0; top: 106px; padding: 0 16px; display: flex; flex-direction: column; gap: 12px">
+
+<section aria-label="Intermittent fasting" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; justify-content: space-between; min-height: 31px">
+<h3 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">Intermittent fasting</h3>
+<span role="switch" aria-checked="true" aria-label="Intermittent fasting" style="width: 51px; height: 31px; border-radius: 16px; background: {{c.switchOn}}; position: relative; display: block"><span style="position: absolute; right: 2px; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.2)"></span></span>
+</div>
+<div style="display: flex; gap: 6px; flex-wrap: wrap">
+<sc-for list="{{fasting}}" as="r" hint-placeholder-count="5"><button aria-pressed="{{r.on}}" style="height: 36px; padding: 0 12px; border-radius: 18px; border: 0; background: {{r.bg}}; color: {{r.col}}; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 15px; font-weight: {{r.w}}; font-variant-numeric: tabular-nums">{{r.label}}</button></sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Window opens</span><input value="12:00" style="width: 100%; height: 44px; border-radius: 12px; border: 0; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; box-sizing: border-box"></label>
+<label style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Eating window</span><input value="8 h" style="width: 100%; height: 44px; border-radius: 12px; border: 0; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; box-sizing: border-box"></label>
+</div>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums"><span style="display: flex; color: {{c.accentText}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></span>Eating 12:00–20:00 · fasting 16 h</span>
+</section>
+
+<section aria-label="Training data" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 4px 8px 4px 16px; display: flex; flex-direction: column">
+<a href="#" style="min-height: 56px; display: flex; align-items: center; gap: 12px; color: {{c.text}}; text-decoration: none">
+<span style="width: 32px; height: 32px; border-radius: 10px; background: {{c.trainingBg}}; color: {{c.training}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7"></circle><path d="M12 13.5V10M10 3.5h4M18 7l1.5-1.5"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 20px; font-weight: 600">WHOOP history</span><span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">38 padel · 30 runs · 22 gym</span></span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{c.text3}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg>
+</a>
+<a href="#" style="min-height: 56px; display: flex; align-items: center; gap: 12px; border-top: 1px solid {{c.line}}; color: {{c.text}}; text-decoration: none">
+<span style="width: 32px; height: 32px; border-radius: 10px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"></rect><path d="M9 9.8a4 4 0 0 1 6 0M12 9.6l1.3-1.7"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Weight &amp; trend</span><span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">98.3 kg · −0.21 kg/wk</span></span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{c.text3}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg>
+</a>
+</section>
+
+<section aria-label="App" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<h3 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">Appearance</h3>
+<div role="radiogroup" aria-label="Appearance" style="height: 40px; border-radius: 12px; background: {{c.raised}}; padding: 3px; box-sizing: border-box; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px">
+<sc-for list="{{segApp}}" as="s" hint-placeholder-count="3"><button role="radio" aria-checked="{{s.on}}" style="border: 0; border-radius: 9px; background: {{s.bg}}; box-shadow: {{s.shadow}}; color: {{s.col}}; font: inherit; font-size: 15px; font-weight: {{s.w}}">{{s.label}}</button></sc-for>
+</div>
+<div style="height: 1px; background: {{c.line}}; margin: 2px 0"></div>
+<div style="display: flex; justify-content: space-between; font-size: 13px; line-height: 18px"><span style="color: {{c.text2}}">Running build</span><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-weight: 700; font-variant-numeric: tabular-nums">1.4.0 (52)</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; line-height: 18px"><span style="color: {{c.text2}}">Over-the-air update</span><span style="height: 24px; padding: 0 9px; border-radius: 12px; background: {{c.goodBg}}; color: {{c.good}}; display: flex; align-items: center; font-weight: 600; font-variant-numeric: tabular-nums">2026-11-18 · ready</span></div>
+<button style="height: 44px; border-radius: 14px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px; font-weight: 600">Restart to update</button>
+</section>
+
+<button style="height: 44px; border-radius: 14px; border: 0; background: transparent; color: {{c.alert}}; font: inherit; font-size: 17px; font-weight: 600">Sign out</button>
+</div>
+
+<div style="position: absolute; left: 0; right: 0; top: 0; height: 98px; background: {{c.bg}}; border-bottom: 1px solid {{c.line}}; display: flex; align-items: flex-end; justify-content: center; box-sizing: border-box">
+<span style="height: 44px; display: flex; align-items: center; font-size: 17px; font-weight: 600">Profile</span>
+<span style="position: absolute; right: 12px; bottom: 0; height: 44px; display: flex; align-items: center; font-size: 17px; font-weight: 600; color: {{c.text3}}">Save</span>
+</div>
+<nav aria-label="Tab bar (native)" style="position: absolute; left: 20px; right: 20px; top: 770px; height: 62px; box-sizing: border-box; border-radius: 31px; background: {{c.tabBar}}; border: 1px solid {{c.tabBorder}}; box-shadow: {{c.floatShadow}}; display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.66 6.34A8 8 0 1 0 17.66 17.66"></path></svg>Today</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>Plan</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+<a href="#" aria-current="page" style="flex: 1; height: 52px; border-radius: 26px; background: {{c.tabPill}}; color: {{c.tabActive}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.6"></circle><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5"></path></svg>Profile</a>
+</nav>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; width: 393px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">3 · End · saved, update waiting</span><span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Fasting on with 16:8. Appearance and app version share one card. Sign out sits last, away from Save.</span></div>
+</div>
+
+<aside aria-label="Spec" style="width: 400px; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 20px 24px; box-sizing: border-box; max-height: 900px; overflow: hidden; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 6px; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 22px; line-height: 28px; font-weight: 800">Spec</h2>
+<sc-for list="{{spec}}" as="s" hint-placeholder-count="16">
+<div style="padding: 7px 0; border-top: 1px solid {{s.c.line}}; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">{{s.k}}</span>
+<span style="font-size: 12px; line-height: 17px; color: {{s.c.text2}}">{{s.d}}</span>
+</div>
+</sc-for>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1835,"height":1160}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257', board: '#050604', phoneEdge: '#2A2D27', behind: '#000000', peek: '#1B1D18', keyboard: '#2C2D2A', pressed: '#2C2F29', onAlert: '#1A0705', thumb: '#3A3D36', thumbShadow: 'none', switchOn: '#C6F24E' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194', board: '#E4E6DE', phoneEdge: '#CFD2C7', behind: '#B9BCB2', peek: '#D9DBD3', keyboard: '#D3D5CC', pressed: '#DFE2D8', onAlert: '#FFFFFF', thumb: '#FFFFFF', thumbShadow: '0 1px 3px rgba(17,19,14,0.15)', switchOn: '#557F00' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const c = this.palette()[theme];
+    const seg = (labels, sel) => labels.map((label, i) => ({ label, on: i === sel ? 'true' : 'false', bg: i === sel ? c.thumb : 'transparent', shadow: i === sel ? c.thumbShadow : 'none', col: i === sel ? c.text : c.text2, w: i === sel ? 600 : 400 }));
+    const chips = (labels, sel) => labels.map((label, i) => ({ label, on: i === sel ? 'true' : 'false', bg: i === sel ? c.accent : c.raised, col: i === sel ? c.onAccent : c.text, w: i === sel ? 700 : 600 }));
+    const A = [['Sedentary', 'Desk job, under ~5k steps'], ['Lightly active', '~5–8k steps a day'], ['Moderately active', 'On your feet a lot, ~8–12k steps'], ['Very active', 'Physical job, 12k+ steps']];
+    const activity = A.map((a, i) => ({ t: a[0], d: a[1], on: i === 1 ? 'true' : 'false', bg: i === 1 ? c.accent : c.raised, col: i === 1 ? c.onAccent : c.text, sub: i === 1 ? c.onAccent : c.text2 }));
+    const meals = ['Meal 1', 'Meal 2', 'Meal 3', 'Meal 4', 'Snacks'].map((name, i) => ({ name, n: i + 1, c }));
+    const S = (k, d) => ({ k, d, c });
+    const spec = [
+      S('Screen', 'Existing Screen (ScrollView): 16 pt gutter, 12 pt between cards, bottom inset clears the tab bar (+96). automaticallyAdjustKeyboardInsets + keyboardDismissMode interactive keep the focused field above the keyboard.'),
+      S('Title + Save', 'Native headerLargeTitle 34/41 collapsing to inline 17/600 at ~52 pt scroll. Save is the header right button: text3 + disabled until dirty, then accentText with a 7 pt dot. On save: Haptics success, dot fades 160 ms.'),
+      S('TargetPreview (new)', 'Card r24, pad 18/20. num.hero variant 48/52 Archivo 800 + 17/600 unit. Recomputes live from unsaved values (debounce 300 ms) and counts up 600 ms out-cubic.'),
+      S('Field', '44 h, r12, pad 0/14, 17 pt text; label 13/16 text2, gap 4. Numbers in Archivo 600 tabular. Focus = 2 pt accentLine border. Height/weight/protein: decimal-pad. Percent: number-pad.'),
+      S('Birth date', 'Field that opens the native date picker (compact, wheels on tap). Stored ISO, shown DD-MM-YYYY.'),
+      S('Segmented', 'Sex, Goal, Appearance. 40–44 h track raised r12, pad 3, thumb r9 (dark #3A3D36 / light white + shadow y1 r3 α.15). Thumb slides 220 ms out-cubic. accessibilityRole radiogroup.'),
+      S('ActivityOption (new)', 'Pressable, min 52 h, r14, pad 7/14; title 15/600, description 13/17. Selected = accent fill + onAccent text. Single choice, role radio, 6 pt gap.'),
+      S('Rate / fasting chips', 'Chip 36 h pill, pad 0/12–14, Archivo 600 15 tabular. Selected = accent fill, onAccent 700. hitSlop 4 to reach 44.'),
+      S('Fine-tuning', '3-up grid, gap 8. Helper footnote 13/18 text2. Out-of-range values show ErrorText under the grid, not per field.'),
+      S('Meals', 'Preset chips replace all names after an Alert confirm. MealNameRow = Field + Remove text button (alert 15/600, 44 h). Remove disabled at 1 meal; “+ Add meal” hides at 6. New row FadeIn 180 ms, removed FadeOut + LinearTransition.'),
+      S('Fasting', 'Native Switch (trackColor.true = switchOn). Off collapses the rest of the card with LinearTransition 220 ms. Window opens = native time picker. Summary line recomputes live.'),
+      S('Training data rows', 'Row 56 h, 32 pt icon tile r10, title 15/600 + meta 13/18, chevron text3. Opens whoop-import and weigh-in sheets.'),
+      S('App card', 'Appearance applies instantly via AppThemeProvider (cross-fade 200 ms). Version rows 13/18; OTA pill = StatusPill good. Button M secondary cycles Check for updates → Loading → Restart to update (expo-updates).'),
+      S('Sign out', 'Button ghost, alert text 17/600, 44 h, 24 pt above the tab-bar inset. Native Alert confirm.'),
+      S('Tab bar', 'NativeTabs, Profile = person.crop.circle(.fill). Renders the system floating bar; we only tint (accentText / tabIdle).')
+    ];
+    return {
+      c, themeName: theme === 'light' ? 'Light' : 'Dark',
+      segSex: seg(['Male', 'Female'], 0), segGoal: seg(['Lose', 'Maintain', 'Gain'], 0), segApp: seg(['Dark', 'Light', 'System'], theme === 'light' ? 1 : 0),
+      rates: chips(['0.25 kg', '0.5 kg', '0.75 kg', '1 kg'], 3), fasting: chips(['14:10', '16:8', '18:6', '20:4', 'OMAD'], 1),
+      activity, meals, spec
+    };
+  }
+}
+</script>
+</body>
+</html>

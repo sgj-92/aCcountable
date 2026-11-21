@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1835px; height: 1160px; box-sizing: border-box; padding: 48px; background: {{c.board}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; gap: 24px">
+
+<header style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">SCREEN · SIGN IN</span>
+<h1 style="margin: 0; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -0.5px">Sign in</h1>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{themeName}} · full screen, no tabs · one form for both modes · email confirmation step</span>
+</header>
+
+<div style="display: flex; gap: 40px; align-items: flex-start">
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="padding: 120px 24px 0; display: flex; flex-direction: column; align-items: stretch">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 14px">
+<svg width="76" height="76" viewBox="0 0 180 180" role="img" aria-label="aCcountable mark"><rect width="180" height="180" rx="40" fill="{{c.surface}}"></rect><path d="M126.8 53.2A52 52 0 1 0 126.8 126.8" fill="none" stroke="{{c.accentLine}}" stroke-width="28" stroke-linecap="round"></path></svg>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 40px; line-height: 44px; font-weight: 800; letter-spacing: -1.2px">a<span style="color: {{c.accentText}}">C</span>countable</span>
+<span style="font-size: 16px; line-height: 22px; color: {{c.text2}}">Calories that follow your training.</span>
+</div>
+<div role="radiogroup" aria-label="Mode" style="margin-top: 40px; height: 44px; border-radius: 12px; background: {{c.raised}}; padding: 3px; box-sizing: border-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px">
+<button role="radio" aria-checked="true" style="border: 0; border-radius: 9px; background: {{c.thumb}}; box-shadow: {{c.thumbShadow}}; color: {{c.text}}; font: inherit; font-size: 15px; font-weight: 600">Sign in</button>
+<button role="radio" aria-checked="false" style="border: 0; border-radius: 9px; background: transparent; color: {{c.text2}}; font: inherit; font-size: 15px">Create account</button>
+</div>
+<div style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Email</span><input type="email" placeholder="you@example.com" style="width: 100%; height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; box-sizing: border-box"></label>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Password</span><input type="password" placeholder="Password" style="width: 100%; height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; box-sizing: border-box"></label>
+</div>
+<button style="margin-top: 24px; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 17px; font-weight: 700">Sign in</button>
+<a href="#" style="align-self: center; margin-top: 8px; min-height: 44px; display: flex; align-items: center; font-size: 15px; font-weight: 600; color: {{c.accentText}}; text-decoration: none">Forgot password?</a>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; width: 393px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">1 · Sign in</span><span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">The brand mark and strap line, then one segmented form. The primary button sits in the thumb zone.</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="padding: 62px 24px 0; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="36" height="36" viewBox="0 0 180 180" aria-hidden="true"><rect width="180" height="180" rx="40" fill="{{c.surface}}"></rect><path d="M126.8 53.2A52 52 0 1 0 126.8 126.8" fill="none" stroke="{{c.accentLine}}" stroke-width="30" stroke-linecap="round"></path></svg>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 24px; line-height: 28px; font-weight: 800; letter-spacing: -0.6px">a<span style="color: {{c.accentText}}">C</span>countable</span>
+</div>
+<div role="radiogroup" aria-label="Mode" style="margin-top: 16px; height: 44px; border-radius: 12px; background: {{c.raised}}; padding: 3px; box-sizing: border-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px">
+<button role="radio" aria-checked="false" style="border: 0; border-radius: 9px; background: transparent; color: {{c.text2}}; font: inherit; font-size: 15px">Sign in</button>
+<button role="radio" aria-checked="true" style="border: 0; border-radius: 9px; background: {{c.thumb}}; box-shadow: {{c.thumbShadow}}; color: {{c.text}}; font: inherit; font-size: 15px; font-weight: 600">Create account</button>
+</div>
+<div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Email</span><input type="email" value="sgj@gmail.com" style="width: 100%; height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; box-sizing: border-box"></label>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; line-height: 16px; color: {{c.text2}}">Password</span><input type="password" value="padel1" aria-invalid="true" aria-describedby="pwerr" style="width: 100%; height: 52px; border-radius: 14px; border: 2px solid {{c.alert}}; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; box-sizing: border-box"></label>
+<span id="pwerr" role="alert" style="display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; color: {{c.alert}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.3 3h7.4L21 8.3v7.4L15.7 21H8.3L3 15.7V8.3z"></path><path d="M12 7.5v5.5M12 16.3v.3"></path></svg>Password needs at least 8 characters.</span>
+</div>
+<button disabled="" style="margin-top: 14px; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 17px; font-weight: 700; opacity: 0.4">Create account</button>
+</div>
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 336px; background: {{c.keyboard}}; display: flex; align-items: center; justify-content: center; font-size: 12px; color: {{c.text2}}">System keyboard</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; width: 393px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">2 · Create account · error</span><span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">The header compresses so the whole form stays above the keyboard. The error is inline and the button stays disabled.</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="padding: 200px 24px 0; display: flex; flex-direction: column; align-items: center; text-align: center">
+<div style="width: 96px; height: 96px; border-radius: 48px; background: {{c.goodBg}}; color: {{c.good}}; display: flex; align-items: center; justify-content: center"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M4 7l8 6 8-6"></path></svg></div>
+<h2 style="margin: 24px 0 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.3px">Check your email</h2>
+<p style="margin: 10px 0 0; max-width: 300px; font-size: 16px; line-height: 22px; color: {{c.text2}}">We sent a link to <span style="color: {{c.text}}; font-weight: 600">s•••@gmail.com</span>. Open it on this iPhone to finish.</p>
+</div>
+<div style="position: absolute; left: 24px; right: 24px; bottom: 48px; display: flex; flex-direction: column; gap: 8px">
+<button style="height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 17px; font-weight: 700">Open Mail</button>
+<button disabled="" style="height: 44px; border-radius: 14px; border: 0; background: transparent; color: {{c.text3}}; font: inherit; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums">Resend in <span style="font-family: Archivo, -apple-system, Inter, sans-serif">0:42</span></button>
+<a href="#" style="align-self: center; min-height: 44px; display: flex; align-items: center; font-size: 15px; font-weight: 600; color: {{c.accentText}}; text-decoration: none">Use a different email</a>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; width: 393px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">3 · Check your email</span><span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">The address is masked. Resend unlocks after 60 s. Opening the link signs in and lands on Today.</span></div>
+</div>
+
+<aside aria-label="Spec" style="width: 400px; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 20px 24px; box-sizing: border-box; max-height: 900px; overflow: hidden; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 6px; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 22px; line-height: 28px; font-weight: 800">Spec</h2>
+<sc-for list="{{spec}}" as="s" hint-placeholder-count="14">
+<div style="padding: 7px 0; border-top: 1px solid {{s.c.line}}; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">{{s.k}}</span>
+<span style="font-size: 12px; line-height: 17px; color: {{s.c.text2}}">{{s.d}}</span>
+</div>
+</sc-for>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1835,"height":1160}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257', board: '#050604', phoneEdge: '#2A2D27', behind: '#000000', peek: '#1B1D18', keyboard: '#2C2D2A', pressed: '#2C2F29', onAlert: '#1A0705', thumb: '#3A3D36', thumbShadow: 'none' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194', board: '#E4E6DE', phoneEdge: '#CFD2C7', behind: '#B9BCB2', peek: '#D9DBD3', keyboard: '#D3D5CC', pressed: '#DFE2D8', onAlert: '#FFFFFF', thumb: '#FFFFFF', thumbShadow: '0 1px 3px rgba(17,19,14,0.15)' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const c = this.palette()[theme];
+    const S = (k, d) => ({ k, d, c });
+    const spec = [
+      S('Screen', 'sign-in route, headerShown false. Existing Screen (ScrollView) with 24 pt gutter, automaticallyAdjustKeyboardInsets, keyboardShouldPersistTaps handled.'),
+      S('BrandMark (new)', 'react-native-svg: 76 pt tile r17, surface fill, open-C arc in accentLine, stroke 28/180. Compact variant 36 pt next to a 24/28 wordmark once the keyboard is up.'),
+      S('Wordmark', 'Archivo 800 40/44, tracking −1.2. Only the C is coloured (accentText). Strap line SF 16/22 text2.'),
+      S('Keyboard shift', 'On keyboardWillShow the large header cross-fades to the compact row (200 ms) so the form and button stay visible. Reverses on hide.'),
+      S('Mode segmented', 'Segmented 44 h, Sign in / Create account. Switching swaps the button label and password hint, FadeIn 160 ms. No route change.'),
+      S('Email field', 'Field 52 h r14. keyboardType email-address, autoCapitalize none, autoComplete email, textContentType username, returnKeyType next.'),
+      S('Password field', 'secureTextEntry. textContentType password (sign in) / newPassword (create) so iOS offers a strong password. returnKeyType go submits.'),
+      S('Primary button', 'Button L 56 h r18 accent. Disabled (40 %) until the email is valid and the password has 8+ characters. Loading shows a spinner and keeps its width.'),
+      S('ErrorText', '13/18 alert with an octagon icon. Field border 2 pt alert, aria-invalid. Enters FadeIn 160 ms and one Haptics.notificationAsync(Error). Clears on edit.'),
+      S('Server errors', 'Same ErrorText slot: “Wrong email or password.” / “That email already has an account. Sign in instead?” with an inline link that flips the mode.'),
+      S('Forgot password', 'Text button 15/600 accentText, 44 h. Sends a reset email and shows the check-your-email state with reset copy.'),
+      S('Check your email', 'Shown after sign-up when confirmation is needed. 96 pt goodBg circle, mail glyph. Title 28/34 700, body 16/22. Buttons pinned 48 pt above the home indicator.'),
+      S('Open Mail', 'Linking.openURL(\'message://\'). Hidden if it cannot open. Resend: ghost, disabled with a 60 s countdown in Archivo tabular, then enabled.'),
+      S('Deep link', 'The confirmation link opens the app (scheme in app.json), the session is set, and the root Stack.Protected guard moves to (tabs) with no extra tap.')
+    ];
+    return { c, themeName: theme === 'light' ? 'Light' : 'Dark', spec };
+  }
+}
+</script>
+</body>
+</html>
