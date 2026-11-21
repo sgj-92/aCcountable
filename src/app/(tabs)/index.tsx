@@ -1,32 +1,32 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, RefreshControl, View } from 'react-native';
+import { RefreshControl, View } from 'react-native';
 
-import { FastingCard } from '@/components/fasting-card';
+import { CRing } from '@/components/c-ring';
+import { FastingBar } from '@/components/fasting-card';
+import { MacroBars, TargetLedger, WeekStrip } from '@/components/hero';
 import { InsightsCard } from '@/components/insights-card';
-import { Ring } from '@/components/ring';
-import {
-  Button,
-  Card,
-  Divider,
-  ErrorText,
-  fmt,
-  Loading,
-  Row,
-  Screen,
-  Stepper,
-  T,
-} from '@/components/ui';
+import { MealCard } from '@/components/meal-card';
+import { showMenu } from '@/components/menu';
+import { PressableScale } from '@/components/pressable-scale';
+import { QuickDock } from '@/components/quick-dock';
+import { Skeleton } from '@/components/skeleton';
+import { AddSlot, DotNote, Sparkline, Tile, TileValue } from '@/components/tiles';
+import { Button, Card, Divider, ErrorText, fmt, IconButton, Num, Row, Screen, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
-import { computeWeek, loadWeek } from '@/lib/adaptive';
-import { deleteFood, isProfileComplete, type FoodEntry } from '@/lib/api';
-import { addDays, formatDay, isValidISODate, today } from '@/lib/dates';
+import { computeWeek, loadWeek, type WeekData, type WeekView } from '@/lib/adaptive';
+import { isProfileComplete, type Profile, type TrainingSession } from '@/lib/api';
+import { addDays, formatDay, formatLongDay, isValidISODate, startOfWeek, today } from '@/lib/dates';
 import { parseClock } from '@/lib/fasting';
 import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
 import { sumTotals } from '@/lib/nutrition';
 import { sessionKcalDetail, sessionLabel } from '@/lib/targets';
+import { WEEK_INSIGHT_IDS, weekSummary } from '@/lib/week-summary';
+
+/** Clears the floating dock and the tab bar. */
+const BOTTOM_PAD = 200;
 
 export default function TodayScreen() {
   const c = useTheme();
@@ -43,262 +43,351 @@ export default function TodayScreen() {
   }
 
   const { data, error, reload, refreshing, refresh } = useAsync(() => loadWeek(date), date);
-
   const isToday = date === today();
-  const label = isToday ? `Today · ${formatDay(date)}` : formatDay(date);
 
-  if (!data) {
+  // Data from a different week is stale for this day: show the skeleton until it arrives.
+  const fresh = data && data.weekStart === startOfWeek(date) ? data : undefined;
+  const profile = fresh?.profile;
+  const slots = resolveSlots(profile?.meal_slots);
+  const windowStart = parseClock(profile?.eating_window_start);
+  const windowEnd = parseClock(profile?.eating_window_end);
+  const fastingWindow =
+    windowStart != null && windowEnd != null ? { startMin: windowStart, endMin: windowEnd } : null;
+  const defaultMeal = isToday ? defaultSlotForNow(slots, new Date(), fastingWindow) : slots[slots.length - 1].key;
+
+  const header = (
+    <DayHeader
+      date={date}
+      isToday={isToday}
+      onPrev={() => setDate(addDays(date, -1))}
+      onNext={() => setDate(addDays(date, 1))}
+      onToday={() => setDate(today())}
+    />
+  );
+
+  const dock = (
+    <QuickDock
+      onScan={() => router.push({ pathname: '/scan', params: { date, meal: defaultMeal } })}
+      onAddFood={() => router.push({ pathname: '/food', params: { date, meal: defaultMeal } })}
+      onLogSession={() => router.push({ pathname: '/training', params: { date } })}
+      onWeighIn={() => router.push('/weigh-in')}
+    />
+  );
+
+  if (!fresh || !profile) {
     return (
-      <Screen>
-        <Stepper label={label} onPrev={() => setDate(addDays(date, -1))} onNext={() => setDate(addDays(date, 1))} />
-        {error ? <ErrorText message={error} /> : <Loading />}
-      </Screen>
+      <View style={{ flex: 1, backgroundColor: c.bg }}>
+        <Screen padBottom={BOTTOM_PAD}>
+          {header}
+          {error ? <ErrorText message={error} /> : <TodaySkeleton />}
+        </Screen>
+        {dock}
+      </View>
     );
   }
 
-  const { profile } = data;
-  const sessions = data.sessions.filter((s) => s.date === date);
-  const food = data.food.filter((f) => f.date === date);
-  // Targets come from the whole week, so they include the weekly balancing.
-  const view = computeWeek(data, today());
+  const view = computeWeek(fresh, today());
   const day = view?.days[date];
-  const target = day ? { ...day.raw, kcal: day.adjusted, proteinG: day.proteinG, carbsG: day.carbsG, fatG: day.fatG } : null;
-  const eaten = sumTotals(food);
-  const remaining = target ? target.kcal - eaten.kcal : 0;
-  const latestTrend = view?.trend.at(-1);
-
-  const slots = resolveSlots(profile.meal_slots);
-  const windowStart = parseClock(profile.eating_window_start);
-  const windowEnd = parseClock(profile.eating_window_end);
-  const fastingWindow =
-    windowStart != null && windowEnd != null ? { startMin: windowStart, endMin: windowEnd } : null;
-  const defaultMeal = isToday
-    ? defaultSlotForNow(slots, new Date(), fastingWindow)
-    : slots[slots.length - 1].key;
-  const addFoodManually = () => router.push({ pathname: '/food', params: { date, meal: defaultMeal } });
-  const scan = () => router.push({ pathname: '/scan', params: { date, meal: defaultMeal } });
 
   return (
-    <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
-      <Stepper label={label} onPrev={() => setDate(addDays(date, -1))} onNext={() => setDate(addDays(date, 1))} />
-      {!isToday ? <Button title="Jump to today" variant="ghost" onPress={() => setDate(today())} /> : null}
-      <ErrorText message={error} />
+    <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <Screen padBottom={BOTTOM_PAD} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
+        {header}
+        <ErrorText message={error} />
 
-      {!isProfileComplete(profile) || !target ? (
-        <Card>
-          <T variant="heading">Set up your profile</T>
-          <T variant="muted">
-            Add your sex, birth date, height and weight so we can work out your daily targets.
-          </T>
-          <Button title="Go to profile" onPress={() => router.navigate('/profile')} />
-        </Card>
-      ) : (
-        <>
-          {/* Calories + macros */}
-          <Card style={{ gap: Spacing.lg, paddingVertical: Spacing.xl }}>
-            <Row gap={Spacing.xl} style={{ alignItems: 'center' }}>
-              <Ring value={eaten.kcal} max={target.kcal} size={156} stroke={14}>
-                <T variant="big" color={remaining < 0 ? c.danger : c.text} style={{ fontSize: 34 }}>
-                  {fmt(Math.abs(remaining))}
-                </T>
-                <T variant="small">{remaining < 0 ? 'kcal over' : 'kcal left'}</T>
-              </Ring>
-              <View style={{ flex: 1, gap: Spacing.sm }}>
-                <Stat label="Eaten" value={fmt(eaten.kcal)} />
-                <Stat label="Target" value={fmt(target.kcal)} />
-                <Stat label="Base" value={fmt(target.base)} small />
-                <Stat label="Training" value={`+${fmt(target.training)}`} color={c.training} small />
-                {day && day.adjustment !== 0 ? (
-                  <Stat
-                    label="Week balance"
-                    value={`${day.adjustment > 0 ? '+' : '−'}${fmt(Math.abs(day.adjustment))}`}
-                    color={day.adjustment < 0 ? c.fat : c.success}
-                    small
-                  />
-                ) : null}
-              </View>
-            </Row>
-            <Row style={{ justifyContent: 'space-around' }}>
-              <MacroRing label="Protein" value={eaten.proteinG} target={target.proteinG} color={c.protein} />
-              <MacroRing label="Carbs" value={eaten.carbsG} target={target.carbsG} color={c.carbs} />
-              <MacroRing label="Fat" value={eaten.fatG} target={target.fatG} color={c.fat} />
-            </Row>
-            {target.flooredAtBmr ? (
-              <T variant="small">
-                Your goal deficit was capped so the base target doesn’t drop below your BMR ({fmt(target.bmr)}).
-              </T>
-            ) : null}
+        {!isProfileComplete(profile) || !view || !day ? (
+          <Card hero>
+            <T variant="headline">Set up your profile</T>
+            <T variant="footnote">Add your sex, birth date, height and weight so we can work out your daily targets.</T>
+            <Button title="Go to profile" onPress={() => router.navigate('/profile')} />
           </Card>
-        </>
-      )}
-
-      {isToday && view ? <InsightsCard insights={view.insights} /> : null}
-
-      {isToday && fastingWindow ? <FastingCard {...fastingWindow} /> : null}
-
-      {/* Actions */}
-      <Row>
-        <Button title="Scan meal" icon="📷" onPress={scan} style={{ flex: 1 }} />
-        <Button title="Add food" variant="secondary" onPress={addFoodManually} style={{ flex: 1 }} />
-      </Row>
-
-      {/* Training */}
-      <Card>
-        <Row style={{ justifyContent: 'space-between' }}>
-          <T variant="heading">Training</T>
-          <Pressable onPress={() => router.push({ pathname: '/training', params: { date } })} hitSlop={8}>
-            <T color={c.primary}>+ Add</T>
-          </Pressable>
-        </Row>
-        {sessions.length === 0 ? (
-          <T variant="muted">Rest day. No sessions planned.</T>
         ) : (
-          sessions.map((s) => {
-            const burn = sessionKcalDetail(profile, s, view?.rates);
-            const needsConfirm = s.date <= today() && s.actual_kcal == null;
-            return (
-              <Pressable
-                key={s.id}
-                onPress={() => router.push({ pathname: '/training', params: { id: s.id, date } })}>
-                <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: Spacing.xs }}>
-                  <View style={{ flex: 1, gap: 2 }}>
-                    <T>
-                      {sessionLabel(s)} · {s.actual_duration_min ?? s.duration_min} min · {s.intensity}
-                    </T>
-                    <T variant="small" color={burn?.source === 'actual' ? c.success : c.textMuted}>
-                      {burn?.source === 'actual'
-                        ? '✓ WHOOP confirmed'
-                        : burn?.source === 'history'
-                          ? `Estimate from your WHOOP history${needsConfirm ? ' · tap to confirm' : ''}`
-                          : `Estimate${needsConfirm ? ' · tap to confirm with WHOOP' : ''}`}
-                    </T>
-                  </View>
-                  <T color={c.training}>
-                    {burn?.source === 'actual' ? '' : '≈ '}+{fmt(burn?.added ?? 0)}
-                  </T>
-                </Row>
-              </Pressable>
-            );
-          })
+          <TodayBody data={fresh} view={view} date={date} isToday={isToday} slots={slots} fastingWindow={fastingWindow} onChanged={reload} />
         )}
-      </Card>
-
-      {/* Weight */}
-      {isToday ? (
-        <Pressable onPress={() => router.push('/weigh-in')} accessibilityRole="button">
-          <Card>
-            <Row style={{ justifyContent: 'space-between' }}>
-              <View style={{ gap: 2 }}>
-                <T variant="heading">Weight</T>
-                <T variant="small">
-                  {latestTrend
-                    ? `Trend ${latestTrend.trend.toFixed(1)} kg${
-                        view?.rate != null ? ` · ${view.rate < 0 ? '−' : '+'}${Math.abs(view.rate).toFixed(2)} kg/week` : ''
-                      }`
-                    : 'No weigh-ins yet'}
-                </T>
-              </View>
-              <T color={c.primary}>{latestTrend?.date === today() ? 'Logged ✓' : '+ Log'}</T>
-            </Row>
-          </Card>
-        </Pressable>
-      ) : null}
-
-      {/* Meals */}
-      {slotsForData(
-        slots,
-        food.map((f) => f.meal),
-      ).map(({ key: meal, label }) => {
-        const items = food.filter((f) => f.meal === meal);
-        const total = sumTotals(items);
-        return (
-          <Card key={meal}>
-            <Row style={{ justifyContent: 'space-between' }}>
-              <T variant="heading">{label}</T>
-              <Row gap={Spacing.lg}>
-                {items.length > 0 ? <T variant="muted">{fmt(total.kcal)} kcal</T> : null}
-                <Pressable onPress={() => router.push({ pathname: '/food', params: { date, meal } })} hitSlop={8}>
-                  <T color={c.primary}>+ Add</T>
-                </Pressable>
-              </Row>
-            </Row>
-            {items.length === 0 ? <T variant="small">Nothing logged</T> : null}
-            {items.map((f, i) => (
-              <View key={f.id}>
-                {i > 0 ? <Divider /> : null}
-                <FoodRow entry={f} onDeleted={reload} />
-              </View>
-            ))}
-          </Card>
-        );
-      })}
-    </Screen>
-  );
-}
-
-function Stat({ label, value, color, small }: { label: string; value: string; color?: string; small?: boolean }) {
-  return (
-    <Row style={{ justifyContent: 'space-between' }}>
-      <T variant={small ? 'small' : 'muted'}>{label}</T>
-      <T variant={small ? 'muted' : 'heading'} color={color} style={{ fontVariant: ['tabular-nums'] }}>
-        {value}
-      </T>
-    </Row>
-  );
-}
-
-function MacroRing({ label, value, target, color }: { label: string; value: number; target: number; color: string }) {
-  return (
-    <View style={{ alignItems: 'center', gap: Spacing.xs }}>
-      <Ring value={value} max={target} size={78} stroke={8} color={color}>
-        <T variant="heading" style={{ fontVariant: ['tabular-nums'] }}>
-          {fmt(value)}
-        </T>
-      </Ring>
-      <T variant="small" color={color}>
-        {label}
-      </T>
-      <T variant="small">of {fmt(target)} g</T>
+      </Screen>
+      {dock}
     </View>
   );
 }
 
-function FoodRow({ entry, onDeleted }: { entry: FoodEntry; onDeleted: () => void }) {
+function DayHeader({
+  date,
+  isToday,
+  onPrev,
+  onNext,
+  onToday,
+}: {
+  date: string;
+  isToday: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+  onToday: () => void;
+}) {
   const c = useTheme();
-  const confirmDelete = () =>
-    Alert.alert('Delete entry?', entry.name, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteFood(entry.id);
-            onDeleted();
-          } catch (e) {
-            Alert.alert('Could not delete', e instanceof Error ? e.message : String(e));
-          }
-        },
-      },
-    ]);
   return (
-    <Pressable
-      onPress={() => router.push({ pathname: '/food', params: { id: entry.id } })}
-      onLongPress={confirmDelete}
-      style={{ paddingVertical: Spacing.sm }}>
-      <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <T numberOfLines={1}>
-            {entry.source === 'photo' ? '📷 ' : ''}
-            {entry.name}
-          </T>
-          <T variant="small">
-            {entry.serving ? `${entry.serving} · ` : ''}P {fmt(entry.protein_g)} · C {fmt(entry.carbs_g)} · F{' '}
-            {fmt(entry.fat_g)}
-          </T>
-        </View>
-        <T color={c.text}>{fmt(entry.kcal)}</T>
+    <Row style={{ alignItems: 'flex-end', justifyContent: 'space-between', paddingBottom: 2 }}>
+      <View style={{ gap: 2, flexShrink: 1 }}>
+        <T variant="footnote" style={{ fontWeight: '600' }} numberOfLines={1}>
+          {formatLongDay(date)}
+        </T>
+        <T variant="largeTitle" numberOfLines={1}>
+          {isToday ? 'Today' : formatDay(date)}
+        </T>
+      </View>
+      <Row gap={Spacing.sm}>
+        {!isToday ? (
+          <PressableScale
+            accessibilityRole="button"
+            accessibilityLabel="Back to today"
+            onPress={onToday}
+            hitSlop={6}
+            style={{ height: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: c.goodBg, justifyContent: 'center' }}>
+            <T color={c.accentText} style={{ fontSize: 13, fontWeight: '700' }}>
+              ↩ Today
+            </T>
+          </PressableScale>
+        ) : null}
+        <IconButton glyph="‹" label="Previous day" onPress={onPrev} />
+        <IconButton glyph="›" label="Next day" onPress={onNext} color={isToday ? c.text3 : c.text} />
       </Row>
-    </Pressable>
+    </Row>
+  );
+}
+
+function TodayBody({
+  data,
+  view,
+  date,
+  isToday,
+  slots,
+  fastingWindow,
+  onChanged,
+}: {
+  data: WeekData;
+  view: WeekView;
+  date: string;
+  isToday: boolean;
+  slots: ReturnType<typeof resolveSlots>;
+  fastingWindow: { startMin: number; endMin: number } | null;
+  onChanged: () => void;
+}) {
+  const c = useTheme();
+  const { profile } = data;
+  const day = view.days[date];
+  const sessions = data.sessions.filter((s) => s.date === date);
+  const food = data.food.filter((f) => f.date === date);
+  const eaten = sumTotals(food);
+  const target = day.adjusted;
+  const closedUnder = date < today() && food.length > 0 && eaten.kcal < target;
+  const trainingLabel =
+    sessions.length === 1 ? sessionLabel(sessions[0]).toLowerCase() : sessions.length > 1 ? 'training' : 'rest day';
+  const insights = view.insights.filter((i) => !WEEK_INSIGHT_IDS.includes(i.id));
+
+  return (
+    <>
+      {/* Hero: today and the week in one card */}
+      <Card hero style={{ alignItems: 'center', gap: Spacing.md, paddingBottom: 14 }}>
+        <CRing eaten={eaten.kcal} target={target} training={day.raw.training} closedUnder={closedUnder} />
+        <TargetLedger
+          base={day.raw.base}
+          training={day.raw.training}
+          trainingLabel={trainingLabel}
+          weekBalance={day.adjustment}
+          target={target}
+        />
+        <View style={{ alignSelf: 'stretch' }}>
+          <Divider />
+        </View>
+        <MacroBars
+          macros={[
+            { label: 'Protein', value: eaten.proteinG, target: day.proteinG, color: c.protein },
+            { label: 'Carbs', value: eaten.carbsG, target: day.carbsG, color: c.carbs },
+            { label: 'Fat', value: eaten.fatG, target: day.fatG, color: c.fat },
+          ]}
+        />
+        <View style={{ alignSelf: 'stretch' }}>
+          <Divider />
+        </View>
+        <WeekStrip days={view.week.days} viewedDate={date} summary={weekSummary(view.week)} />
+        {day.raw.flooredAtBmr ? (
+          <T variant="footnote" style={{ alignSelf: 'stretch' }}>
+            Your goal deficit was capped so the base target doesn’t drop below your BMR ({fmt(day.raw.bmr)}).
+          </T>
+        ) : null}
+      </Card>
+
+      {isToday ? <InsightsCard insights={insights} /> : null}
+
+      {isToday && fastingWindow ? <FastingBar {...fastingWindow} /> : null}
+
+      <Row gap={Spacing.md} style={{ alignItems: 'stretch' }}>
+        <TrainingTile profile={profile} sessions={sessions} date={date} isToday={isToday} view={view} />
+        <WeightTile view={view} date={date} isToday={isToday} />
+      </Row>
+
+      <Row style={{ justifyContent: 'space-between', alignItems: 'baseline', paddingTop: Spacing.md, paddingHorizontal: 4 }}>
+        <T variant="title" style={{ fontSize: 20, lineHeight: 25 }}>
+          Meals
+        </T>
+        <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
+          {fmt(eaten.kcal)} kcal eaten
+        </T>
+      </Row>
+      {slotsForData(
+        slots,
+        food.map((f) => f.meal),
+      ).map(({ key, label }) => (
+        <MealCard
+          key={key}
+          label={label}
+          meal={key}
+          date={date}
+          items={food.filter((f) => f.meal === key)}
+          slots={slots}
+          onChanged={onChanged}
+        />
+      ))}
+    </>
+  );
+}
+
+function TrainingTile({
+  profile,
+  sessions,
+  date,
+  isToday,
+  view,
+}: {
+  profile: Profile;
+  sessions: TrainingSession[];
+  date: string;
+  isToday: boolean;
+  view: WeekView;
+}) {
+  const c = useTheme();
+  const add = () => router.push({ pathname: '/training', params: { date } });
+  const open = (s: TrainingSession) => router.push({ pathname: '/training', params: { id: s.id, date } });
+
+  if (sessions.length === 0) {
+    const title = isToday ? 'Rest day' : date > today() ? 'Nothing planned' : 'No session logged';
+    return (
+      <Tile overline="Training" overlineColor={c.training} onPress={add} accessibilityLabel={`${title}. Add a session`}>
+        <T style={{ fontSize: 16, lineHeight: 21, fontWeight: '600' }}>{title}</T>
+        <T variant="footnote">{isToday ? 'Nothing planned today' : formatDay(date)}</T>
+        <AddSlot label="+ Session" />
+      </Tile>
+    );
+  }
+
+  const details = sessions.map((s) => ({ s, burn: sessionKcalDetail(profile, s, view.rates) }));
+  const net = details.reduce((sum, d) => sum + (d.burn?.net ?? 0), 0);
+  const allConfirmed = details.every((d) => d.burn?.source === 'actual');
+  const first = sessions[0];
+  const title =
+    sessions.length === 1
+      ? `${sessionLabel(first)} · ${first.actual_duration_min ?? first.duration_min}′`
+      : `${sessions.length} sessions`;
+  const canConfirm = date <= today();
+  const fromHistory = details.some((d) => d.burn?.source === 'history');
+  const note = allConfirmed
+    ? { label: '✓ WHOOP confirmed', color: c.good }
+    : canConfirm
+      ? { label: 'Estimate · tap to confirm', color: c.info }
+      : { label: fromHistory ? 'Estimate from your WHOOP history' : 'Estimate', color: c.text3 };
+
+  const onPress =
+    sessions.length === 1
+      ? () => open(first)
+      : () =>
+          showMenu(
+            [...sessions.map((s) => ({ label: sessionLabel(s), onPress: () => open(s) })), { label: 'Add a session', onPress: add }],
+            'Training',
+          );
+
+  return (
+    <Tile
+      overline="Training"
+      overlineColor={c.training}
+      onPress={onPress}
+      accessibilityLabel={`${title}, ${allConfirmed ? '' : 'about '}${fmt(net)} kcal. ${note.label}`}>
+      <T style={{ fontSize: 16, lineHeight: 21, fontWeight: '600' }} numberOfLines={1}>
+        {title}
+      </T>
+      <Num size="m" color={c.training} style={{ fontSize: 24, lineHeight: 28 }}>
+        {allConfirmed ? '' : '≈ '}+{fmt(net)}
+      </Num>
+      <DotNote label={note.label} color={note.color} />
+    </Tile>
+  );
+}
+
+function WeightTile({ view, date, isToday }: { view: WeekView; date: string; isToday: boolean }) {
+  const c = useTheme();
+  const trend = view.trend.filter((p) => p.date <= date);
+  const latest = trend.at(-1);
+  const loggedThatDay = latest?.date === date;
+  const paceColor =
+    view.pace === 'on-track' ? c.good : view.pace === 'wrong-direction' ? c.alert : view.pace === 'not-enough-data' ? c.text2 : c.warn;
+
+  let note: { label: string; color: string };
+  if (loggedThatDay) note = { label: isToday ? 'Logged ✓ today' : 'Logged ✓ that morning', color: c.good };
+  else if (isToday && view.rate != null)
+    note = { label: `${view.rate < 0 ? '−' : '+'}${Math.abs(view.rate).toFixed(2)} kg/wk`, color: paceColor };
+  else if (isToday) note = { label: 'Not logged today', color: c.info };
+  else note = { label: 'Not logged that day', color: c.text2 };
+
+  return (
+    <Tile
+      overline="Weight"
+      onPress={() => router.push('/weigh-in')}
+      accessibilityLabel={latest ? `Weight, ${latest.trend.toFixed(1)} kg. ${note.label}. Log weight` : 'Weight. Log your first weigh-in'}>
+      {latest ? (
+        <>
+          <TileValue value={latest.trend.toFixed(1)} unit="kg" />
+          <T variant="footnote" color={note.color} style={{ fontWeight: '600', fontVariant: ['tabular-nums'] }}>
+            {note.label}
+          </T>
+          <Sparkline values={trend.slice(-14).map((p) => p.trend)} />
+        </>
+      ) : (
+        <>
+          <T style={{ fontSize: 16, lineHeight: 21, fontWeight: '600' }}>No weigh-ins yet</T>
+          <T variant="footnote">See whether the plan is working</T>
+          <AddSlot label="+ Weigh in" />
+        </>
+      )}
+    </Tile>
+  );
+}
+
+function TodaySkeleton() {
+  return (
+    <>
+      <Card hero style={{ alignItems: 'center', gap: Spacing.md, paddingBottom: 14 }} >
+        <Skeleton width={208} height={208} radius={104} />
+        <Row gap={Spacing.md} style={{ alignSelf: 'stretch' }}>
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} height={34} style={{ flex: 1 }} width={undefined} />
+          ))}
+        </Row>
+        <Row gap={14} style={{ alignSelf: 'stretch' }}>
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} height={40} style={{ flex: 1 }} width={undefined} />
+          ))}
+        </Row>
+        <Skeleton height={62} radius={10} />
+      </Card>
+      <Card hero style={{ gap: 14 }}>
+        <Skeleton width={96} height={14} radius={7} />
+        <Row gap={Spacing.md}>
+          <Skeleton width={32} height={32} radius={16} />
+          <Skeleton height={14} radius={7} style={{ flex: 1 }} width={undefined} />
+        </Row>
+        <Row gap={Spacing.md}>
+          <Skeleton width={32} height={32} radius={16} />
+          <Skeleton width="60%" height={14} radius={7} />
+        </Row>
+      </Card>
+    </>
   );
 }

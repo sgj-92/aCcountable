@@ -3,6 +3,7 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
 import { ProfileProvider } from '@/hooks/use-profile';
@@ -50,12 +51,12 @@ function ThemedNavigation() {
     ...base,
     colors: {
       ...base.colors,
-      primary: c.primary,
-      background: c.background,
-      card: c.card,
+      primary: c.accentText,
+      background: c.bg,
+      card: c.surface,
       text: c.text,
-      border: c.border,
-      notification: c.danger,
+      border: c.line,
+      notification: c.alert,
     },
   };
   return (
@@ -72,8 +73,10 @@ function ThemedNavigation() {
 
 export default function RootLayout() {
   return (
-    <AppThemeProvider>
-      <ThemedNavigation />
-    </AppThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AppThemeProvider>
+        <ThemedNavigation />
+      </AppThemeProvider>
+    </GestureHandlerRootView>
   );
 }

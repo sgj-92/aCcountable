@@ -5,10 +5,10 @@ import { useTheme } from '@/hooks/use-theme';
 export default function TabsLayout() {
   const c = useTheme();
   return (
-    <NativeTabs backgroundColor={c.card} labelStyle={{ selected: { color: c.primary } }}>
+    <NativeTabs backgroundColor={c.surface} labelStyle={{ selected: { color: c.accentText } }}>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Today</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="flame.fill" md="local_fire_department" />
+        <NativeTabs.Trigger.Icon sf={{ default: 'c.circle', selected: 'c.circle.fill' }} md="data_usage" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="plan">
         <NativeTabs.Trigger.Label>Plan</NativeTabs.Trigger.Label>

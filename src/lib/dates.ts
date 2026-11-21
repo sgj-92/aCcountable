@@ -47,6 +47,18 @@ export function dayName(s: string): string {
   return DAY_NAMES[parseISODate(s).getDay()];
 }
 
+const LONG_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const LONG_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+/** e.g. "Thursday 19 November" */
+export function formatLongDay(s: string): string {
+  const d = parseISODate(s);
+  return `${LONG_DAYS[d.getDay()]} ${d.getDate()} ${LONG_MONTHS[d.getMonth()]}`;
+}
+
 /** e.g. "Fri 14 Nov" */
 export function formatDay(s: string): string {
   const d = parseISODate(s);
