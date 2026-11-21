@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sheet · Planned food</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1835px; height: 1160px; box-sizing: border-box; padding: 48px; background: {{c.board}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 24px; -webkit-font-smoothing: antialiased">
+
+<header style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">SHEET · PLANNED FOOD</span>
+<h1 style="margin: 0; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -0.5px">Planned food</h1>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{themeName}} · opened by tapping a food on the Plan tab</span>
+</header>
+
+<div style="display: flex; gap: 40px; align-items: flex-start">
+
+<!-- 1 Not logged -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px; position: relative">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="position: absolute; left: 60px; right: 60px; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Planned food</span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 22px; line-height: 27px; font-weight: 700">Basmati rice (dry)</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums"><span style="height: 18px; padding: 0 6px; border-radius: 9px; background: {{c.raised}}; font-size: 11px; font-weight: 700; display: flex; align-items: center">USDA</span>per 100 g: 351 kcal · P 8 · C 77 · F 1</span>
+</div>
+<section aria-label="Log what you ate" style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">Log what you ate</h2><span style="font-size: 13px; color: {{c.text2}}; font-variant-numeric: tabular-nums">Planned 100 g</span></div>
+<label style="height: 64px; border-radius: 16px; background: {{c.raised}}; border: 2px solid transparent; box-sizing: border-box; display: flex; align-items: center; padding: 0 16px; gap: 6px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Grams eaten</span><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; font-variant-numeric: tabular-nums">100</span><span style="font-size: 18px; color: {{c.text2}}">g</span></label>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums">
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 20px; font-weight: 800">351<span style="font-family: -apple-system, Inter, sans-serif; font-size: 13px; font-weight: 500; color: {{c.text2}}"> kcal</span></span>
+<span style="flex: 1"></span>
+<span style="display: flex; align-items: center; gap: 4px"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{c.protein}}"></span>P 8</span>
+<span style="display: flex; align-items: center; gap: 4px"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{c.carbs}}"></span>C 77</span>
+<span style="display: flex; align-items: center; gap: 4px"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{c.fat}}"></span>F 1</span>
+</div>
+<button style="height: 52px; border-radius: 16px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">Log 100 g</button>
+</section>
+<section aria-label="Planner settings" style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 6px 16px 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 56px; border-bottom: 1px solid {{c.line}}">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Fix this amount</span><span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">The planner won’t change it</span></div>
+<button role="switch" aria-checked="false" aria-label="Fix this amount" style="width: 51px; height: 31px; border-radius: 16px; border: 0; padding: 0; background: {{c.pressed}}; position: relative"><span style="position: absolute; left: 2px; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: #FFFFFF"></span></button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: {{c.text2}}">Portion range the planner may use</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Minimum grams</span><input placeholder="Min g" style="flex: 1; min-width: 0; height: 48px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+<label style="display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Maximum grams</span><input placeholder="Max g" style="flex: 1; min-width: 0; height: 48px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: {{c.text2}}">Meal</span>
+<div role="radiogroup" aria-label="Meal" style="display: flex; gap: 8px; overflow: hidden; margin-right: -16px">
+<sc-for list="{{meals}}" as="m" hint-placeholder-count="5"><button role="radio" aria-checked="{{m.sel}}" style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{m.bg}}; color: {{m.col}}; font: inherit; font-size: 15px; font-weight: {{m.w}}">{{m.n}}</button></sc-for>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">1 · Not logged</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Grams default to the planned amount. Log is the main action.</span>
+</div>
+
+<!-- 2 Logged -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px; position: relative">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="position: absolute; left: 60px; right: 60px; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Planned food</span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 22px; line-height: 27px; font-weight: 700">Basmati rice (dry)</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums"><span style="height: 18px; padding: 0 6px; border-radius: 9px; background: {{c.raised}}; font-size: 11px; font-weight: 700; display: flex; align-items: center">USDA</span>per 100 g: 351 kcal · P 8 · C 77 · F 1</span>
+</div>
+<section aria-label="Logged" style="border-radius: 22px; background: {{c.goodBg}}; padding: 14px 16px; display: flex; align-items: center; gap: 12px">
+<span style="flex: none; width: 32px; height: 32px; border-radius: 16px; background: {{c.accent}}; color: {{c.onAccent}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Logged 100 g to Meal 3</span><span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">14:05 · 351 kcal</span></div>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.surface}}; color: {{c.text}}; font: inherit; font-size: 14px; font-weight: 600">Un-log</button>
+</section>
+<section aria-label="Log what you ate" aria-disabled="true" style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 16px; display: flex; flex-direction: column; gap: 10px; opacity: 0.45">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">Log what you ate</h2><span style="font-size: 13px; color: {{c.text2}}; font-variant-numeric: tabular-nums">Planned 100 g</span></div>
+<div style="height: 64px; border-radius: 16px; background: {{c.raised}}; display: flex; align-items: center; padding: 0 16px; gap: 6px"><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; font-variant-numeric: tabular-nums">100</span><span style="font-size: 18px; color: {{c.text2}}">g</span></div>
+<div style="display: flex; gap: 12px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums"><span>351 kcal</span><span style="flex: 1"></span><span>P 8</span><span>C 77</span><span>F 1</span></div>
+</section>
+<section aria-label="Planner settings" aria-disabled="true" style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 6px 16px 16px; display: flex; flex-direction: column; gap: 12px; opacity: 0.45">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 56px; border-bottom: 1px solid {{c.line}}"><span style="flex: 1; font-size: 15px; font-weight: 600">Fix this amount</span><span style="width: 51px; height: 31px; border-radius: 16px; background: {{c.pressed}}; position: relative; display: block"><span style="position: absolute; left: 2px; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: #FFFFFF"></span></span></div>
+<span style="font-size: 13px; color: {{c.text2}}">Meal · Meal 3</span>
+</section>
+<p style="margin: 0; padding: 0 4px; font-size: 13px; line-height: 18px; color: {{c.text2}}">Logged foods are locked so the plan matches what you ate. Un-log to change the amount.</p>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">2 · Logged</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Good-tinted banner, Un-log as the only action. The rest is read-only.</span>
+</div>
+
+<!-- 3 Settings scrolled -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px; position: relative">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="position: absolute; left: 60px; right: 60px; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Hash browns (frozen)</span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<section aria-label="Fixed amount" style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 6px 16px 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 52px">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Fix this amount</span><span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">The planner won’t change it</span></div>
+<button role="switch" aria-checked="true" aria-label="Fix this amount" style="width: 51px; height: 31px; border-radius: 16px; border: 0; padding: 0; background: {{c.switchOn}}; position: relative"><span style="position: absolute; right: 2px; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: #FFFFFF"></span></button>
+</div>
+<label style="height: 56px; border-radius: 14px; background: {{c.raised}}; border: 2px solid transparent; box-sizing: border-box; display: flex; align-items: center; padding: 0 14px; gap: 6px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Fixed grams</span><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums">175</span><span style="font-size: 16px; color: {{c.text2}}">g</span><span style="flex: 1"></span><span style="font-size: 13px; color: {{c.text2}}">5 hash browns · 175 g</span></label>
+</section>
+<section aria-label="Portion range" aria-disabled="true" style="display: flex; flex-direction: column; gap: 6px; opacity: 0.45">
+<span style="font-size: 13px; color: {{c.text2}}">Portion range · ignored while the amount is fixed</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Minimum grams</span><input value="50 g" disabled="" style="flex: 1; min-width: 0; height: 48px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+<label style="display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Maximum grams</span><input value="150 g" disabled="" style="flex: 1; min-width: 0; height: 48px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+</div>
+</section>
+<section aria-label="Nutrition per 100 g" style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><span style="font-size: 13px; color: {{c.text2}}">Nutrition per 100 g</span><a href="#" style="padding: 4px 0; font-size: 13px; font-weight: 600; color: {{c.accentText}}; text-decoration: none">Use exact values from the food database</a></div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{nutri}}" as="n" hint-placeholder-count="4">
+<label style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: {{n.c.text2}}"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{n.dot}}"></span>{{n.k}}</span><input value="{{n.v}}" style="height: 48px; min-width: 0; border-radius: 12px; border: 2px solid transparent; padding: 0 10px; background: {{n.c.raised}}; color: {{n.c.text}}; font: inherit; font-size: 16px; box-sizing: border-box; font-variant-numeric: tabular-nums"></label>
+</sc-for>
+</div>
+</section>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: {{c.text2}}">Meal</span>
+<div role="radiogroup" aria-label="Meal" style="display: flex; gap: 8px; overflow: hidden; margin-right: -16px">
+<sc-for list="{{mealsHB}}" as="m" hint-placeholder-count="5"><button role="radio" aria-checked="{{m.sel}}" style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{m.bg}}; color: {{m.col}}; font: inherit; font-size: 15px; font-weight: {{m.w}}">{{m.n}}</button></sc-for>
+</div>
+</div>
+<button style="margin-top: 4px; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">Save</button>
+<button style="height: 44px; border-radius: 14px; border: 0; background: transparent; color: {{c.alert}}; font: inherit; font-size: 16px; font-weight: 600">Remove from plan</button>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">3 · Fixed amount + settings</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Fixing an amount disables the range. Remove is a quiet alert action.</span>
+</div>
+
+<!-- Spec -->
+<aside aria-label="Spec" style="width: 400px; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 20px 24px; box-sizing: border-box; max-height: 900px; overflow: hidden; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 8px; font-size: 17px; line-height: 22px; font-weight: 700">Spec</h2>
+<sc-for list="{{spec}}" as="s" hint-placeholder-count="15">
+<div style="padding: 7px 0; border-top: 1px solid {{s.c.line}}; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; line-height: 17px; font-weight: 600">{{s.k}}</span>
+<span style="font-size: 12px; line-height: 16px; color: {{s.c.text2}}">{{s.d}}</span>
+</div>
+</sc-for>
+</aside>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1835,"height":1160}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257', board: '#050604', phoneEdge: '#2A2D27', behind: '#000000', peek: '#1B1D18', keyboard: '#2C2D2A', pressed: '#2C2F29', onAlert: '#1A0705', switchOn: '#C6F24E' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194', board: '#E4E6DE', phoneEdge: '#CFD2C7', behind: '#B9BCB2', peek: '#D9DBD3', keyboard: '#D3D5CC', pressed: '#DFE2D8', onAlert: '#FFFFFF', switchOn: '#557F00' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const c = this.palette()[theme];
+    const mk = (selName) => ['Meal 1', 'Meal 2', 'Meal 3', 'Meal 4', 'Snacks'].map((n) => {
+      const sel = n === selName;
+      return { n, sel: sel ? 'true' : 'false', bg: sel ? c.accent : c.raised, col: sel ? c.onAccent : c.text, w: sel ? 600 : 400 };
+    });
+    const nutri = [
+      { k: 'kcal', v: '196', dot: c.text3 }, { k: 'Protein', v: '2.6', dot: c.protein },
+      { k: 'Carbs', v: '25', dot: c.carbs }, { k: 'Fat', v: '9.4', dot: c.fat }
+    ].map((n) => Object.assign(n, { c }));
+    const spec = [
+      ['Sheet', 'Modal pageSheet “Planned food” (plan-item.tsx). Native header: close 44 left, title 17/600 (food name when scrolled). Screen gutter 16, gap 12.'],
+      ['Food header', 'Name 22/700, source badge 18 h r9 + per-100 g line 13 text2, num tabular.'],
+      ['Log card', 'Card r22 pad 16, gap 10. Title 17/600 + “Planned 100 g” 13 text2 right.'],
+      ['GramsField (M)', '64 h r16, raised; value num 32/800, unit 18 text2. Prefilled with the planned amount, selectTextOnFocus, decimal-pad.'],
+      ['LiveMacros', 'kcal num 20/800 + P/C/F dots 7 pt. Recompute per keystroke, count-up 200 ms.'],
+      ['Log button', 'Button primary 52 h r16 “Log {grams} g”, label follows the field. Tap: haptic success, row on Plan gets ✓ and dims (opacity 0.5, 240 ms).'],
+      ['Logged banner', 'goodBg card r22 pad 14/16: 32 accent check circle, “Logged 100 g to Meal 3” 15/600, time · kcal 13. Un-log = Button S secondary 36 h on surface.'],
+      ['Locked state', 'Log + settings cards at 45 % opacity, pointerEvents none, aria-disabled. Helper line 13 text2 explains how to change it.'],
+      ['Fix this amount', 'Row 52–56 h: label 15/600 + hint 13. Native Switch, trackColor.true = switchOn (accent dark / accentLine light). On → reveals fixed GramsField 56 h with the serving description right.'],
+      ['Portion range', 'Two Field 48 h r14 (Min g / Max g) in a 2-col grid. Disabled (45 %) while fixed, hint says why. Validate min ≤ max, ErrorText below.'],
+      ['Nutrition per 100 g', '4-col grid of Field 48 h r12 with macro dot labels 12. “Use exact values from the food database” ghost link 13/600 resets them.'],
+      ['MealPicker', 'Chip row 36 h, horizontal scroll; selected = accent.'],
+      ['Save', 'Button L 56 h primary. Dismisses and re-runs the planner if fixed/range changed; Plan totals count up.'],
+      ['Remove from plan', 'Ghost 44 h alert text. Native Alert confirm (destructive) → row exits FadeOut 160 + LinearTransition.'],
+      ['Keyboard', 'Screen ScrollView automaticallyAdjustKeyboardInsets + keyboardDismissMode interactive; focused field scrolls above the keyboard, Log button directly under it.']
+    ].map((s) => ({ k: s[0], d: s[1], c }));
+    return { c, themeName: theme === 'light' ? 'Light' : 'Dark', meals: mk('Meal 3'), mealsHB: mk('Meal 1'), nutri, spec };
+  }
+}
+</script>
+</body>
+</html>

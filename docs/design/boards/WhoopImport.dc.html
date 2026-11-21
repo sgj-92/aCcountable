@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WHOOP history sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 2268px; height: 1160px; box-sizing: border-box; padding: 48px; background: {{c.board}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; gap: 24px">
+
+<header style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">SHEET · WHOOP HISTORY</span>
+<h1 style="margin: 0; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -0.5px">WHOOP history</h1>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{themeName}} · how-to → reading → preview → imported · opened from Profile › Training data</span>
+</header>
+
+<div style="display: flex; gap: 40px; align-items: flex-start">
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">WHOOP history</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 0 4px">
+<h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700">Use your own burn rates</h2>
+<p style="margin: 0; font-size: 15px; line-height: 21px; color: {{c.text2}}">Import your WHOOP workouts once. aCcountable learns what each activity really burns for you.</p>
+</div>
+<section aria-label="How to export" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 6px 16px">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="3">
+<div style="display: flex; gap: 12px; padding: 12px 0; border-top: {{s.sep}}">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 14px; background: {{s.c.raised}}; display: flex; align-items: center; justify-content: center; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 14px; font-weight: 800">{{s.n}}</span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; line-height: 20px; font-weight: 600">{{s.t}}</span><span style="font-size: 13px; line-height: 18px; color: {{s.c.text2}}">{{s.d}}</span></div>
+</div>
+</sc-for>
+</section>
+<div style="display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 16px; background: {{c.raised}}">
+<span style="display: flex; color: {{c.text2}}; margin-top: 1px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path></svg></span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Only <span style="color: {{c.text}}; font-weight: 600">workouts.csv</span> is read, on this iPhone. Just the per-activity averages are saved to your account.</span>
+</div>
+<span style="padding: 0 4px; font-size: 13px; line-height: 18px; color: {{c.text3}}; font-variant-numeric: tabular-nums">Last import 12 Oct 2026 · 84 sessions</span>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 34px">
+<button style="width: 100%; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5"></path></svg>Choose export file</button>
+</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; width: 393px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">1 · How to export</span><span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Three steps, what gets read, and when you last imported. The one action sits pinned in the thumb zone.</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px">
+<button aria-label="Close" disabled="" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center; opacity: 0.4"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">WHOOP history</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; background: {{c.surface}}; box-shadow: {{c.shadow}}">
+<span style="width: 40px; height: 40px; border-radius: 12px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5"></path></svg></span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 20px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">my_whoop_data_2026_11_18.zip</span><span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">2.4 MB · ZIP from Files</span></span>
+</div>
+<section aria-label="Reading" aria-live="polite" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 20px 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="display: flex; color: {{c.accentLine}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 1-9 9"></path></svg></span>
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">Reading workouts…</span>
+</div>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -0.5px; font-variant-numeric: tabular-nums">412 <span style="font-family: -apple-system, Inter, sans-serif; font-size: 15px; font-weight: 500; letter-spacing: 0; color: {{c.text2}}">of 1,208 rows</span></span>
+<div role="progressbar" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100" aria-label="Reading progress" style="height: 8px; border-radius: 4px; background: {{c.track}}; overflow: hidden"><div style="height: 8px; width: 34%; border-radius: 4px; background: {{c.accentLine}}"></div></div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Grouping by activity name. About 6 s left.</span>
+</section>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 34px">
+<button style="width: 100%; height: 56px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; font-weight: 600">Cancel</button>
+</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; width: 393px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">2 · Reading</span><span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Live row count with a determinate bar. Close is disabled; Cancel is the only way out.</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">WHOOP history</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<section aria-label="File" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">my_whoop_data_2026_11_18.zip</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 22px; line-height: 26px; font-weight: 800; font-variant-numeric: tabular-nums">1,208</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">workouts found</span></div>
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 15px; line-height: 26px; font-weight: 700; font-variant-numeric: tabular-nums">Mar 2023 – 18 Nov 2026</span><span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">date range</span></div>
+</div>
+<span style="font-size: 12px; line-height: 16px; font-weight: 600; color: {{c.text2}}">Columns read</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{cols}}" as="k" hint-placeholder-count="5"><span style="height: 26px; padding: 0 9px; border-radius: 13px; background: {{k.c.raised}}; display: flex; align-items: center; font-size: 12px; font-weight: 500; color: {{k.c.text}}">{{k.t}}</span></sc-for>
+</div>
+</section>
+<section aria-label="What it learned" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 14px 16px 6px; display: flex; flex-direction: column">
+<h3 style="margin: 0 0 6px; font-size: 17px; line-height: 22px; font-weight: 600">What it learned</h3>
+<sc-for list="{{learned}}" as="a" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid {{a.c.line}}">
+<span style="flex: none; width: 36px; height: 36px; border-radius: 11px; background: {{a.c.trainingBg}}; color: {{a.c.training}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7"></circle><path d="M12 13.5V10M10 3.5h4M18 7l1.5-1.5"></path></svg></span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 15px; line-height: 20px; font-weight: 600">{{a.name}}</span><span style="font-size: 13px; line-height: 18px; color: {{a.c.text2}}; font-variant-numeric: tabular-nums">{{a.meta}}</span></div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px"><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 15px; line-height: 20px; font-weight: 800; color: {{a.c.training}}; font-variant-numeric: tabular-nums">{{a.rate}}</span><span style="font-size: 12px; line-height: 16px; color: {{a.c.text2}}; font-variant-numeric: tabular-nums">{{a.per}}</span></div>
+</div>
+</sc-for>
+<span style="padding: 8px 0 10px; border-top: 1px solid {{c.line}}; font-size: 12px; line-height: 17px; color: {{c.text3}}">14 activities with fewer than 3 sessions are skipped and keep the generic estimate.</span>
+</section>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 34px">
+<button style="width: 100%; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 17px; font-weight: 700">Import 90 sessions</button>
+</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; width: 393px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">3 · Preview</span><span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Shows exactly what will change before anything is saved. Rates in the training hue match the session sheet.</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">WHOOP history</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 56px 16px 0; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+<div style="width: 96px; height: 96px; border-radius: 48px; background: {{c.goodBg}}; color: {{c.good}}; display: flex; align-items: center; justify-content: center"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+<h2 style="margin: 8px 0 0; font-size: 26px; line-height: 32px; font-weight: 700">Imported <span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-weight: 800; font-variant-numeric: tabular-nums">90</span> sessions</h2>
+<p style="margin: 0; font-size: 15px; line-height: 21px; color: {{c.text2}}">Burn estimates now use your own history.</p>
+<section aria-label="What changed" style="width: 100%; margin-top: 12px; background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 22px; padding: 12px 16px 4px; display: flex; flex-direction: column; text-align: left">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.6px; color: {{c.text2}}; padding-bottom: 6px">WHAT CHANGED</span>
+<sc-for list="{{changed}}" as="w" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid {{w.c.line}}">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 15px; line-height: 20px; font-weight: 600">{{w.t}}</span><span style="font-size: 13px; line-height: 18px; color: {{w.c.text2}}">{{w.d}}</span></div>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; line-height: 22px; font-weight: 800; color: {{w.c.training}}; font-variant-numeric: tabular-nums">{{w.v}}</span>
+</div>
+</sc-for>
+</section>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 34px">
+<button style="width: 100%; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 17px; font-weight: 700">Done</button>
+</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; width: 393px"><span style="font-size: 13px; line-height: 18px; font-weight: 600">4 · Imported</span><span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Confirms the effect in today’s terms, so the change is felt, not just reported.</span></div>
+</div>
+
+<aside aria-label="Spec" style="width: 400px; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 20px 24px; box-sizing: border-box; max-height: 900px; overflow: hidden; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 6px; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 22px; line-height: 28px; font-weight: 800">Spec</h2>
+<sc-for list="{{spec}}" as="s" hint-placeholder-count="15">
+<div style="padding: 7px 0; border-top: 1px solid {{s.c.line}}; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">{{s.k}}</span>
+<span style="font-size: 12px; line-height: 17px; color: {{s.c.text2}}">{{s.d}}</span>
+</div>
+</sc-for>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":2268,"height":1160}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257', board: '#050604', phoneEdge: '#2A2D27', behind: '#000000', peek: '#1B1D18', keyboard: '#2C2D2A', pressed: '#2C2F29', onAlert: '#1A0705' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194', board: '#E4E6DE', phoneEdge: '#CFD2C7', behind: '#B9BCB2', peek: '#D9DBD3', keyboard: '#D3D5CC', pressed: '#DFE2D8', onAlert: '#FFFFFF' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const c = this.palette()[theme];
+    const steps = [
+      { n: '1', t: 'Open WHOOP › More › App settings › Data export', d: 'Any recent version of the WHOOP app.' },
+      { n: '2', t: 'Tap Request export', d: 'WHOOP emails you a ZIP, usually within a few minutes.' },
+      { n: '3', t: 'Save the ZIP to Files', d: 'In Mail, long-press the attachment › Save to Files.' }
+    ].map((s, i) => Object.assign(s, { sep: i === 0 ? '0' : '1px solid ' + c.line, c }));
+    const cols = ['Workout start time', 'Duration (min)', 'Activity name', 'Energy burned (cal)', 'Average HR', 'Max HR'].map((t) => ({ t, c }));
+    const learned = [
+      { name: 'Padel', meta: '38 sessions · usually 90 min', rate: '574 kcal/h', per: '≈ 860 per session' },
+      { name: 'Running', meta: '30 sessions · usually 52 min', rate: '704 kcal/h', per: '≈ 610 per session' },
+      { name: 'Functional fitness', meta: '22 sessions · usually 60 min', rate: '420 kcal/h', per: '≈ 420 per session' }
+    ].map((a) => Object.assign(a, { c }));
+    const changed = [
+      { t: 'Today’s padel, 90 min', d: 'From 38 of your sessions, not a generic MET', v: '≈ +748' },
+      { t: 'Running, 52 min', d: 'Used when you add a run', v: '≈ 610' },
+      { t: 'Functional fitness, 60 min', d: 'Used when you add a gym session', v: '≈ 420' }
+    ].map((w) => Object.assign(w, { c }));
+    const S = (k, d) => ({ k, d, c });
+    const spec = [
+      S('Presentation', 'Stack.Screen whoop-import, presentation modal (pageSheet), native header title “WHOOP history”, close = SF xmark in a 36 pt circle (44 hit). Swipe-down is blocked while reading (gestureEnabled false).'),
+      S('Intro', 'Title 22/28 700, body 15/21 text2, 4 pt inset from the card edge.'),
+      S('StepList (new)', 'Card r22, pad 6/16. Row pad 12, 28 pt number disc (raised, Archivo 800 14). Title 15/600, detail 13/18 text2. Hairline between rows.'),
+      S('Privacy note', 'Raised r16, pad 12/14, shield glyph 18 text2, 13/18 copy. Not tappable.'),
+      S('Last import', '13/18 text3, tabular. Hidden on first import.'),
+      S('Sticky action', 'Button L 56 h r18 pinned 34 pt above the bottom (safe area). Content gets bottom padding 106 so nothing hides under it.'),
+      S('Choose export file', 'expo-document-picker, types application/zip + text/csv, copyToCacheDirectory true. Cancelled picker = no state change.'),
+      S('Reading', 'Parse on device, report progress every 50 rows to a shared value; the bar animates width with withTiming 200 ms. aria-live polite on the card.'),
+      S('Cancel', 'Button L secondary. Stops parsing and returns to state 1. The header close is disabled (40 %) while reading.'),
+      S('File chip', 'Row 64 h, 40 pt icon tile r12, name 15/600 with middle-ellipsis, meta 13/18.'),
+      S('Preview stats', '2-up grid. num.m 22/26 Archivo 800 for counts; ranges 15/700 Archivo. Column chips 26 h pill, 12/500.'),
+      S('LearnedRow (new)', '36 pt training tile r11, name 15/600, meta 13/18; right side rate Archivo 800 15 in training colour, per-session 12/16. Rows enter FadeInDown 220 ms, stagger 40.'),
+      S('Skipped note', '12/17 text3. Fewer than 3 sessions per activity are ignored.'),
+      S('Import', 'Primary label carries the count (“Import 90 sessions”). Spinner while saving. Then Haptics success and state 4.'),
+      S('Success', '96 pt goodBg disc, check 46 good, title 26/32 with Archivo count. What changed rows in training colour. Done closes the sheet; Today’s estimate updates with a 600 ms count-up.'),
+      S('Errors', 'Wrong file or no workouts.csv: ErrorText under the action, “That ZIP has no workouts.csv. Export from WHOOP › Data export.” Keep the file picker one tap away.')
+    ];
+    return { c, themeName: theme === 'light' ? 'Light' : 'Dark', steps, cols, learned, changed, spec };
+  }
+}
+</script>
+</body>
+</html>

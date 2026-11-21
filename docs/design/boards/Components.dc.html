@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>aCcountable · Components</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; height: 1900px; box-sizing: border-box; padding: 56px 64px; background: {{c.bg}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 28px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">DESIGN SYSTEM · 03 · {{themeName}}</span>
+<h1 style="margin: 0; font-family: Archivo, sans-serif; font-size: 48px; line-height: 52px; font-weight: 800; letter-spacing: -1px">Components and states</h1>
+</div>
+<p style="margin: 0; max-width: 560px; font-size: 15px; line-height: 22px; color: {{c.text2}}">Names match <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px">src/components/ui.tsx</span>. Every tappable thing is at least 44 × 44 pt (small chips extend with hitSlop). Pressed = scale 0.97 plus the pressed fill; disabled = 40 % opacity, no press.</p>
+</header>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start">
+
+<section style="grid-column: span 2; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; font-weight: 700">Button</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">L 56 · r18 · 16/700   M 44 · r14 · 15/600   S 32 · r16 · 13/700 (+hitSlop 6)</span></div>
+<div style="display: grid; grid-template-columns: 90px repeat(4, minmax(0, 1fr)); gap: 10px; align-items: center">
+<span></span><span style="font-size: 12px; font-weight: 600; color: {{c.text2}}">Default</span><span style="font-size: 12px; font-weight: 600; color: {{c.text2}}">Pressed</span><span style="font-size: 12px; font-weight: 600; color: {{c.text2}}">Disabled</span><span style="font-size: 12px; font-weight: 600; color: {{c.text2}}">Loading</span>
+<sc-for list="{{buttons}}" as="b" hint-placeholder-count="4">
+<span style="font-size: 13px; font-weight: 600">{{b.name}}</span>
+<sc-for list="{{b.cells}}" as="x" hint-placeholder-count="4">
+<button style="height: 44px; border-radius: 14px; border: {{x.border}}; padding: 0 12px; background: {{x.bg}}; color: {{x.col}}; opacity: {{x.op}}; transform: scale({{x.scale}}); font: inherit; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px">
+<sc-if value="{{x.loading}}" hint-placeholder-val="{{false}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 1-9 9"></path></svg></sc-if>{{x.label}}</button>
+</sc-for>
+</sc-for>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding-top: 6px; border-top: 1px solid {{c.line}}">
+<button style="height: 56px; flex: 1; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">L · Add to log</button>
+<button style="height: 44px; padding: 0 18px; border-radius: 14px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px; font-weight: 600">M · Retake</button>
+<button style="height: 32px; padding: 0 14px; border-radius: 16px; border: 0; background: {{c.raised}}; color: {{c.accentText}}; font: inherit; font-size: 13px; font-weight: 700">S · Confirm</button>
+<a href="#" style="padding: 12px 4px; font-size: 15px; font-weight: 600; color: {{c.accentText}}; text-decoration: none">Text · + Session</a>
+</div>
+</section>
+
+<section style="border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; font-weight: 700">Chip</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">36 · pill · 15/500</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">Meal 1</button>
+<button aria-pressed="true" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 15px; font-weight: 600">Meal 3</button>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.pressed}}; color: {{c.text}}; font: inherit; font-size: 15px; transform: scale(0.97)">Pressed</button>
+<button disabled="" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px; opacity: 0.4">Disabled</button>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.trainingBg}}; color: {{c.training}}; font: inherit; font-size: 15px; font-weight: 600">✓ Padel 90′</button>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1.5px dashed {{c.text3}}; background: transparent; color: {{c.text2}}; font: inherit; font-size: 15px">+ Session</button>
+</div>
+<span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Selected = accent fill. Session chips use the training tint. Dashed = add slot.</span>
+<div style="height: 1px; background: {{c.line}}"></div>
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; font-weight: 700">Segmented</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">40 · r12 · thumb r9</span></div>
+<div role="radiogroup" aria-label="Goal" style="height: 40px; border-radius: 12px; background: {{c.raised}}; padding: 3px; box-sizing: border-box; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px">
+<button role="radio" aria-checked="true" style="border: 0; border-radius: 9px; background: {{c.thumb}}; box-shadow: {{c.thumbShadow}}; color: {{c.text}}; font: inherit; font-size: 14px; font-weight: 600">Lose</button>
+<button role="radio" aria-checked="false" style="border: 0; border-radius: 9px; background: transparent; color: {{c.text2}}; font: inherit; font-size: 14px">Maintain</button>
+<button role="radio" aria-checked="false" style="border: 0; border-radius: 9px; background: transparent; color: {{c.text2}}; font: inherit; font-size: 14px">Gain</button>
+</div>
+<span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Thumb slides 220 ms (withTiming, out cubic). Use the native SegmentedControl where it fits.</span>
+</section>
+
+<section style="border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; font-weight: 700">Field</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">52 · r14 · 17/400 · pad 16</span></div>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Default</span><input placeholder="Search foods, e.g. chicken breast raw" style="height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; box-sizing: border-box"></label>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Focused</span><input value="chicken bre" style="height: 52px; border-radius: 14px; border: 2px solid {{c.accentLine}}; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; box-sizing: border-box"></label>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Weight (kg) · error</span><input value="9.83" aria-invalid="true" style="height: 52px; border-radius: 14px; border: 2px solid {{c.alert}}; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; box-sizing: border-box"><span style="font-size: 13px; line-height: 18px; color: {{c.alert}}">That looks off. Enter 30–250 kg.</span></label>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Disabled</span><input value="1.5 g per kg" disabled="" style="height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; box-sizing: border-box; opacity: 0.4"></label>
+</section>
+
+<section style="border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; font-weight: 700">GramsField + serving chips</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">72 · num.l</span></div>
+<label style="height: 72px; border-radius: 18px; background: {{c.raised}}; border: 2px solid {{c.accentLine}}; box-sizing: border-box; display: flex; align-items: center; padding: 0 18px; gap: 6px"><span style="font-family: Archivo, sans-serif; font-size: 36px; font-weight: 800; font-variant-numeric: tabular-nums">250</span><span style="font-size: 17px; color: {{c.text2}}">g</span><span style="flex: 1"></span><span style="font-family: Archivo, sans-serif; font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums">383 kcal</span></label>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">1 bar · 50 g</button><button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">100 g</button><button aria-pressed="true" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 15px; font-weight: 600">250 g</button></div>
+<span style="font-size: 13px; color: {{c.text2}}; font-variant-numeric: tabular-nums">P 8 · C 85 · F 1 · per 100 g: 153 kcal</span>
+<div style="height: 1px; background: {{c.line}}"></div>
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; font-weight: 700">Stepper</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">44 · arrows 44×44</span></div>
+<div style="display: flex; align-items: center; height: 44px; border-radius: 22px; background: {{c.raised}}"><button aria-label="Previous" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{c.text}}; font: inherit; font-size: 20px">‹</button><span style="flex: 1; text-align: center; font-size: 15px; font-weight: 600">Wed 18 Nov</span><button aria-label="Next" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{c.text}}; font: inherit; font-size: 20px">›</button></div>
+<button style="align-self: flex-start; height: 32px; padding: 0 12px; border-radius: 16px; border: 0; background: {{c.goodBg}}; color: {{c.accentText}}; font: inherit; font-size: 13px; font-weight: 700">↩ Back to today</button>
+<span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Next is text3 and disabled on today and in the future for weigh-ins.</span>
+</section>
+
+<section style="border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; font-weight: 700">Ring / Gauge / Bar</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">react-native-svg</span></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center">
+<sc-for list="{{rings}}" as="r" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+<svg width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="{{r.label}}"><circle cx="48" cy="48" r="40" fill="none" stroke="{{r.c.track}}" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{r.track}}" transform="rotate(45 48 48)"></circle><circle cx="48" cy="48" r="40" fill="none" stroke="{{r.col}}" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{r.fill}}" transform="rotate(45 48 48)"></circle></svg>
+<span style="font-size: 12px; font-weight: 600">{{r.label}}</span>
+</div>
+</sc-for>
+</div>
+<span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Ring sizes: hero 248 / stroke 18, gauge 300 / 20, macro 60 / 7, inline 28 / 4. Round caps. Training share of the target drawn on the track in trainingSeg. Over = full ring in alert plus the word “over”.</span>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{bars}}" as="b" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: 70px minmax(0, 1fr) 80px; align-items: center; gap: 10px; font-size: 12px; font-variant-numeric: tabular-nums">
+<span style="color: {{b.c.text2}}">{{b.k}}</span>
+<div style="height: 6px; border-radius: 3px; background: {{b.c.track}}; overflow: hidden"><div style="height: 6px; border-radius: 3px; width: {{b.w}}; background: {{b.col}}"></div></div>
+<span style="text-align: right; color: {{b.tcol}}; font-weight: 600">{{b.t}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 22px 24px 10px; display: flex; flex-direction: column">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 6px"><h2 style="margin: 0; font-size: 17px; font-weight: 700">InsightRow · 4 levels</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">icon 32 · title 15/600</span></div>
+<sc-for list="{{insights}}" as="i" hint-placeholder-count="4">
+<div style="display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid {{i.c.line}}">
+<span style="flex: none; width: 32px; height: 32px; border-radius: 16px; background: {{i.bg}}; color: {{i.col}}; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">{{i.glyph}}</span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.6px; color: {{i.capCol}}">{{i.lv}}</span><span style="font-size: 15px; line-height: 20px; font-weight: 600">{{i.t}}</span><sc-if value="{{i.hasA}}" hint-placeholder-val="{{false}}"><a href="#" style="align-self: flex-start; padding: 4px 0; font-size: 14px; font-weight: 600; color: {{i.c.accentText}}; text-decoration: none">{{i.a}} ›</a></sc-if></div>
+</div>
+</sc-for>
+<span style="padding: 6px 0 10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Icon shape differs per level (octagon, triangle, circle-i, check) so colour is never the only signal. Show at most 5; alerts sort first.</span>
+</section>
+
+<section style="border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 22px 24px 10px; display: flex; flex-direction: column">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 6px"><h2 style="margin: 0; font-size: 17px; font-weight: 700">FoodRow variants</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">min 56 · pad 10/16</span></div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid {{r.c.line}}; opacity: {{r.op}}">
+<sc-if value="{{r.hasDot}}" hint-placeholder-val="{{false}}"><span role="img" aria-label="{{r.dotLabel}}" style="flex: none; width: 10px; height: 10px; border-radius: 5px; background: {{r.dot}}; border: {{r.dotBorder}}; box-sizing: border-box"></span></sc-if>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; line-height: 20px; text-decoration: {{r.strike}}">{{r.name}}</span><span style="font-size: 13px; line-height: 18px; color: {{r.c.text2}}; font-variant-numeric: tabular-nums">{{r.meta}}</span></div>
+<span style="font-family: Archivo, sans-serif; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{r.kcal}}</span>
+</div>
+</sc-for>
+<span style="padding: 6px 0 10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Swipe left: Delete (alert). Long-press: Edit, Move to meal, Log again. Confidence dots: filled high, half medium, hollow low.</span>
+</section>
+
+<section style="border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; font-weight: 700">StatusPill · Switch</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">28 · pill · 12/600</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<span style="height: 28px; padding: 0 10px; border-radius: 14px; background: {{c.goodBg}}; color: {{c.good}}; display: flex; align-items: center; font-size: 12px; font-weight: 600">✓ WHOOP confirmed</span>
+<span style="height: 28px; padding: 0 10px; border-radius: 14px; background: {{c.infoBg}}; color: {{c.info}}; display: flex; align-items: center; font-size: 12px; font-weight: 600">Estimate · tap to confirm</span>
+<span style="height: 28px; padding: 0 10px; border-radius: 14px; background: {{c.raised}}; color: {{c.text2}}; display: flex; align-items: center; font-size: 12px; font-weight: 600">Estimate</span>
+<span style="height: 28px; padding: 0 10px; border-radius: 14px; background: {{c.raised}}; color: {{c.text2}}; display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600">Fixed · 175 g</span>
+</div>
+<div style="display: flex; gap: 24px; align-items: center">
+<span role="switch" aria-checked="true" aria-label="Intermittent fasting on" style="width: 51px; height: 31px; border-radius: 16px; background: {{c.switchOn}}; position: relative; display: block"><span style="position: absolute; right: 2px; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: #FFFFFF"></span></span>
+<span role="switch" aria-checked="false" aria-label="Off" style="width: 51px; height: 31px; border-radius: 16px; background: {{c.pressed}}; position: relative; display: block"><span style="position: absolute; left: 2px; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: #FFFFFF"></span></span>
+<span style="font-size: 12px; line-height: 17px; color: {{c.text2}}">Native Switch, trackColor.true = {{switchToken}}</span>
+</div>
+<div style="height: 1px; background: {{c.line}}"></div>
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="margin: 0; font-size: 17px; font-weight: 700">Loading · empty</h2><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{c.text2}}">skeleton pulse 900 ms</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 44px; height: 44px; border-radius: 14px; background: {{c.raised}}"></span><div style="flex: 1; display: flex; flex-direction: column; gap: 6px"><span style="height: 12px; width: 70%; border-radius: 6px; background: {{c.raised}}"></span><span style="height: 10px; width: 45%; border-radius: 5px; background: {{c.raised}}"></span></div><span style="height: 14px; width: 40px; border-radius: 7px; background: {{c.raised}}"></span></div>
+<div style="border-radius: 16px; border: 1.5px dashed {{c.line}}; padding: 14px; display: flex; align-items: center; justify-content: space-between"><span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">Meal 3</span><span style="font-size: 13px; color: {{c.text3}}">Nothing logged</span></span><span style="font-size: 15px; font-weight: 600; color: {{c.accentText}}">+ Add</span></div>
+</section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const P = {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', pressed: '#2C2F29', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', accentPressed: '#B0DA3C', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', alertPressed: '#E9534A', onAlert: '#1A0705', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', shadow: 'none', thumb: '#3A3D36', thumbShadow: 'none', switchOn: '#C6F24E' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', pressed: '#DFE2D8', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', accentPressed: '#B0DA3C', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', alertPressed: '#B2271F', onAlert: '#FFFFFF', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', shadow: '0 1px 3px rgba(17,19,14,0.07)', thumb: '#FFFFFF', thumbShadow: '0 1px 3px rgba(17,19,14,0.15)', switchOn: '#557F00' }
+    };
+    const c = P[theme];
+    const V = [
+      { name: 'Primary', label: 'Add to log', bg: c.accent, pbg: c.accentPressed, col: c.onAccent, border: '0' },
+      { name: 'Secondary', label: 'Retake', bg: c.raised, pbg: c.pressed, col: c.text, border: '0' },
+      { name: 'Ghost', label: 'Edit values', bg: 'transparent', pbg: c.raised, col: c.accentText, border: '0' },
+      { name: 'Danger', label: 'Delete', bg: c.alert, pbg: c.alertPressed, col: c.onAlert, border: '0' }
+    ];
+    const buttons = V.map((v) => ({ name: v.name, cells: [
+      { label: v.label, bg: v.bg, col: v.col, border: v.border, op: 1, scale: 1, loading: false },
+      { label: v.label, bg: v.pbg, col: v.col, border: v.border, op: 1, scale: 0.97, loading: false },
+      { label: v.label, bg: v.bg, col: v.col, border: v.border, op: 0.4, scale: 1, loading: false },
+      { label: 'Saving', bg: v.bg, col: v.col, border: v.border, op: 1, scale: 1, loading: true }
+    ] }));
+    const ARC = 2 * Math.PI * 40 * 0.75;
+    const ring = (label, p, col) => ({ label, col, track: ARC.toFixed(1) + ' 1000', fill: (ARC * Math.min(1, p)).toFixed(1) + ' 1000', c });
+    const rings = [ring('Under · 23 %', 0.23, c.accentLine), ring('On target', 1, c.accentLine), ring('Over · 650', 1, c.alert)];
+    const bars = [
+      { k: 'Protein', w: '20%', col: c.protein, t: '30 / 147 g', tcol: c.text2, c },
+      { k: 'Carbs', w: '100%', col: c.carbs, t: '308 / 308 g', tcol: c.text2, c },
+      { k: 'Fat', w: '100%', col: c.fat, t: '+25 g over', tcol: c.alert, c }
+    ];
+    const I = (lv, glyph, t, a) => ({ lv: lv.toUpperCase(), glyph, t, a, hasA: !!a, col: c[lv], bg: c[lv + 'Bg'], capCol: lv === 'good' ? c.accentText : c[lv], c });
+    const insights = [
+      I('alert', '!', '650 kcal over today’s target', 'Add a session'),
+      I('warn', '▲', 'On course to finish the week 481 kcal over', ''),
+      I('info', 'i', 'Confirm Mon’s padel burn', 'Confirm'),
+      I('good', '✓', 'On pace: losing 0.48 kg a week', '')
+    ];
+    const R = (name, meta, kcal, o) => Object.assign({ name, meta, kcal, op: 1, strike: 'none', hasDot: false, dot: 'transparent', dotBorder: '0', dotLabel: '', c }, o || {});
+    const rows = [
+      R('Greek yoghurt 0%', '170 g · P 17 · C 6 · F 0', '97'),
+      R('Oat milk latte', 'From photo · 1 small cup · 240 ml · P 4 · C 14 · F 6', '125'),
+      R('Basmati rice (dry) ✓', 'Plan · logged 100 g', '351', { op: 0.5 }),
+      R('Chicken breast', 'high confidence · 180 g', '297', { hasDot: true, dot: c.good, dotLabel: 'High confidence' }),
+      R('Butter (assumed)', 'low confidence · 10 g', '72', { hasDot: true, dot: 'transparent', dotBorder: '2px solid ' + c.warn, dotLabel: 'Low confidence' })
+    ];
+    return { c, themeName: theme === 'light' ? 'LIGHT' : 'DARK', buttons, rings, bars, insights, rows, switchToken: theme === 'light' ? 'accentLine #557F00' : 'accent #C6F24E' };
+  }
+}
+</script>
+</body>
+</html>

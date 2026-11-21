@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>aCcountable · Colour tokens</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1440px; height: 1400px; box-sizing: border-box; padding: 56px 64px; background: #0C0D0B; color: #F2F4EC; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 28px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #C6F24E">DESIGN SYSTEM · 01</span>
+<h1 style="margin: 0; font-family: Archivo, sans-serif; font-size: 48px; line-height: 52px; font-weight: 800; letter-spacing: -1px">Colour tokens</h1>
+</div>
+<p style="margin: 0; max-width: 620px; font-size: 15px; line-height: 22px; color: #A9AD9F">Graphite ground, one lime accent, four data hues, four status hues. Lime has three roles because one value can’t pass everywhere: <b style="color: #F2F4EC">accent</b> fills buttons and selected chips (always with onAccent text), <b style="color: #F2F4EC">accentLine</b> draws rings and bars (3:1), <b style="color: #F2F4EC">accentText</b> is for links (4.5:1). In dark they are the same value. Ratios below are computed live from the hex values.</p>
+</header>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="2">
+<section style="border-radius: 28px; background: {{t.bg}}; border: 1px solid {{t.border}}; padding: 28px 28px 20px; color: {{t.text}}; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 8px">
+<h2 style="margin: 0; font-family: Archivo, sans-serif; font-size: 26px; font-weight: 800">{{t.name}}</h2>
+<span style="font-size: 13px; color: {{t.muted}}">{{t.note}}</span>
+</div>
+<sc-for list="{{t.groups}}" as="g" hint-placeholder-count="5">
+<div style="display: flex; flex-direction: column">
+<span style="padding: 14px 0 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.8px; color: {{g.muted}}">{{g.title}}</span>
+<sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4">
+<div style="display: grid; grid-template-columns: 44px 132px 84px minmax(0, 1fr) 124px; align-items: center; gap: 12px; min-height: 46px; border-top: 1px solid {{r.lineCol}}">
+<span style="width: 36px; height: 36px; border-radius: 10px; background: {{r.hex}}; border: 1px solid {{r.edge}}; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: {{r.swText}}">{{r.sw}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500">{{r.k}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: {{r.muted}}">{{r.hexLabel}}</span>
+<span style="font-size: 13px; line-height: 17px; color: {{r.muted}}">{{r.use}}</span>
+<span style="justify-self: end; height: 24px; padding: 0 9px; border-radius: 12px; background: {{r.badgeBg}}; color: {{r.badgeCol}}; display: flex; align-items: center; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap">{{r.badge}}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</section>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 19px; color: #878B7E">Rules: data and status hues are used as text only on <b>bg</b> or <b>surface</b>, never on <b>raised</b> in light mode. Status tints carry a status-coloured icon (3:1) with the title in <b>text</b>. Over-target always pairs red with the word “over”, never colour alone. Tokens ship as <span style="font-family: 'JetBrains Mono', monospace">src/constants/theme.ts</span> → <span style="font-family: 'JetBrains Mono', monospace">Colors.dark / Colors.light</span>, same keys in both.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: '#2E1715', warnBg: '#2E2114', infoBg: '#1C2230', goodBg: '#232A14' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6' }
+    };
+    const lum = (h) => { const v = [1, 3, 5].map((i) => parseInt(h.substr(i, 2), 16) / 255).map((x) => x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+    const cr = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+    const spec = [
+      { title: 'SURFACES', rows: [
+        ['bg', 'Screen background', null, 0], ['surface', 'Cards, list groups', null, 0], ['raised', 'Inputs, chips, secondary buttons, segmented track', null, 0], ['line', 'Hairline dividers (decorative)', null, 0], ['track', 'Empty part of rings and bars', null, 0]] },
+      { title: 'TEXT', rows: [
+        ['text', 'Primary text and big numbers', 'surface', 4.5], ['text2', 'Secondary text, units, meta lines', 'surface', 4.5], ['text3', 'Hints, placeholders, empty states', 'surface', 4.5]] },
+      { title: 'BRAND', rows: [
+        ['accent', 'Primary button fill, selected chip, the C', 'bg', 0], ['onAccent', 'Text and icons on accent', 'accent', 4.5], ['accentLine', 'Calorie ring, progress bars, chart line', 'surface', 3], ['accentText', 'Links, text buttons, active tab', 'surface', 4.5]] },
+      { title: 'DATA', rows: [
+        ['protein', 'Protein ring, dot, label', 'surface', 4.5], ['carbs', 'Carbs ring, dot, label', 'surface', 4.5], ['fat', 'Fat ring, dot, label', 'surface', 4.5], ['training', 'Training burn, sessions', 'surface', 4.5]] },
+      { title: 'STATUS  ·  icon on its tint', rows: [
+        ['alert', 'Over target, errors, destructive', 'alertBg', 3], ['warn', 'Drifting: week projection, slow loss', 'warnBg', 3], ['info', 'Needs a tap: confirm, log weight', 'infoBg', 3], ['good', 'On target, on pace, confirmed', 'goodBg', 3]] }
+    ];
+    const mkTheme = (key, name, note) => {
+      const c = P[key];
+      const groups = spec.map((g) => ({
+        title: g.title, muted: c.text2,
+        rows: g.rows.map((r) => {
+          const hex = c[r[0]];
+          const vs = r[2];
+          let badge = 'decor', ok = true;
+          if (vs) { const ratio = cr(hex, c[vs]); ok = r[3] === 0 || ratio >= r[3]; badge = ratio.toFixed(1) + ':1 ' + (r[3] === 0 ? '' : (ok ? (r[3] === 3 ? '≥3 ✓' : 'AA ✓') : 'fail')) + (vs === 'surface' || vs === 'bg' ? '' : ' on ' + vs); }
+          else { badge = cr(hex, c.bg).toFixed(2) + ':1 vs bg'; }
+          const isText = r[0].indexOf('text') === 0 || ['protein', 'carbs', 'fat', 'training', 'alert', 'warn', 'info', 'good'].indexOf(r[0]) >= 0;
+          return {
+            k: r[0], hex, hexLabel: hex.toUpperCase(), use: r[1], badge,
+            badgeBg: !vs ? c.raised : (ok ? c.goodBg : c.alertBg), badgeCol: !vs ? c.text2 : (ok ? c.good : c.alert),
+            sw: r[0] === 'onAccent' ? 'Aa' : (isText && r[0].indexOf('text') === 0 ? 'Aa' : ''),
+            swText: r[0] === 'onAccent' ? c.accent : c.surface,
+            edge: c.line, lineCol: c.line, muted: c.text2
+          };
+        })
+      }));
+      return { name, note, bg: c.bg, text: c.text, muted: c.text2, border: c.line, groups };
+    };
+    return { themes: [mkTheme('dark', 'Dark (default)', 'OLED-friendly graphite, no pure black'), mkTheme('light', 'Light', 'Warm paper, white cards')] };
+  }
+}
+</script>
+</body>
+</html>

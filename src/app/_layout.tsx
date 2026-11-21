@@ -1,3 +1,4 @@
+import { Archivo_700Bold, Archivo_800ExtraBold, useFonts } from '@expo-google-fonts/archivo';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -11,12 +12,15 @@ SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { session, initialising } = useAuth();
+  // Numbers use Archivo. If the font fails to load the system font is used instead.
+  const [fontsLoaded, fontError] = useFonts({ Archivo_700Bold, Archivo_800ExtraBold });
+  const ready = !initialising && (fontsLoaded || !!fontError);
 
   useEffect(() => {
-    if (!initialising) SplashScreen.hideAsync();
-  }, [initialising]);
+    if (ready) SplashScreen.hideAsync();
+  }, [ready]);
 
-  if (initialising) return null;
+  if (!ready) return null;
 
   const signedIn = !!session;
   return (

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sheet · Scan a meal</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 2701px; height: 1160px; box-sizing: border-box; padding: 48px; background: {{c.board}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 24px; -webkit-font-smoothing: antialiased">
+
+<header style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">SHEET · SCAN A MEAL</span>
+<h1 style="margin: 0; font-family: Archivo, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -0.6px">Scan a meal</h1>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{themeName}} · photo → AI estimate → reply to correct → log</span>
+</header>
+
+<div style="display: flex; gap: 40px; align-items: flex-start">
+
+<!-- 1 Empty -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Scan a meal</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 8px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<section style="border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 32px 24px 28px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<span style="width: 72px; height: 72px; border-radius: 24px; background: {{c.goodBg}}; color: {{c.accentText}}; display: flex; align-items: center; justify-content: center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5h3.2l1.8-2.5h7l1.8 2.5h3.2v10.5h-17z"></path><circle cx="12" cy="13.5" r="3.6"></circle></svg></span>
+<h2 style="margin: 6px 0 0; font-size: 20px; line-height: 25px; font-weight: 700">Snap your meal</h2>
+<p style="margin: 0; font-size: 15px; line-height: 21px; color: {{c.text2}}">Shoot from above with the whole plate in frame. Cutlery or a hand in shot helps judge portion size.</p>
+</section>
+<div style="display: flex; gap: 8px">
+<button style="flex: 1; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5h3.2l1.8-2.5h7l1.8 2.5h3.2v10.5h-17z"></path><circle cx="12" cy="13.5" r="3.6"></circle></svg>Take photo</button>
+<button style="flex: 1; height: 56px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3"></rect><circle cx="9" cy="10" r="1.8"></circle><path d="M20.5 16l-5-5-8 8.5"></path></svg>Library</button>
+</div>
+<div style="border-radius: 20px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 4px 16px">
+<div style="display: flex; gap: 12px; padding: 12px 0"><span style="flex: none; font-family: Archivo, sans-serif; font-size: 15px; font-weight: 800; color: {{c.accentText}}; width: 16px">1</span><span style="font-size: 14px; line-height: 19px; color: {{c.text2}}">One plate per photo. Drinks and sauces count too.</span></div>
+<div style="display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid {{c.line}}"><span style="flex: none; font-family: Archivo, sans-serif; font-size: 15px; font-weight: 800; color: {{c.accentText}}; width: 16px">2</span><span style="font-size: 14px; line-height: 19px; color: {{c.text2}}">Add a note for what the camera can’t see, like oil or butter.</span></div>
+<div style="display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid {{c.line}}"><span style="flex: none; font-family: Archivo, sans-serif; font-size: 15px; font-weight: 800; color: {{c.accentText}}; width: 16px">3</span><span style="font-size: 14px; line-height: 19px; color: {{c.text2}}">Nothing is logged until you check the estimate.</span></div>
+</div>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">1 · Empty</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Opened from the dock’s Scan meal. Camera first, library second.</span>
+</div>
+
+<!-- 2 Photo + note -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Scan a meal</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 8px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div role="img" aria-label="Meal photo: plate of chicken, rice and broccoli" style="position: relative; width: 361px; height: 270px; border-radius: 20px; background: {{c.photo}}; overflow: hidden">
+<span style="position: absolute; left: 70px; top: 24px; width: 222px; height: 222px; border-radius: 111px; background: {{c.peek}}"></span>
+<span style="position: absolute; left: 96px; top: 56px; width: 110px; height: 80px; border-radius: 40px; background: {{c.raised}}"></span>
+<span style="position: absolute; left: 180px; top: 70px; width: 86px; height: 64px; border-radius: 32px; background: {{c.track}}"></span>
+<span style="position: absolute; left: 118px; top: 140px; width: 130px; height: 70px; border-radius: 35px; background: {{c.line}}"></span>
+<span style="position: absolute; left: 300px; top: 150px; width: 12px; height: 90px; border-radius: 6px; background: {{c.track}}"></span>
+<span style="position: absolute; left: 12px; top: 12px; height: 24px; padding: 0 10px; border-radius: 12px; background: {{c.bg}}; color: {{c.text2}}; display: flex; align-items: center; font-size: 12px; font-weight: 600">Photo</span>
+</div>
+<div style="display: flex; gap: 8px">
+<button style="flex: 1; height: 44px; border-radius: 14px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px; font-weight: 600">Retake</button>
+<button style="flex: 1; height: 44px; border-radius: 14px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px; font-weight: 600">Library</button>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Anything the photo can’t show? <span style="color: {{c.text3}}">Optional</span></span>
+<input value="Cooked in 1 tsp olive oil" style="height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; box-sizing: border-box">
+</label>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text3}}">Examples: “half the rice”, “no sauce”, “2 slices”.</span>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 34px">
+<button style="width: 100%; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">Estimate</button>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">2 · Photo + note</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Estimate stays pinned above the home indicator.</span>
+</div>
+
+<!-- 3 Analysing -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Scan a meal</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 8px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div role="img" aria-label="Photo being analysed" style="position: relative; width: 361px; height: 270px; border-radius: 20px; background: {{c.photo}}; overflow: hidden">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; opacity: 0.45">
+<span style="position: absolute; left: 70px; top: 24px; width: 222px; height: 222px; border-radius: 111px; background: {{c.peek}}"></span>
+<span style="position: absolute; left: 96px; top: 56px; width: 110px; height: 80px; border-radius: 40px; background: {{c.raised}}"></span>
+<span style="position: absolute; left: 180px; top: 70px; width: 86px; height: 64px; border-radius: 32px; background: {{c.track}}"></span>
+<span style="position: absolute; left: 118px; top: 140px; width: 130px; height: 70px; border-radius: 35px; background: {{c.line}}"></span>
+</div>
+<span style="position: absolute; left: 0; right: 0; top: 104px; height: 44px; background: {{c.goodBg}}"></span>
+<span style="position: absolute; left: 0; right: 0; top: 146px; height: 2px; background: {{c.accentLine}}"></span>
+<span style="position: absolute; left: 94px; top: 52px; width: 116px; height: 86px; border-radius: 14px; border: 2px solid {{c.accentLine}}; box-sizing: border-box"></span>
+<span style="position: absolute; left: 96px; top: 30px; height: 20px; padding: 0 8px; border-radius: 10px; background: {{c.accent}}; color: {{c.onAccent}}; display: flex; align-items: center; font-size: 11px; font-weight: 700">chicken</span>
+</div>
+<section aria-live="polite" style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 18px 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">Estimating portions…</span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Usually 5–10 seconds</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 24px; height: 24px; border-radius: 12px; background: {{c.goodBg}}; color: {{c.good}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span style="font-size: 15px">Finding foods</span><span style="margin-left: auto; font-size: 13px; color: {{c.text2}}">4 found</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: {{c.accentText}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 1-9 9"></path></svg></span><span style="font-size: 15px; font-weight: 600">Judging portions</span></div>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center"><span style="width: 10px; height: 10px; border-radius: 5px; border: 2px solid {{c.text3}}; box-sizing: border-box"></span></span><span style="font-size: 15px; color: {{c.text3}}">Totting up</span></div>
+</section>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 34px">
+<button style="width: 100%; height: 44px; border-radius: 14px; border: 0; background: transparent; color: {{c.text2}}; font: inherit; font-size: 15px; font-weight: 600">Cancel</button>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">3 · Analysing</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Sweep line loops; steps tick off as the request streams.</span>
+</div>
+
+<!-- 4 Result top + reply -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="position: relative; z-index: 1; height: 56px; display: flex; align-items: center; padding: 0 8px; background: {{c.bg}}">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Scan a meal</span>
+<span style="width: 44px"></span>
+</div>
+<div style="position: absolute; top: 56px; left: 0; right: 0; bottom: 336px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; padding: 0 16px 10px">
+<section style="flex: none; border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 14px 16px; display: flex; align-items: center; gap: 12px">
+<div role="img" aria-label="Meal photo thumbnail" style="flex: none; width: 56px; height: 56px; border-radius: 14px; background: {{c.photo}}; position: relative; overflow: hidden"><span style="position: absolute; left: 8px; top: 8px; width: 40px; height: 40px; border-radius: 20px; background: {{c.peek}}"></span></div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">Chicken, rice &amp; broccoli</span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">P 55 · C 69 · F 11</span>
+</div>
+<span style="font-family: Archivo, sans-serif; font-size: 26px; line-height: 30px; font-weight: 800; font-variant-numeric: tabular-nums">618<span style="font-family: -apple-system, Inter, sans-serif; font-size: 13px; font-weight: 600; color: {{c.text2}}"> kcal</span></span>
+</section>
+<section style="flex: none; border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.6px; color: {{c.text2}}">WHAT I ASSUMED</span>
+<sc-for list="{{assumed}}" as="a" hint-placeholder-count="3">
+<div style="display: flex; gap: 10px; align-items: baseline"><span style="flex: none; width: 6px; height: 6px; border-radius: 3px; background: {{a.c.info}}; transform: translateY(-2px)"></span><span style="font-size: 14px; line-height: 19px">{{a.t}}</span></div>
+</sc-for>
+</section>
+<div style="flex: none; display: flex; flex-direction: column; gap: 6px">
+<div style="align-self: flex-end; max-width: 260px; padding: 9px 14px; border-radius: 18px 18px 6px 18px; background: {{c.raised}}; font-size: 15px; line-height: 20px"><span style="display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.4px; color: {{c.text2}}">YOU</span>no butter</div>
+<div style="align-self: flex-start; max-width: 280px; padding: 9px 14px; border-radius: 18px 18px 18px 6px; background: {{c.goodBg}}; font-size: 14px; line-height: 19px">Removed the butter: −72 kcal. Oil kept at 1 tsp.</div>
+</div>
+<div style="flex: none; display: flex; gap: 8px; align-items: flex-end">
+<label style="flex: 1; display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Reply to correct the estimate</span><input value="the rice was a small portion" style="width: 100%; height: 48px; border-radius: 24px; border: 2px solid {{c.accentLine}}; padding: 0 16px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+<button style="flex: none; height: 48px; padding: 0 16px; border-radius: 24px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 15px; font-weight: 700">Update estimate</button>
+</div>
+</div>
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 336px; background: {{c.keyboard}}; display: flex; align-items: center; justify-content: center; font-size: 12px; color: {{c.text2}}">System keyboard</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">4 · Result, replying</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Reply box rides the keyboard; content above scrolls under the header.</span>
+</div>
+
+<!-- 5 Result bottom -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="position: relative; z-index: 1; height: 56px; display: flex; align-items: center; padding: 0 8px; background: {{c.bg}}">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Scan a meal</span>
+<span style="width: 44px"></span>
+</div>
+<div style="position: absolute; top: 56px; left: 0; right: 0; bottom: 104px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px; padding: 0 16px 12px">
+<section style="flex: none; border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 4px 6px 4px 16px; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; justify-content: space-between; min-height: 40px; padding-right: 10px"><span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.6px; color: {{c.text2}}">ITEMS · TAP TO EDIT</span><span style="font-size: 12px; color: {{c.text3}}">updated</span></div>
+<sc-for list="{{items}}" as="it" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid {{it.c.line}}">
+<span role="img" aria-label="{{it.confLabel}}" style="flex: none; display: flex">
+<sc-if value="{{it.high}}" hint-placeholder-val="{{true}}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="{{it.c.good}}"></circle></svg></sc-if>
+<sc-if value="{{it.med}}" hint-placeholder-val="{{false}}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" fill="none" stroke="{{it.c.warn}}" stroke-width="1.6"></circle><path d="M6 1.5A4.5 4.5 0 0 0 6 10.5z" fill="{{it.c.warn}}"></path></svg></sc-if>
+<sc-if value="{{it.low}}" hint-placeholder-val="{{false}}"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" fill="none" stroke="{{it.c.warn}}" stroke-width="1.6"></circle></svg></sc-if>
+</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 15px; line-height: 20px; font-weight: 600">{{it.name}}</span>
+<span style="font-size: 13px; line-height: 18px; color: {{it.c.text2}}; font-variant-numeric: tabular-nums">{{it.meta}}</span>
+</div>
+<span style="font-family: Archivo, sans-serif; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{it.kcal}}</span>
+<button aria-label="Remove {{it.name}}" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; color: {{it.c.alert}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"></path><circle cx="12" cy="12" r="9"></circle></svg></button>
+</div>
+</sc-for>
+</section>
+<div style="flex: none; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">How much did you eat?</span>
+<div role="radiogroup" aria-label="Portion eaten" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{portions}}" as="p" hint-placeholder-count="6">
+<button role="radio" aria-checked="{{p.sel}}" style="height: 36px; border-radius: 18px; border: 0; padding: 0; background: {{p.bg}}; color: {{p.col}}; font: inherit; font-family: Archivo, sans-serif; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums">{{p.t}}</button>
+</sc-for>
+</div>
+</div>
+<div style="flex: none; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Meal</span>
+<div style="display: flex; gap: 6px; overflow: hidden">
+<sc-for list="{{mealChips}}" as="m" hint-placeholder-count="5">
+<button style="flex: none; height: 36px; padding: 0 13px; border-radius: 18px; border: 0; background: {{m.bg}}; color: {{m.col}}; font: inherit; font-size: 15px; font-weight: {{m.w}}">{{m.t}}</button>
+</sc-for>
+</div>
+</div>
+<div role="radiogroup" aria-label="Log as" style="flex: none; height: 40px; border-radius: 12px; background: {{c.raised}}; padding: 3px; box-sizing: border-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px">
+<button role="radio" aria-checked="true" style="border: 0; border-radius: 9px; background: {{c.thumb}}; box-shadow: {{c.thumbShadow}}; color: {{c.text}}; font: inherit; font-size: 14px; font-weight: 600">Separate items</button>
+<button role="radio" aria-checked="false" style="border: 0; border-radius: 9px; background: transparent; color: {{c.text2}}; font: inherit; font-size: 14px">As one meal</button>
+</div>
+</div>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 104px; box-sizing: border-box; padding: 10px 16px 34px; background: {{c.bg}}; border-top: 1px solid {{c.line}}; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-size: 13px; line-height: 16px; color: {{c.text2}}; font-variant-numeric: tabular-nums"><span>4 items · P 54 · C 59 · F 10</span><span>Thu target 2,301</span></div>
+<button style="width: 100%; height: 44px; border-radius: 14px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">Add 572 kcal to Meal 3</button>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">5 · Result, ready to log</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">After the reply: rice down to 180 g, total 618 → 572.</span>
+</div>
+
+<!-- Spec -->
+<aside aria-label="Spec" style="width: 400px; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 20px 24px; box-sizing: border-box; max-height: 900px; overflow: hidden; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 8px; font-family: Archivo, sans-serif; font-size: 20px; font-weight: 800">Spec</h2>
+<sc-for list="{{spec}}" as="s" hint-placeholder-count="16">
+<div style="padding: 7px 0; border-top: 1px solid {{s.c.line}}; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; line-height: 17px; font-weight: 600">{{s.k}}</span>
+<span style="font-size: 12px; line-height: 16px; color: {{s.c.text2}}">{{s.d}}</span>
+</div>
+</sc-for>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":2701,"height":1160}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257', board: '#050604', phoneEdge: '#2A2D27', behind: '#000000', peek: '#1B1D18', keyboard: '#2C2D2A', pressed: '#2C2F29', onAlert: '#1A0705', photo: '#2B2A24', thumb: '#3A3D36', thumbShadow: 'none' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194', board: '#E4E6DE', phoneEdge: '#CFD2C7', behind: '#B9BCB2', peek: '#D9DBD3', keyboard: '#D3D5CC', pressed: '#DFE2D8', onAlert: '#FFFFFF', photo: '#CFCBBE', thumb: '#FFFFFF', thumbShadow: '0 1px 3px rgba(17,19,14,0.15)' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const c = this.palette()[theme];
+    const assumed = ['Rice ≈ 1¼ cups cooked (215 g)', 'Chicken breast ≈ 150 g, skin off', 'Broccoli ≈ 120 g, steamed', '1 tsp olive oil in cooking (your note)'].map((t) => ({ t, c }));
+    const I = (name, meta, kcal, conf) => ({ name, meta, kcal, high: conf === 'h', med: conf === 'm', low: conf === 'l', confLabel: { h: 'High confidence', m: 'Medium confidence', l: 'Low confidence' }[conf], c });
+    const items = [
+      I('Chicken breast', '150 g · P 46 · C 0 · F 5', '248', 'h'),
+      I('Basmati rice, cooked', '180 g · P 5 · C 51 · F 0', '238', 'm'),
+      I('Broccoli', '120 g · P 3 · C 8 · F 0', '41', 'h'),
+      I('Olive oil', '5 g · F 5', '45', 'l')
+    ];
+    const portions = ['¼', '½', '¾', 'All', '1½', '2×'].map((t) => { const sel = t === 'All'; return { t, sel: sel ? 'true' : 'false', bg: sel ? c.accent : c.raised, col: sel ? c.onAccent : c.text }; });
+    const mealChips = ['Meal 1', 'Meal 2', 'Meal 3', 'Meal 4', 'Snacks'].map((t) => { const sel = t === 'Meal 3'; return { t, bg: sel ? c.accent : c.raised, col: sel ? c.onAccent : c.text, w: sel ? 600 : 400 }; });
+    const S = (k, d) => ({ k, d, c });
+    const spec = [
+      S('Presentation', 'Stack modal (pageSheet), native header: close xmark left, title 17/600. Content in Screen (ScrollView) with 16 gutter, 8 top.'),
+      S('Tips card · Card', 'radius 24, pad 32/24/28, icon tile 72 r24 goodBg. Title 20/700, body 15/21 text2.'),
+      S('PhotoPicker · Button L ×2', '56 h, r18, gap 8. Take photo = expo-image-picker launchCameraAsync; Library = launchImageLibraryAsync. Compress to 1280 px long edge.'),
+      S('Photo preview', '361 × 270, r20, cover. Retake / Library are Button M (44, r14) below it.'),
+      S('NoteField · Field', 'label 13 text2 + “Optional”. 52 h, r14, 17/400. Focus ring 2 pt accentLine.'),
+      S('Pinned action', 'Estimate / Add to log sit in a footer above the home indicator (bottom inset 34). Footer has a hairline and bg so content scrolls under it.'),
+      S('AnalysingState', 'Photo at 45 % opacity. Sweep: 2 pt accentLine + 44 pt goodBg band, translateY 0→270 loop, 1.2 s linear (withRepeat). Detected-food boxes fade in 160 ms.'),
+      S('Steps list', 'done = 24 circle goodBg + check; current = spinner (rotate 800 ms loop); pending = hollow 10 dot text3. Each step FadeIn 220 ms. aria-live polite.'),
+      S('ResultHeader · Card', 'thumb 56 r14, name 17/600, macros 13 text2, kcal num 26/800 with count-up 600 ms when the estimate changes.'),
+      S('AssumptionList', 'overline 12/700 + rows 14/19 with 6 pt info dot. The AI’s guesses in plain words, one per line.'),
+      S('ReplyThread', 'You = right bubble raised, r18/18/6/18. AI = left bubble goodBg, says what changed (“−72 kcal”). Max width 280.'),
+      S('ReplyBox', 'pill input 48 h r24 + Button “Update estimate” 48 h r24. Keyboard: ScrollView automaticallyAdjustKeyboardInsets + keyboardDismissMode interactive; scrollToEnd on focus so the box sits 10 pt above the keyboard.'),
+      S('ScanItemRow · FoodRow', 'min 60. ConfidenceDot 12: high filled good, medium half warn, low hollow warn (shape differs, not only colour). Tap opens edit; remove = 44 target, minus-circle alert, undo toast 4 s.'),
+      S('PortionChips', '6 equal chips, 36 h pill, Archivo 14/700. Scales every item and the total live; count-up 300 ms.'),
+      S('MealPicker · Chip', 'existing meal-picker.tsx, horizontal scroll, defaults to the meal for the time of day.'),
+      S('LogMode · Segmented', '40 h, r12, thumb r9. Separate items (default) or As one meal.'),
+      S('Add to log', 'Button M 44 in footer; label carries kcal + meal. On success: Haptics.notificationAsync(Success), dismiss, Today ring counts up.'),
+      S('Light mode', 'Photo placeholder #CFCBBE, keyboard follows system; all text tokens as Tokens board.')
+    ];
+    return { c, themeName: theme === 'light' ? 'Light' : 'Dark', assumed, items, portions, mealChips, spec };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sheet · Training session</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1835px; height: 1160px; box-sizing: border-box; padding: 48px; background: {{c.board}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 24px; -webkit-font-smoothing: antialiased">
+
+<header style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">SHEET · TRAINING SESSION</span>
+<h1 style="margin: 0; font-family: Archivo, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -0.6px">Training session</h1>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{themeName}} · estimate from WHOOP history, confirm after, override if needed</span>
+</header>
+
+<div style="display: flex; gap: 40px; align-items: flex-start">
+
+<!-- 1 Plan -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Training session</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; height: 44px; border-radius: 22px; background: {{c.raised}}"><button aria-label="Previous day" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"></path></svg></button><span style="flex: 1; text-align: center; font-size: 15px; font-weight: 600">Today · Thu 19 Nov</span><button aria-label="Next day" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg></button></div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Your WHOOP activities</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button aria-pressed="true" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 15px; font-weight: 600">Padel</button>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">Running</button>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">Functional fitness</button>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">Usually 90 min · about 860 kcal · 38 sessions</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Other activities</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">Walking</button>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">Cycling</button>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">Swimming</button>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">Strength</button>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 10px; align-items: end">
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Duration</span><span style="height: 52px; border-radius: 14px; background: {{c.raised}}; display: flex; align-items: center; padding: 0 14px; gap: 6px"><input value="90" inputmode="numeric" style="width: 44px; border: 0; padding: 0; background: transparent; color: {{c.text}}; font-family: Archivo, sans-serif; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums"><span style="font-size: 15px; color: {{c.text2}}">min</span></span></label>
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Intensity</span>
+<div role="radiogroup" aria-label="Intensity" style="height: 52px; border-radius: 14px; background: {{c.raised}}; padding: 4px; box-sizing: border-box; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px">
+<button role="radio" aria-checked="false" style="border: 0; border-radius: 10px; background: transparent; color: {{c.text2}}; font: inherit; font-size: 14px">Easy</button>
+<button role="radio" aria-checked="true" style="border: 0; border-radius: 10px; background: {{c.thumb}}; box-shadow: {{c.thumbShadow}}; color: {{c.text}}; font: inherit; font-size: 14px; font-weight: 600">Moderate</button>
+<button role="radio" aria-checked="false" style="border: 0; border-radius: 10px; background: transparent; color: {{c.text2}}; font: inherit; font-size: 14px">Hard</button>
+</div></div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Notes <span style="color: {{c.text3}}">Optional</span></span><input value="Evening doubles at the club" style="height: 48px; border-radius: 14px; border: 0; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+<section aria-label="Effect on today" style="border-radius: 20px; background: {{c.trainingBg}}; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: Archivo, sans-serif; font-size: 28px; line-height: 32px; font-weight: 800; color: {{c.training}}; font-variant-numeric: tabular-nums">≈ +748</span><span style="font-size: 15px; font-weight: 600">kcal adds to Thu’s target</span></div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">+561 counted at your 75 % eat-back</span>
+<span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">Estimated from your 38 WHOOP ‘Padel’ sessions</span>
+</section>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 34px"><button style="width: 100%; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">Save session</button></div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">1 · Plan a session</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Picking Padel fills duration from history; the estimate updates live.</span>
+</div>
+
+<!-- 2 How did it go -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Training session</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; height: 44px; border-radius: 22px; background: {{c.raised}}"><button aria-label="Previous day" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"></path></svg></button><span style="flex: 1; text-align: center; font-size: 15px; font-weight: 600">Today · Thu 19 Nov</span><button aria-label="Next day" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg></button></div>
+<a href="#" style="border-radius: 20px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 12px 16px; display: flex; align-items: center; gap: 12px; color: {{c.text}}; text-decoration: none">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 14px; background: {{c.trainingBg}}; color: {{c.training}}; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7"></circle><path d="M12 13.5V10M10 3.5h4M18 7l1.5-1.5"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 16px; font-weight: 600">Padel</span><span style="font-size: 13px; color: {{c.text2}}">Planned 90 min · moderate · 19:00</span></span>
+<span style="font-size: 15px; font-weight: 600; color: {{c.accentText}}">Change</span>
+</a>
+<section style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">How did it go?</h2><span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">From the activity in your WHOOP app</span></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">WHOOP calories</span><span style="height: 52px; border-radius: 14px; background: {{c.raised}}; display: flex; align-items: center; padding: 0 14px; gap: 6px"><input value="812" inputmode="numeric" style="width: 60px; border: 0; padding: 0; background: transparent; color: {{c.text}}; font-family: Archivo, sans-serif; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums"><span style="font-size: 15px; color: {{c.text2}}">kcal</span></span></label>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Actual minutes</span><span style="height: 52px; border-radius: 14px; background: {{c.raised}}; display: flex; align-items: center; padding: 0 14px; gap: 6px"><input value="95" inputmode="numeric" style="width: 44px; border: 0; padding: 0; background: transparent; color: {{c.text}}; font-family: Archivo, sans-serif; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums"><span style="font-size: 15px; color: {{c.text2}}">min</span></span></label>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">Estimate was ≈ 748, so this adds 64 more.</span>
+</section>
+<section aria-label="Effect on today" style="border-radius: 20px; background: {{c.trainingBg}}; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: Archivo, sans-serif; font-size: 28px; line-height: 32px; font-weight: 800; color: {{c.training}}; font-variant-numeric: tabular-nums">+812</span><span style="font-size: 15px; font-weight: 600">kcal adds to Thu’s target</span></div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">+609 counted at your 75 % eat-back</span>
+<span style="align-self: flex-start; height: 28px; padding: 0 10px; border-radius: 14px; background: {{c.goodBg}}; color: {{c.good}}; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Confirmed from WHOOP</span>
+</section>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 34px"><button style="width: 100%; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">Save · +812 kcal</button></div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">2 · How did it go?</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Shown for today and past days only. Confirmed burn replaces the estimate.</span>
+</div>
+
+<!-- 3 Past day override -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Training session</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; height: 44px; border-radius: 22px; background: {{c.raised}}"><button aria-label="Previous day" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"></path></svg></button><span style="flex: 1; text-align: center; font-size: 15px; font-weight: 600">Mon 16 Nov</span><button aria-label="Next day" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg></button></div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Your WHOOP activities</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">Padel</button>
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">Running</button>
+<button aria-pressed="true" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 15px; font-weight: 600">Functional fitness</button>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">Usually 60 min · about 420 kcal · 22 sessions</span>
+</div>
+<div style="display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 10px; align-items: end">
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Duration</span><span style="height: 52px; border-radius: 14px; background: {{c.raised}}; display: flex; align-items: center; padding: 0 14px; gap: 6px"><input value="60" inputmode="numeric" style="width: 44px; border: 0; padding: 0; background: transparent; color: {{c.text}}; font-family: Archivo, sans-serif; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums"><span style="font-size: 15px; color: {{c.text2}}">min</span></span></label>
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Intensity</span>
+<div role="radiogroup" aria-label="Intensity" style="height: 52px; border-radius: 14px; background: {{c.raised}}; padding: 4px; box-sizing: border-box; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px">
+<button role="radio" aria-checked="false" style="border: 0; border-radius: 10px; background: transparent; color: {{c.text2}}; font: inherit; font-size: 14px">Easy</button>
+<button role="radio" aria-checked="false" style="border: 0; border-radius: 10px; background: transparent; color: {{c.text2}}; font: inherit; font-size: 14px">Moderate</button>
+<button role="radio" aria-checked="true" style="border: 0; border-radius: 10px; background: {{c.thumb}}; box-shadow: {{c.thumbShadow}}; color: {{c.text}}; font: inherit; font-size: 14px; font-weight: 600">Hard</button>
+</div></div>
+</div>
+<section style="border-radius: 20px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 4px 16px 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; min-height: 52px; gap: 12px"><span style="flex: 1; font-size: 16px">Set calories myself</span><span role="switch" aria-checked="true" aria-label="Set calories myself" style="width: 51px; height: 31px; border-radius: 16px; background: {{c.switchOn}}; position: relative; display: block"><span style="position: absolute; right: 2px; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: #FFFFFF"></span></span></div>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Calories burned</span><span style="height: 52px; border-radius: 14px; background: {{c.raised}}; border: 2px solid {{c.accentLine}}; box-sizing: border-box; display: flex; align-items: center; padding: 0 12px; gap: 6px"><input value="380" inputmode="numeric" style="width: 60px; border: 0; padding: 0; background: transparent; color: {{c.text}}; font-family: Archivo, sans-serif; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums"><span style="font-size: 15px; color: {{c.text2}}">kcal</span></span></label>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; color: {{c.text2}}"><span style="display: flex; color: {{c.warn}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"></path><path d="M12 10v4.5M12 17.2v.3"></path></svg></span>Overrides the WHOOP estimate of 420</span>
+</section>
+<section aria-label="Effect on Monday" style="border-radius: 20px; background: {{c.trainingBg}}; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: Archivo, sans-serif; font-size: 28px; line-height: 32px; font-weight: 800; color: {{c.training}}; font-variant-numeric: tabular-nums">+380</span><span style="font-size: 15px; font-weight: 600">kcal adds to Mon’s target</span></div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">+285 at 75 % · your own number · the week rebalances</span>
+</section>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 34px; display: flex; flex-direction: column; gap: 4px">
+<button style="width: 100%; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">Save changes</button>
+<button style="width: 100%; height: 44px; border-radius: 14px; border: 0; background: transparent; color: {{c.alert}}; font: inherit; font-size: 15px; font-weight: 600">Delete session</button>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">3 · Past day, own number</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Delete asks first (native Alert): “Delete Mon’s session? Its 285 kcal leave Mon’s target.”</span>
+</div>
+
+<!-- Spec -->
+<aside aria-label="Spec" style="width: 400px; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 20px 24px; box-sizing: border-box; max-height: 900px; overflow: hidden; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 8px; font-family: Archivo, sans-serif; font-size: 20px; font-weight: 800">Spec</h2>
+<sc-for list="{{spec}}" as="s" hint-placeholder-count="16">
+<div style="padding: 7px 0; border-top: 1px solid {{s.c.line}}; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; line-height: 17px; font-weight: 600">{{s.k}}</span>
+<span style="font-size: 12px; line-height: 16px; color: {{s.c.text2}}">{{s.d}}</span>
+</div>
+</sc-for>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1835,"height":1160}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257', board: '#050604', phoneEdge: '#2A2D27', behind: '#000000', peek: '#1B1D18', keyboard: '#2C2D2A', pressed: '#2C2F29', onAlert: '#1A0705', photo: '#2B2A24', thumb: '#3A3D36', thumbShadow: 'none', switchOn: '#C6F24E' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194', board: '#E4E6DE', phoneEdge: '#CFD2C7', behind: '#B9BCB2', peek: '#D9DBD3', keyboard: '#D3D5CC', pressed: '#DFE2D8', onAlert: '#FFFFFF', photo: '#CFCBBE', thumb: '#FFFFFF', thumbShadow: '0 1px 3px rgba(17,19,14,0.15)', switchOn: '#557F00' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const c = this.palette()[theme];
+    const S = (k, d) => ({ k, d, c });
+    const spec = [
+      S('Presentation', 'Stack modal “training”, native header (close left, title). Screen ScrollView, 16 gutter, 12 gap between groups. Footer pinned above home indicator (34).'),
+      S('Date · Stepper', '44 h pill, raised, arrows 44×44. Future days allowed (planning). Changing day re-runs the estimate.'),
+      S('ActivityChips · Chip', '36 h pill, gap 8, wrap. “Your WHOOP activities” sorted by session count, selected = accent. “Other activities” below, generic estimates.'),
+      S('UsuallyLine · T muted', '13/18 text2, tabular. Typical minutes · typical kcal · session count from WHOOP history. Hidden for “Other”.'),
+      S('DurationField · Field', '120 wide, 52 h, r14. Archivo 20/800 value + unit. number-pad. Prefilled with the usual minutes.'),
+      S('IntensitySegmented · Segmented', '52 h to match the field, thumb r10. Easy / Moderate / Hard scale the per-minute burn ±15 %.'),
+      S('Notes · Field', '48 h, optional, single line.'),
+      S('BurnResultCard', 'trainingBg, r20, pad 14/16. Archivo 28/800 training colour (≈ when estimated), 15/600 “kcal adds to <day>’s target”, eat-back line, source line 12. Number count-up 400 ms on every change.'),
+      S('Source states', 'Estimate: “≈” + “Estimated from your N WHOOP ‘X’ sessions”. Confirmed: no ≈ + StatusPill good “Confirmed from WHOOP”. Generic: “Typical estimate for this activity”. Own: “your own number”.'),
+      S('ConfirmCard “How did it go?”', 'Card r22 pad 16. Only for today or past days. Two fields side by side (kcal, minutes). Shows the delta vs the estimate in plain words.'),
+      S('Override', 'Row 52 with native Switch (trackColor.true accent / accentLine). Reveals kcal field with 2 pt focus ring + warn note “Overrides the WHOOP estimate of N”.'),
+      S('Save · Button L', '56 h r18 accent. Label carries the number when confirmed (“Save · +812 kcal”). Success: haptic success, dismiss, Today ring + target count up.'),
+      S('Delete · Button ghost alert', '44 h. Alert.alert confirm with destructive style; the week rebalance runs after.'),
+      S('Keyboard', 'Screen ScrollView automaticallyAdjustKeyboardInsets; footer moves up with the keyboard (KeyboardStickyView or bottom inset from useKeyboardHeight).'),
+      S('Accessibility', 'Result card is one accessibility element: “Adds about 748 kcal to Thursday’s target, 561 counted.” Chips announce selected.')
+    ];
+    return { c, themeName: theme === 'light' ? 'Light' : 'Dark', spec };
+  }
+}
+</script>
+</body>
+</html>

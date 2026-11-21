@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sheet · Weight</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1835px; height: 1160px; box-sizing: border-box; padding: 48px; background: {{c.board}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 24px; -webkit-font-smoothing: antialiased">
+
+<header style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">SHEET · WEIGHT</span>
+<h1 style="margin: 0; font-family: Archivo, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -0.6px">Weight</h1>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{themeName}} · weigh in, see the trend, know if the plan is working</span>
+</header>
+
+<div style="display: flex; gap: 40px; align-items: flex-start">
+
+<!-- 1 Entry -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Weight</span>
+<span style="width: 44px"></span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; height: 44px; border-radius: 22px; background: {{c.raised}}"><button aria-label="Previous day" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"></path></svg></button><span style="flex: 1; text-align: center; font-size: 15px; font-weight: 600">Today · Thu 19 Nov</span><button aria-label="Next day" disabled="" style="width: 44px; height: 44px; border: 0; background: transparent; color: {{c.text3}}; opacity: 0.4; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg></button></div>
+<section style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Weight (kg)</span>
+<span style="height: 72px; border-radius: 18px; background: {{c.raised}}; border: 2px solid {{c.accentLine}}; box-sizing: border-box; display: flex; align-items: center; padding: 0 18px; gap: 8px"><input value="98.3" inputmode="decimal" style="width: 110px; border: 0; padding: 0; background: transparent; color: {{c.text}}; font-family: Archivo, sans-serif; font-size: 40px; font-weight: 800; letter-spacing: -1px; font-variant-numeric: tabular-nums"><span style="font-size: 17px; color: {{c.text2}}">kg</span></span>
+</label>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Best first thing in the morning, after the toilet, before eating or drinking.</span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text3}}; font-variant-numeric: tabular-nums">Last: 98.5 kg on Mon 16 Nov</span>
+</section>
+<button style="width: 100%; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">Save</button>
+</div>
+<div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 336px; background: {{c.keyboard}}; display: flex; align-items: center; justify-content: center; font-size: 12px; color: {{c.text2}}">System keyboard · decimal pad</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">1 · Entry</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Field focused on open; Save sits above the decimal pad.</span>
+</div>
+
+<!-- 2 Saved + trend -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Weight</span>
+<a href="#" style="width: 60px; text-align: right; padding-right: 8px; font-size: 17px; font-weight: 600; color: {{c.accentText}}; text-decoration: none">Done</a>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div role="status" style="height: 44px; border-radius: 14px; background: {{c.goodBg}}; display: flex; align-items: center; gap: 8px; padding: 0 14px; font-size: 15px; font-weight: 600"><span style="display: flex; color: {{c.good}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>Logged <span style="font-family: Archivo, sans-serif; font-weight: 800; font-variant-numeric: tabular-nums">98.3 kg</span> for today</div>
+<section style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.6px; color: {{c.text2}}">TREND</span><span style="font-family: Archivo, sans-serif; font-size: 34px; line-height: 38px; font-weight: 800; letter-spacing: -0.8px; font-variant-numeric: tabular-nums">98.3<span style="font-family: -apple-system, Inter, sans-serif; font-size: 15px; font-weight: 500; letter-spacing: 0; color: {{c.text2}}"> kg</span></span></div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px"><span style="font-family: Archivo, sans-serif; font-size: 20px; font-weight: 800; color: {{c.warn}}; font-variant-numeric: tabular-nums">−0.21</span><span style="font-size: 12px; color: {{c.text2}}">kg per week</span></div>
+</div>
+<span style="display: flex; gap: 8px; align-items: flex-start; font-size: 14px; line-height: 19px"><span style="flex: none; display: flex; color: {{c.warn}}; margin-top: 1px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"></path><path d="M12 10v4.5M12 17.2v.3"></path></svg></span>Slower than your 1 kg goal, about 0.8 kg a week behind.</span>
+</section>
+<section style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 8px">
+<svg width="329" height="150" viewBox="0 0 329 150" role="img" aria-label="Weight over 4 weeks: 9 weigh-ins from 99.4 to 98.3 kg, trend falling 0.21 kg a week, goal line falls faster">
+<line x1="0" y1="{{ch.gl1}}" x2="329" y2="{{ch.gl1}}" stroke="{{c.line}}" stroke-width="1"></line>
+<line x1="0" y1="{{ch.gl2}}" x2="329" y2="{{ch.gl2}}" stroke="{{c.line}}" stroke-width="1"></line>
+<line x1="0" y1="{{ch.gl3}}" x2="329" y2="{{ch.gl3}}" stroke="{{c.line}}" stroke-width="1"></line>
+<path d="{{ch.goal}}" fill="none" stroke="{{c.text3}}" stroke-width="1.6" stroke-dasharray="5 5"></path>
+<path d="{{ch.trend}}" fill="none" stroke="{{c.accentLine}}" stroke-width="3" stroke-linecap="round"></path>
+<circle cx="{{ch.p0.x}}" cy="{{ch.p0.y}}" r="{{ch.p0.r}}" fill="{{ch.p0.fill}}"></circle>
+<circle cx="{{ch.p1.x}}" cy="{{ch.p1.y}}" r="{{ch.p1.r}}" fill="{{ch.p1.fill}}"></circle>
+<circle cx="{{ch.p2.x}}" cy="{{ch.p2.y}}" r="{{ch.p2.r}}" fill="{{ch.p2.fill}}"></circle>
+<circle cx="{{ch.p3.x}}" cy="{{ch.p3.y}}" r="{{ch.p3.r}}" fill="{{ch.p3.fill}}"></circle>
+<circle cx="{{ch.p4.x}}" cy="{{ch.p4.y}}" r="{{ch.p4.r}}" fill="{{ch.p4.fill}}"></circle>
+<circle cx="{{ch.p5.x}}" cy="{{ch.p5.y}}" r="{{ch.p5.r}}" fill="{{ch.p5.fill}}"></circle>
+<circle cx="{{ch.p6.x}}" cy="{{ch.p6.y}}" r="{{ch.p6.r}}" fill="{{ch.p6.fill}}"></circle>
+<circle cx="{{ch.p7.x}}" cy="{{ch.p7.y}}" r="{{ch.p7.r}}" fill="{{ch.p7.fill}}"></circle>
+<circle cx="{{ch.p8.x}}" cy="{{ch.p8.y}}" r="{{ch.p8.r}}" fill="{{ch.p8.fill}}"></circle>
+<text x="0" y="{{ch.l1y}}" font-size="10" fill="{{c.text3}}" font-family="-apple-system, Inter, sans-serif">99.5</text>
+<text x="0" y="{{ch.l2y}}" font-size="10" fill="{{c.text3}}" font-family="-apple-system, Inter, sans-serif">98.5</text>
+</svg>
+<div style="display: flex; justify-content: space-between; font-size: 11px; color: {{c.text3}}; font-variant-numeric: tabular-nums"><span>23 Oct</span><span>30 Oct</span><span>6 Nov</span><span>13 Nov</span><span>19 Nov</span></div>
+<div style="display: flex; gap: 14px; font-size: 12px; color: {{c.text2}}"><span style="display: flex; align-items: center; gap: 6px"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{c.text3}}"></span>Weigh-in</span><span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 3px; border-radius: 2px; background: {{c.accentLine}}"></span>Trend</span><span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; border-top: 2px dashed {{c.text3}}"></span>1 kg/week goal</span></div>
+</section>
+<section style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 4px 16px">
+<sc-for list="{{recent}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; min-height: 44px; border-top: {{r.sep}}; font-variant-numeric: tabular-nums">
+<span style="flex: 1; font-size: 15px">{{r.d}}</span>
+<span style="width: 70px; text-align: right; font-family: Archivo, sans-serif; font-size: 15px; font-weight: 700">{{r.kg}}</span>
+<span style="width: 56px; text-align: right; font-size: 13px; font-weight: 600; color: {{r.col}}">{{r.ch}}</span>
+</div>
+</sc-for>
+</section>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">2 · Saved, trend</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Pace text is warn: losing, but slower than the goal.</span>
+</div>
+
+<!-- 3 Not enough data + pace messages -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="flex: 1; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Weight</span>
+<a href="#" style="width: 60px; text-align: right; padding-right: 8px; font-size: 17px; font-weight: 600; color: {{c.accentText}}; text-decoration: none">Done</a>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div role="status" style="height: 44px; border-radius: 14px; background: {{c.goodBg}}; display: flex; align-items: center; gap: 8px; padding: 0 14px; font-size: 15px; font-weight: 600"><span style="display: flex; color: {{c.good}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>First weigh-in saved: <span style="font-family: Archivo, sans-serif; font-weight: 800; font-variant-numeric: tabular-nums">98.3 kg</span></div>
+<section style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="position: relative; height: 130px; border-radius: 14px; border: 1.5px dashed {{c.line}}; box-sizing: border-box">
+<svg width="327" height="127" viewBox="0 0 327 127" aria-hidden="true" style="position: absolute; left: 0; top: 0"><path d="M20 70 C 100 74, 200 80, 306 88" fill="none" stroke="{{c.track}}" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round"></path><circle cx="20" cy="70" r="5" fill="{{c.accentLine}}"></circle></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 16px; line-height: 21px; font-weight: 600">Log 3 weigh-ins over a week to see your trend</span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">One reading moves with water and food. The trend is what counts.</span>
+</div>
+<div role="img" aria-label="1 of 3 weigh-ins" style="display: flex; align-items: center; gap: 8px"><span style="width: 10px; height: 10px; border-radius: 5px; background: {{c.accentLine}}"></span><span style="width: 10px; height: 10px; border-radius: 5px; border: 2px solid {{c.text3}}; box-sizing: border-box"></span><span style="width: 10px; height: 10px; border-radius: 5px; border: 2px solid {{c.text3}}; box-sizing: border-box"></span><span style="font-size: 13px; color: {{c.text2}}">1 of 3</span></div>
+</section>
+<section style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 12px 16px 6px; display: flex; flex-direction: column">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.6px; color: {{c.text2}}; padding-bottom: 6px">PACE MESSAGES · ONCE THERE IS A TREND</span>
+<sc-for list="{{pace}}" as="p" hint-placeholder-count="4">
+<div style="display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid {{p.c.line}}">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 14px; background: {{p.bg}}; color: {{p.col}}; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800">{{p.g}}</span>
+<div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 14px; line-height: 19px; font-weight: 600">{{p.t}}</span><span style="font-size: 12px; line-height: 16px; color: {{p.c.text2}}">{{p.d}}</span></div>
+</div>
+</sc-for>
+</section>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">3 · Not enough data yet</span>
+<span style="margin-top: -8px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Empty chart until 3 readings; below, the four pace levels.</span>
+</div>
+
+<!-- Spec -->
+<aside aria-label="Spec" style="width: 400px; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 20px 24px; box-sizing: border-box; max-height: 900px; overflow: hidden; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 8px; font-family: Archivo, sans-serif; font-size: 20px; font-weight: 800">Spec</h2>
+<sc-for list="{{spec}}" as="s" hint-placeholder-count="15">
+<div style="padding: 7px 0; border-top: 1px solid {{s.c.line}}; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; line-height: 17px; font-weight: 600">{{s.k}}</span>
+<span style="font-size: 12px; line-height: 16px; color: {{s.c.text2}}">{{s.d}}</span>
+</div>
+</sc-for>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1835,"height":1160}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257', board: '#050604', phoneEdge: '#2A2D27', behind: '#000000', peek: '#1B1D18', keyboard: '#2C2D2A', pressed: '#2C2F29', onAlert: '#1A0705', photo: '#2B2A24' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194', board: '#E4E6DE', phoneEdge: '#CFD2C7', behind: '#B9BCB2', peek: '#D9DBD3', keyboard: '#D3D5CC', pressed: '#DFE2D8', onAlert: '#FFFFFF', photo: '#CFCBBE' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const c = this.palette()[theme];
+    const HI = 99.8, LO = 97.8, TOP = 10, H = 130, X0 = 28, XW = 293;
+    const y = (v) => TOP + (HI - v) / (HI - LO) * H;
+    const x = (d) => X0 + d / 27 * XW;
+    const days = [0, 3, 7, 10, 14, 17, 21, 24, 27];
+    const vals = [99.4, 99.1, 99.2, 98.9, 98.8, 98.9, 98.6, 98.5, 98.3];
+    const pts = days.map((d, i) => ({ x: x(d).toFixed(1), y: y(vals[i]).toFixed(1), r: i === 8 ? 5 : 3.5, fill: i === 8 ? c.accentLine : c.text3 }));
+    const t0 = 99.25, t1 = 98.38;
+    const trend = 'M' + x(0).toFixed(1) + ' ' + y(t0).toFixed(1) + ' C ' + x(9).toFixed(1) + ' ' + y(t0 - 0.24).toFixed(1) + ', ' + x(18).toFixed(1) + ' ' + y(t1 + 0.32).toFixed(1) + ', ' + x(27).toFixed(1) + ' ' + y(t1).toFixed(1);
+    const dEnd = (t0 - LO) / (1 / 7);
+    const goal = 'M' + x(0).toFixed(1) + ' ' + y(t0).toFixed(1) + ' L ' + x(Math.min(27, dEnd)).toFixed(1) + ' ' + y(Math.max(LO, t0 - 27 / 7)).toFixed(1);
+    const ch = { p0: pts[0], p1: pts[1], p2: pts[2], p3: pts[3], p4: pts[4], p5: pts[5], p6: pts[6], p7: pts[7], p8: pts[8], trend, goal, gl1: y(99.5).toFixed(1), gl2: y(98.5).toFixed(1), gl3: y(LO).toFixed(1), l1y: (y(99.5) - 3).toFixed(1), l2y: (y(98.5) - 3).toFixed(1) };
+    const R = (d, kg, chg, i) => ({ d, kg, ch: chg, col: chg.indexOf('+') === 0 ? c.warn : c.text2, sep: i === 0 ? '0' : '1px solid ' + c.line });
+    const recent = [R('Thu 19 Nov', '98.3', '−0.2', 0), R('Mon 16 Nov', '98.5', '−0.1', 1), R('Fri 13 Nov', '98.6', '−0.3', 2), R('Tue 10 Nov', '98.9', '+0.1', 3)];
+    const P = (lv, g, t, d) => ({ g, t, d, col: c[lv], bg: c[lv + 'Bg'], c });
+    const pace = [
+      P('alert', '!', 'Wrong direction: up 0.3 kg a week', 'Trend from 6 weigh-ins. Check weekend logging or lower the target.'),
+      P('warn', '▲', 'Slower than your goal: 0.21 of 1 kg a week', 'Shows on Today’s On track? list too.'),
+      P('info', 'i', 'Faster than planned: 1.4 kg a week', 'Fine for a while; watch training recovery.'),
+      P('good', '✓', 'On pace: losing 0.96 kg a week', 'Within 10 % of your goal.')
+    ];
+    const S = (k, d) => ({ k, d, c });
+    const spec = [
+      S('Presentation', 'Stack modal “weigh-in”, native header (close left, title, Done right after saving). Screen ScrollView, 16 gutter.'),
+      S('Date · Stepper', '44 h pill. Next is disabled on today (opacity 0.4, text3) — no future weigh-ins. Past days edit that day’s reading.'),
+      S('WeightField · Field (big)', '72 h, r18, 2 pt accentLine focus ring. Archivo 40/800 tabular, “kg” 17 text2. keyboardType decimal-pad, autoFocus on open. Accepts “,” as decimal.'),
+      S('Validation · ErrorText', '30–250 kg, else ring turns alert + “That looks off. Enter 30–250 kg.” Save disabled until valid.'),
+      S('Tip + last reading', '13/18 text2 and text3. Last reading helps catch typos (98.3 vs 9.83).'),
+      S('Save · Button L', '56 h r18, sits directly under the card so it stays above the keyboard (automaticallyAdjustKeyboardInsets). Success: Haptics.notificationAsync(Success), banner swaps in, keyboard dismisses.'),
+      S('Logged banner', '44 h r14 goodBg, check + Archivo value. role status. Enters FadeInDown 220 ms.'),
+      S('TrendSummary · Card', 'overline, Archivo 34/800 trend kg, rate Archivo 20/800 coloured by pace level, pace sentence 14/19 with level icon.'),
+      S('PaceText levels', 'good on pace (±10 % of goal) · warn slower · info faster · alert wrong direction. Same copy feeds Today’s On track? insight.'),
+      S('WeightTrendChart · weight-chart.tsx', '329 × 150 react-native-svg. Dots 3.5 text3 (latest 5 accentLine), trend = smoothed EWMA path 3 pt accentLine, goal = dashed 1.6 text3, gridlines line. X labels 11 text3. Trend path draws in 600 ms (strokeDashoffset).'),
+      S('RecentList · Row', '44 h rows, hairline between. Date 15, kg Archivo 15/700, change 13/600 (gains in warn). Swipe to delete.'),
+      S('Not enough data', 'Under 3 readings in 7 days: dashed empty chart, one dot, 1-of-3 progress dots, plain explanation. No rate shown.'),
+      S('Accessibility', 'Chart has a summary label (range, rate, direction). Pace icon shape differs per level.')
+    ];
+    return { c, themeName: theme === 'light' ? 'Light' : 'Dark', ch, recent, pace, spec };
+  }
+}
+</script>
+</body>
+</html>

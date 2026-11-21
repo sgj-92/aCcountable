@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sheet · Add food</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 2701px; height: 1160px; box-sizing: border-box; padding: 48px; background: {{c.board}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 24px; -webkit-font-smoothing: antialiased">
+
+<header style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">SHEET · ADD FOOD</span>
+<h1 style="margin: 0; font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -0.5px">Add food</h1>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{themeName}} · search, barcode, weigh and manual entry, opened from Add food in the Today dock</span>
+</header>
+
+<div style="display: flex; gap: 40px; align-items: flex-start">
+
+<!-- 1 Default -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px; position: relative">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="position: absolute; left: 60px; right: 60px; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Add food · Thu 19 Nov</span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div role="radiogroup" aria-label="Meal" style="display: flex; gap: 8px; overflow: hidden; margin-right: -16px">
+<sc-for list="{{meals}}" as="m" hint-placeholder-count="5"><button role="radio" aria-checked="{{m.sel}}" style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{m.bg}}; color: {{m.col}}; font: inherit; font-size: 15px; font-weight: {{m.w}}">{{m.n}}</button></sc-for>
+</div>
+<div style="display: flex; gap: 8px">
+<label style="flex: 1; display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Search foods</span><input placeholder="Search foods, e.g. chicken breast raw" style="flex: 1; min-width: 0; height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+<button disabled="" style="height: 52px; padding: 0 16px; border-radius: 14px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 15px; font-weight: 700; opacity: 0.4">Search</button>
+</div>
+<button style="height: 52px; border-radius: 14px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 7V4h3M18 4h3v3M21 17v3h-3M6 20H3v-3"></path><path d="M7 8v8M10 8v8M12.5 8v8M15 8v8M17 8v8"></path></svg>Scan barcode</button>
+<a href="#" style="height: 44px; display: flex; align-items: center; justify-content: center; color: {{c.accentText}}; font-size: 16px; font-weight: 600; text-decoration: none">Enter manually</a>
+<section aria-label="Recent foods" style="border-radius: 22px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 14px 8px 6px 16px; display: flex; flex-direction: column">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 8px 6px 0"><h2 style="margin: 0; font-size: 17px; line-height: 22px; font-weight: 600">Recent</h2><span style="font-size: 12px; color: {{c.text2}}">Tap + to log again</span></div>
+<sc-for list="{{recent}}" as="r" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid {{r.c.line}}">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; line-height: 20px">{{r.name}}</span><span style="font-size: 13px; line-height: 18px; color: {{r.c.text2}}; font-variant-numeric: tabular-nums">{{r.meta}}</span></div>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{r.kcal}}</span>
+<button aria-label="Log {{r.name}} to Meal 3 again" style="flex: none; width: 44px; height: 44px; border: 0; padding: 0; background: transparent; color: {{r.c.accentText}}; display: flex; align-items: center; justify-content: center"><span style="width: 32px; height: 32px; border-radius: 16px; background: {{r.c.raised}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span></button>
+</div>
+</sc-for>
+</section>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">1 · Default</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Meal pre-selected from the time of day. Search disabled until 2 characters.</span>
+</div>
+
+<!-- 2 Results -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px; position: relative">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="position: absolute; left: 60px; right: 60px; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Add food · Thu 19 Nov</span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; gap: 8px">
+<label style="flex: 1; position: relative; display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Search foods</span><input value="chicken breast" style="flex: 1; min-width: 0; height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 44px 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"><button aria-label="Clear search" style="position: absolute; right: 4px; top: 4px; width: 44px; height: 44px; border: 0; padding: 0; background: transparent; color: {{c.text3}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9 9l6 6M15 9l-6 6"></path></svg></button></label>
+<button style="height: 52px; padding: 0 16px; border-radius: 14px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 15px; font-weight: 700">Search</button>
+</div>
+<sc-for list="{{sections}}" as="s" hint-placeholder-count="2">
+<section aria-label="{{s.title}}" style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; gap: 8px; padding: 6px 4px 0"><span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.8px; color: {{s.c.text2}}">{{s.title}}</span><span style="height: 20px; padding: 0 8px; border-radius: 10px; background: {{s.c.raised}}; color: {{s.c.text2}}; display: flex; align-items: center; font-size: 11px; font-weight: 700">{{s.badge}}</span><span style="flex: 1"></span><span style="font-size: 12px; color: {{s.c.text3}}">kcal / 100 g</span></div>
+<div style="border-radius: 20px; background: {{s.c.surface}}; box-shadow: {{s.c.shadow}}; padding: 0 16px">
+<sc-for list="{{s.rows}}" as="r" hint-placeholder-count="3">
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 0; box-sizing: border-box; border-top: {{r.sep}}; color: {{r.c.text}}; text-decoration: none">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; line-height: 20px">{{r.name}}</span>
+<sc-if value="{{r.hasBrand}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px; line-height: 18px; color: {{r.c.text2}}">{{r.brand}}</span></sc-if>
+<span style="font-size: 13px; line-height: 18px; color: {{r.c.text2}}; font-variant-numeric: tabular-nums">{{r.macros}}</span>
+<sc-if value="{{r.missing}}" hint-placeholder-val="{{false}}"><span style="display: flex; align-items: center; gap: 5px; font-size: 12px; line-height: 16px; font-weight: 600; color: {{r.c.warn}}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"></path><path d="M12 10v4.5M12 17.2v.3"></path></svg>Some values missing</span></sc-if>
+</div>
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums">{{r.kcal}}</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{r.c.text3}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg>
+</a>
+</sc-for>
+</div>
+</section>
+</sc-for>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">2 · Results</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Whole foods first. Missing values flagged in warn, never hidden.</span>
+</div>
+
+<!-- 3 Barcode -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px; position: relative">
+<button aria-label="Close" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="position: absolute; left: 60px; right: 60px; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Add food · Thu 19 Nov</span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div role="radiogroup" aria-label="Meal" style="display: flex; gap: 8px; overflow: hidden; margin-right: -16px">
+<sc-for list="{{meals}}" as="m" hint-placeholder-count="5"><button role="radio" aria-checked="{{m.sel}}" style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{m.bg}}; color: {{m.col}}; font: inherit; font-size: 15px; font-weight: {{m.w}}">{{m.n}}</button></sc-for>
+</div>
+<div role="img" aria-label="Camera viewfinder with aiming frame" style="position: relative; height: 300px; border-radius: 22px; background: #0E100D; overflow: hidden">
+<div style="position: absolute; left: 50px; top: 70px; width: 260px; height: 160px">
+<svg width="260" height="160" viewBox="0 0 260 160" aria-hidden="true" style="position: absolute; left: 0; top: 0"><path d="M2 30V8a6 6 0 0 1 6-6h22M230 2h22a6 6 0 0 1 6 6v22M258 130v22a6 6 0 0 1-6 6h-22M30 158H8a6 6 0 0 1-6-6v-22" fill="none" stroke="#C6F24E" stroke-width="4" stroke-linecap="round"></path></svg>
+<div style="position: absolute; left: 14px; right: 14px; top: 79px; height: 2px; border-radius: 1px; background: #C6F24E; opacity: 0.85"></div>
+</div>
+<button aria-label="Close scanner" style="position: absolute; right: 4px; top: 4px; width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 34px; height: 34px; border-radius: 17px; background: rgba(0,0,0,0.55); color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+<span style="position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); height: 30px; padding: 0 14px; border-radius: 15px; background: rgba(0,0,0,0.6); color: #FFFFFF; display: flex; align-items: center; font-size: 13px; font-weight: 600; white-space: nowrap">Point at the barcode</span>
+</div>
+<div style="display: flex; gap: 8px">
+<label style="flex: 1; display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Search foods</span><input placeholder="Or search by name" style="flex: 1; min-width: 0; height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+<button disabled="" style="height: 52px; padding: 0 16px; border-radius: 14px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 15px; font-weight: 700; opacity: 0.4">Search</button>
+</div>
+<a href="#" style="height: 44px; display: flex; align-items: center; justify-content: center; color: {{c.accentText}}; font-size: 16px; font-weight: 600; text-decoration: none">Enter manually</a>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">3 · Barcode scanning</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Inline camera, not full screen. A read gives a success haptic and opens Weigh.</span>
+</div>
+
+<!-- 4 Weigh -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px; position: relative">
+<button aria-label="Back to results" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"></path></svg></span></button>
+<span style="position: absolute; left: 60px; right: 60px; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Weigh</span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 20px; line-height: 25px; font-weight: 700">Chicken breast, raw</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums"><span style="height: 18px; padding: 0 6px; border-radius: 9px; background: {{c.raised}}; font-size: 11px; font-weight: 700; display: flex; align-items: center">USDA</span>per 100 g: 120 kcal · P 23 · C 0 · F 1</span>
+</div>
+<label style="height: 80px; border-radius: 18px; background: {{c.raised}}; border: 2px solid {{c.accentLine}}; box-sizing: border-box; display: flex; align-items: center; padding: 0 18px; gap: 6px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Grams</span><span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 40px; line-height: 44px; font-weight: 800; font-variant-numeric: tabular-nums">180</span><span style="width: 2px; height: 36px; background: {{c.accentLine}}"></span><span style="font-size: 20px; color: {{c.text2}}">g</span></label>
+<div style="display: flex; gap: 8px; overflow: hidden">
+<button style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">1 breast · 174 g</button>
+<button style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">100 g</button>
+<button style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 15px">150 g</button>
+</div>
+<div style="border-radius: 18px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 12px 16px; display: flex; align-items: center; gap: 14px">
+<span style="font-family: Archivo, -apple-system, Inter, sans-serif; font-size: 24px; line-height: 28px; font-weight: 800; font-variant-numeric: tabular-nums">216<span style="font-family: -apple-system, Inter, sans-serif; font-size: 14px; font-weight: 500; color: {{c.text2}}"> kcal</span></span>
+<span style="flex: 1"></span>
+<span style="display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{c.protein}}"></span>P 41</span>
+<span style="display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{c.carbs}}"></span>C 0</span>
+<span style="display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums"><span style="width: 7px; height: 7px; border-radius: 4px; background: {{c.fat}}"></span>F 2</span>
+</div>
+<button style="height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">Add 180 g to Meal 3</button>
+<a href="#" style="height: 36px; display: flex; align-items: center; justify-content: center; color: {{c.accentText}}; font-size: 14px; font-weight: 600; text-decoration: none">Edit values directly</a>
+</div>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 336px; background: {{c.keyboard}}; display: flex; align-items: center; justify-content: center; font-size: 12px; color: {{c.text2}}">System keyboard · number pad</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">4 · Weigh step</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Grams focused on open. kcal and macros update live; primary stays above the keyboard.</span>
+</div>
+
+<!-- 5 Manual -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.behind}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="position: absolute; left: 16px; right: 16px; top: 46px; height: 30px; border-radius: 14px; background: {{c.peek}}"></div>
+<div style="position: absolute; left: 0; right: 0; top: 58px; bottom: 0; border-radius: 24px 24px 0 0; background: {{c.bg}}; overflow: hidden">
+<div style="height: 56px; display: flex; align-items: center; padding: 0 8px; position: relative">
+<button aria-label="Back" style="width: 44px; height: 44px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center"><span style="width: 36px; height: 36px; border-radius: 18px; background: {{c.raised}}; color: {{c.text}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6l-6 6 6 6"></path></svg></span></button>
+<span style="position: absolute; left: 60px; right: 60px; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600">Enter manually</span>
+</div>
+<div style="padding: 4px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Name</span><input value="Homemade flapjack" style="height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+<div style="display: flex; gap: 10px; align-items: flex-end">
+<label style="flex: 1; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Amount</span><input value="1 piece · 60" style="height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box; font-variant-numeric: tabular-nums"></label>
+<div role="radiogroup" aria-label="Unit" style="height: 52px; width: 132px; border-radius: 14px; background: {{c.raised}}; padding: 4px; box-sizing: border-box; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px">
+<button role="radio" aria-checked="true" style="border: 0; border-radius: 10px; background: {{c.surface}}; color: {{c.text}}; font: inherit; font-size: 15px; font-weight: 600">g</button>
+<button role="radio" aria-checked="false" style="border: 0; border-radius: 10px; background: transparent; color: {{c.text2}}; font: inherit; font-size: 15px">ml</button>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.alert}}; font-weight: 600">kcal</span><input value="" aria-invalid="true" placeholder="0" style="height: 52px; border-radius: 14px; border: 2px solid {{c.alert}}; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"><span style="font-size: 13px; line-height: 18px; color: {{c.alert}}">Enter calories</span></label>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Protein (g)</span><input value="5" style="height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Carbs (g)</span><input value="34" style="height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; color: {{c.text2}}">Fat (g)</span><input value="12" style="height: 52px; border-radius: 14px; border: 2px solid transparent; padding: 0 14px; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 16px; box-sizing: border-box"></label>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums">From macros ≈ 264 kcal. <a href="#" style="color: {{c.accentText}}; font-weight: 600; text-decoration: none">Use 264</a></span>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: {{c.text2}}">Meal</span>
+<div role="radiogroup" aria-label="Meal" style="display: flex; gap: 8px; overflow: hidden; margin-right: -16px">
+<sc-for list="{{meals}}" as="m" hint-placeholder-count="5"><button role="radio" aria-checked="{{m.sel}}" style="flex: none; height: 36px; padding: 0 14px; border-radius: 18px; border: 0; background: {{m.bg}}; color: {{m.col}}; font: inherit; font-size: 15px; font-weight: {{m.w}}">{{m.n}}</button></sc-for>
+</div>
+</div>
+<button style="margin-top: 4px; height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700">Add to Meal 3</button>
+</div>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">5 · Manual entry · error</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Validated on Add. Missing kcal can be filled from the macros.</span>
+</div>
+
+<!-- Spec -->
+<aside aria-label="Spec" style="width: 400px; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 20px 24px; box-sizing: border-box; max-height: 900px; overflow: hidden; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 8px; font-size: 17px; line-height: 22px; font-weight: 700">Spec</h2>
+<sc-for list="{{spec}}" as="s" hint-placeholder-count="16">
+<div style="padding: 7px 0; border-top: 1px solid {{s.c.line}}; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; line-height: 17px; font-weight: 600">{{s.k}}</span>
+<span style="font-size: 12px; line-height: 16px; color: {{s.c.text2}}">{{s.d}}</span>
+</div>
+</sc-for>
+</aside>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":2701,"height":1160}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257', board: '#050604', phoneEdge: '#2A2D27', behind: '#000000', peek: '#1B1D18', keyboard: '#2C2D2A', pressed: '#2C2F29', onAlert: '#1A0705' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194', board: '#E4E6DE', phoneEdge: '#CFD2C7', behind: '#B9BCB2', peek: '#D9DBD3', keyboard: '#D3D5CC', pressed: '#DFE2D8', onAlert: '#FFFFFF' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const c = this.palette()[theme];
+    const meals = ['Meal 1', 'Meal 2', 'Meal 3', 'Meal 4', 'Snacks'].map((n) => {
+      const sel = n === 'Meal 3';
+      return { n, sel: sel ? 'true' : 'false', bg: sel ? c.accent : c.raised, col: sel ? c.onAccent : c.text, w: sel ? 600 : 400 };
+    });
+    const recent = [
+      { name: 'Oat milk latte (espresso + barista oat milk)', meta: '1 small cup (~8 oz / 240 ml) (~240 g)', kcal: '125' },
+      { name: 'Greek yoghurt 0%', meta: '170 g · P 17 · C 6 · F 0', kcal: '97' },
+      { name: 'Protein bar', meta: '1 bar · 50 g · P 20 · C 18 · F 7', kcal: '194' }
+    ].map((r) => Object.assign(r, { c }));
+    const row = (name, brand, macros, kcal, missing, i) => ({ name, brand, hasBrand: !!brand, macros, kcal, missing: !!missing, sep: i === 0 ? '0' : '1px solid ' + c.line, c });
+    const sections = [
+      { title: 'WHOLE FOODS', badge: 'USDA', c, rows: [
+        row('Chicken breast, raw', '', 'P 23 · C 0 · F 1', '120', false, 0),
+        row('Chicken breast, roasted', '', 'P 31 · C 0 · F 4', '165', false, 1)
+      ] },
+      { title: 'BRANDED', badge: 'OPEN FOOD FACTS', c, rows: [
+        row('Chicken breast fillets', 'Tesco · 650 g pack', 'P 24 · C 0 · F 2', '113', false, 0),
+        row('Sliced roast chicken breast', 'Heck · 90 g', 'P 26 · C — · F 1.8', '118', true, 1),
+        row('Cooked chicken breast pieces', 'Sainsbury’s · 140 g', 'P 30 · C 0.5 · F 2.2', '144', false, 2)
+      ] }
+    ];
+    const spec = [
+      ['Sheet', 'Stack.Screen presentation "modal" (pageSheet), native header: close 44 left, title 17/600. Body = Screen (ScrollView, gutter 16, gap 12).'],
+      ['MealPicker · meal-picker.tsx', 'Horizontal ScrollView of Chip 36 h, pad 0 14, gap 8, bleeds off the right edge. Selected = accent fill + onAccent 600. Default meal from time of day.'],
+      ['SearchField + Search', 'Field 52 h, r14, raised, returnKeyType "search". Button M 52 h primary, disabled (40 %) until 2 characters. Clear button 44 × 44 inside the field.'],
+      ['Scan barcode', 'Button secondary 52 h, full width, SF barcode.viewfinder 22. Opens the inline scanner in place.'],
+      ['BarcodeScanner · barcode-scanner.tsx', 'expo-camera CameraView, barcodeScannerSettings ean13/ean8/upc_a/upc_e. Box 300 h r22. Aiming frame 260 × 160, corner brackets 4 pt accent, r 6. Scan line 2 pt accent at 85 %, sweeps 1.6 s ease-in-out loop. Haptics.notificationAsync(Success) on read → Weigh.'],
+      ['Enter manually', 'Ghost button 44 h, accentText 16/600, pushes the manual form.'],
+      ['Recent', 'Card r22, pad 14/16. FoodRow 15/20 + 13/18 meta, kcal num.xs right. “+” 32 circle (44 hit) re-logs at the last amount to the selected meal, row flashes, toast “Logged 125 · Undo”.'],
+      ['ResultSection', 'Overline 12/700 + source badge (20 h, r10). Card r20 of ResultRow; USDA first, Open Food Facts second, 10 rows each, “Show more”.'],
+      ['ResultRow', 'min 60 h: name 15, brand 13 text2, P · C · F per 100 g, kcal num.s right, chevron. Missing values: warn triangle + “Some values missing” 12/600.'],
+      ['Loading results', 'Skeleton rows (raised blocks), opacity pulse 0.5 ↔ 1, 900 ms. Each section streams in independently.'],
+      ['Weigh header', 'Back chevron replaces close. Name 20/700, source badge + per-100 g line 13 text2.'],
+      ['GramsField', '80 h, r18, raised, 2 pt accentLine ring when focused. Value num 40/800, unit 20 text2. keyboardType "decimal-pad", autoFocus, selectTextOnFocus.'],
+      ['ServingChips', 'Chip 36 from the food’s serving sizes + 100 g. Tap fills grams, haptic selection.'],
+      ['LiveMacros', 'Card r18 pad 12/16: kcal num 24 + P/C/F dots. Recomputes per keystroke; numbers count up 200 ms.'],
+      ['Primary', 'Button L 56 h “Add 180 g to Meal 3”. Lives in the scroll content, which uses automaticallyAdjustKeyboardInsets so it stays visible above the keyboard.'],
+      ['Manual form', 'Field ×6: name, amount + unit Segmented (g / ml), kcal/P/C/F in a 2-col grid. Validate on submit: kcal required → ErrorText 13 alert + 2 pt alert ring, focus moves to it. Offers kcal from macros (4/4/9).'],
+      ['After logging', 'Sheet dismisses; Today ring and meal total count up (600 ms), entry row flashes.']
+    ].map((s) => ({ k: s[0], d: s[1], c }));
+    return { c, themeName: theme === 'light' ? 'Light' : 'Dark', meals, recent, sections, spec };
+  }
+}
+</script>
+</body>
+</html>

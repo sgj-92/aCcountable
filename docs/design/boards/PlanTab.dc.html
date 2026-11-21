@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan tab · states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 2268px; height: 1160px; box-sizing: border-box; padding: 48px; background: {{c.board}}; color: {{c.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; gap: 24px">
+
+<header style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 1px; color: {{c.accentText}}">TAB · PLAN</span>
+<h1 style="margin: 0; font-family: Archivo, sans-serif; font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -0.5px">Plan</h1>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">{{themeName}} · Type what you’ll eat, get the grams that hit today’s 2,301 kcal</span>
+</header>
+
+<div style="display: flex; gap: 40px; align-items: flex-start">
+
+<!-- 1 EMPTY -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="padding: 62px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 style="margin: 0; font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.4px">Plan</h2>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600; color: {{c.text2}}; font-variant-numeric: tabular-nums">Thu 19 Nov · target 2,301 kcal</span>
+</div>
+<section style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<label for="plan-empty" style="font-size: 17px; line-height: 22px; font-weight: 600">What are you eating today?</label>
+<textarea id="plan-empty" placeholder="Oats&#10;2 eggs&#10;Chicken breast&#10;Basmati rice&#10;Broccoli&#10;Greek yoghurt&#10;Banana&#10;Protein bar" style="height: 232px; resize: none; border-radius: 16px; border: 2px solid transparent; padding: 12px 14px; box-sizing: border-box; background: {{c.raised}}; color: {{c.text}}; font: inherit; font-size: 17px; line-height: 24px"></textarea>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">One food per line or comma separated. Add amounts you’re sure of (“2 eggs”) and the rest gets worked out.</span>
+<button disabled="" style="height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; opacity: 0.4; font: inherit; font-size: 16px; font-weight: 700">Plan my amounts</button>
+</section>
+<section style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 20px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start">
+<span style="flex: none; width: 32px; height: 32px; border-radius: 16px; background: {{c.infoBg}}; color: {{c.info}}; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Info"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5.5M12 7.8v.3"></path></svg></span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}; font-variant-numeric: tabular-nums"><span style="font-weight: 600; color: {{c.text}}">Fitted to today’s target.</span> 2,301 kcal · P 147 · C 308 · F 53. Padel days get the extra as carbs.</span>
+</section>
+</div>
+<nav aria-label="Tab bar (native)" style="position: absolute; left: 20px; right: 20px; top: 770px; height: 62px; box-sizing: border-box; border-radius: 31px; background: {{c.tabBar}}; border: 1px solid {{c.tabBorder}}; box-shadow: {{c.floatShadow}}; display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.66 6.34A8 8 0 1 0 17.66 17.66"></path></svg>Today</a>
+<a href="#" aria-current="page" style="flex: 1; height: 52px; border-radius: 26px; background: {{c.tabPill}}; color: {{c.tabActive}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>Plan</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.6"></circle><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5"></path></svg>Profile</a>
+</nav>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">1 · Empty</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">Example list as placeholder. Button stays disabled until there’s text.</span>
+</div>
+
+<!-- 2 LOADING -->
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{c.bg}}; border: 1px solid {{c.phoneEdge}}; box-sizing: border-box">
+<div style="padding: 62px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 style="margin: 0; font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.4px">Plan</h2>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600; color: {{c.text2}}; font-variant-numeric: tabular-nums">Thu 19 Nov · target 2,301 kcal</span>
+</div>
+<section style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">What are you eating today?</span>
+<div aria-label="Your list" style="min-height: 168px; border-radius: 16px; padding: 12px 14px; box-sizing: border-box; background: {{c.raised}}; color: {{c.text2}}; font-size: 17px; line-height: 24px; white-space: pre-line">{{listText}}</div>
+<button aria-busy="true" style="height: 56px; border-radius: 18px; border: 0; background: {{c.accent}}; color: {{c.onAccent}}; font: inherit; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 1-9 9"></path></svg>Planning…</button>
+</section>
+<section aria-live="polite" style="background: {{c.surface}}; box-shadow: {{c.shadow}}; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 17px; line-height: 22px; font-weight: 600">Working out your foods…</span>
+<span style="font-size: 13px; line-height: 18px; color: {{c.text2}}">Matching 8 foods, then fitting amounts to 2,301 kcal.</span>
+</div>
+<sc-for list="{{skeleton}}" as="s" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; opacity: {{s.op}}">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 7px"><span style="height: 18px; width: 64px; border-radius: 6px; background: {{s.c.raised}}"></span><span style="height: 12px; width: {{s.w}}; border-radius: 6px; background: {{s.c.raised}}"></span></div>
+<span style="height: 14px; width: 44px; border-radius: 7px; background: {{s.c.raised}}"></span>
+</div>
+</sc-for>
+</section>
+</div>
+<nav aria-label="Tab bar (native)" style="position: absolute; left: 20px; right: 20px; top: 770px; height: 62px; box-sizing: border-box; border-radius: 31px; background: {{c.tabBar}}; border: 1px solid {{c.tabBorder}}; box-shadow: {{c.floatShadow}}; display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.66 6.34A8 8 0 1 0 17.66 17.66"></path></svg>Today</a>
+<a href="#" aria-current="page" style="flex: 1; height: 52px; border-radius: 26px; background: {{c.tabPill}}; color: {{c.tabActive}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>Plan</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+<a href="#" style="flex: 1; height: 52px; color: {{c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.6"></circle><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5"></path></svg>Profile</a>
+</nav>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">2 · Loading</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{c.text2}}">List locks while planning; skeleton rows pulse until the plan lands.</span>
+</div>
+
+<!-- 3 + 4 PLANNED -->
+<sc-for list="{{planned}}" as="p" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="width: 393px; height: 852px; border-radius: 48px; overflow: hidden; position: relative; background: {{p.c.bg}}; border: 1px solid {{p.c.phoneEdge}}; box-sizing: border-box">
+<div style="padding: 62px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 style="margin: 0; font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: -0.4px">Plan</h2>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600; color: {{p.c.text2}}">Thu 19 Nov · 8 foods</span>
+</div>
+<button aria-label="Edit the list" style="height: 44px; padding: 0 14px; border-radius: 22px; border: 0; background: {{p.c.raised}}; color: {{p.c.accentText}}; font: inherit; font-size: 15px; font-weight: 600">Edit list</button>
+</div>
+
+<section style="background: {{p.c.surface}}; box-shadow: {{p.c.shadow}}; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.8px; color: {{p.c.text2}}">PLANNED FOR THE DAY</span>
+<span style="font-family: Archivo, sans-serif; font-size: 40px; line-height: 44px; font-weight: 800; letter-spacing: -1px; font-variant-numeric: tabular-nums">{{p.kcal}}<span style="font-family: -apple-system, Inter, sans-serif; font-size: 15px; font-weight: 500; letter-spacing: 0; color: {{p.c.text2}}"> of 2,301 kcal</span></span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{p.diffs}}" as="d" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; font-weight: 600; color: {{d.c.text2}}"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{d.dot}}"></span>{{d.label}}</span>
+<span style="font-family: Archivo, sans-serif; font-size: 15px; line-height: 20px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{d.col}}">{{d.v}}<span style="font-weight: 600; color: {{d.c.text2}}"> / {{d.t}}</span></span>
+<span style="font-size: 12px; line-height: 16px; font-weight: 600; font-variant-numeric: tabular-nums; color: {{d.diffCol}}">{{d.diff}}</span>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 14px; background: {{p.statusBg}}">
+<span style="flex: none; display: flex; color: {{p.statusCol}}; margin-top: 1px">
+<sc-if value="{{p.ok}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Good"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.3l2.8 2.8L16.2 9.6"></path></svg></sc-if>
+<sc-if value="{{p.gap}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Alert"><path d="M8.3 3h7.4L21 8.3v7.4L15.7 21H8.3L3 15.7V8.3z"></path><path d="M12 7.5v5.5M12 16.3v.3"></path></svg></sc-if>
+</span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 15px; line-height: 20px; font-weight: 600">{{p.status}}</span>
+<sc-if value="{{p.gap}}" hint-placeholder-val="{{false}}"><a href="#" style="align-self: flex-start; height: 32px; padding: 0 12px; border-radius: 16px; background: {{p.c.surface}}; color: {{p.c.accentText}}; display: flex; align-items: center; font-size: 13px; font-weight: 700; text-decoration: none">+ Add a carb food</a></sc-if>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 18px; color: {{p.c.text2}}">{{p.note}}</span>
+</section>
+
+<sc-for list="{{p.groups}}" as="g" hint-placeholder-count="2">
+<section style="background: {{g.c.surface}}; box-shadow: {{g.c.shadow}}; border-radius: 20px; padding: 0 8px 0 16px; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding-right: 8px">
+<span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.8px; color: {{g.c.text2}}">{{g.name}}</span>
+<span style="font-family: Archivo, sans-serif; font-size: 14px; font-weight: 700; color: {{g.c.text2}}; font-variant-numeric: tabular-nums">{{g.total}}</span>
+</div>
+<sc-for list="{{g.items}}" as="it" hint-placeholder-count="3">
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 8px 10px 0; border-top: 1px solid {{it.c.line}}; color: {{it.c.text}}; text-decoration: none; opacity: {{it.op}}">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-family: Archivo, sans-serif; font-size: 22px; line-height: 26px; font-weight: 800; font-variant-numeric: tabular-nums">{{it.amt}}</span>
+<sc-if value="{{it.fixed}}" hint-placeholder-val="{{false}}"><span style="height: 22px; padding: 0 8px; border-radius: 11px; background: {{it.c.raised}}; color: {{it.c.text2}}; display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>FIXED</span></sc-if>
+</div>
+<span style="font-size: 15px; line-height: 20px">{{it.name}}</span>
+<span style="font-size: 13px; line-height: 18px; color: {{it.c.text2}}; font-variant-numeric: tabular-nums">{{it.meta}}</span>
+</div>
+<sc-if value="{{it.logged}}" hint-placeholder-val="{{false}}"><span role="img" aria-label="Logged" style="flex: none; width: 28px; height: 28px; border-radius: 14px; background: {{it.c.accent}}; color: {{it.c.onAccent}}; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></sc-if>
+<sc-if value="{{it.open}}" hint-placeholder-val="{{true}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{it.c.text3}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6l6 6-6 6"></path></svg></sc-if>
+</a>
+</sc-for>
+</section>
+</sc-for>
+
+<div style="display: flex; gap: 8px">
+<button style="flex: 1; height: 44px; border-radius: 14px; border: 0; background: {{p.c.raised}}; color: {{p.c.text}}; font: inherit; font-size: 15px; font-weight: 600">+ Add foods</button>
+<button style="flex: 1; height: 44px; border-radius: 14px; border: 0; background: transparent; color: {{p.c.alert}}; font: inherit; font-size: 15px; font-weight: 600">Clear plan</button>
+</div>
+</div>
+<nav aria-label="Tab bar (native)" style="position: absolute; left: 20px; right: 20px; top: 770px; height: 62px; box-sizing: border-box; border-radius: 31px; background: {{p.c.tabBar}}; border: 1px solid {{p.c.tabBorder}}; box-shadow: {{p.c.floatShadow}}; display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+<a href="#" style="flex: 1; height: 52px; color: {{p.c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M17.66 6.34A8 8 0 1 0 17.66 17.66"></path></svg>Today</a>
+<a href="#" aria-current="page" style="flex: 1; height: 52px; border-radius: 26px; background: {{p.c.tabPill}}; color: {{p.c.tabActive}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg>Plan</a>
+<a href="#" style="flex: 1; height: 52px; color: {{p.c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Week</a>
+<a href="#" style="flex: 1; height: 52px; color: {{p.c.tabIdle}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 10px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.6"></circle><path d="M5.5 19.5c1.3-3 3.7-4.5 6.5-4.5s5.2 1.5 6.5 4.5"></path></svg>Profile</a>
+</nav>
+</div>
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">{{p.caption}}</span>
+<span style="margin-top: -10px; font-size: 12px; line-height: 17px; color: {{p.c.text2}}">{{p.captionSub}}</span>
+</div>
+</sc-for>
+
+<aside aria-label="Spec" style="width: 400px; border-radius: 24px; background: {{c.surface}}; box-shadow: {{c.shadow}}; padding: 20px 24px; box-sizing: border-box; max-height: 900px; overflow: hidden; display: flex; flex-direction: column">
+<h2 style="margin: 0 0 8px; font-size: 17px; line-height: 22px; font-weight: 700">Spec</h2>
+<sc-for list="{{spec}}" as="s" hint-placeholder-count="16">
+<div style="padding: 8px 0; border-top: 1px solid {{s.c.line}}; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; line-height: 18px; font-weight: 600">{{s.k}}</span>
+<span style="font-size: 12px; line-height: 17px; color: {{s.c.text2}}">{{s.d}}</span>
+</div>
+</sc-for>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":2268,"height":1160}}'>
+class Component extends DCLogic {
+  palette() {
+    return {
+      dark: { bg: '#0C0D0B', surface: '#161814', raised: '#21241F', line: '#2A2D27', track: '#2C2F29', text: '#F2F4EC', text2: '#A9AD9F', text3: '#878B7E', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#C6F24E', accentText: '#C6F24E', protein: '#FF7BAC', carbs: '#55C2FF', fat: '#FFC94D', training: '#A68CFF', alert: '#FF6359', warn: '#FF9F43', info: '#7FA8FF', good: '#C6F24E', alertBg: 'rgba(255,99,89,0.14)', warnBg: 'rgba(255,159,67,0.14)', infoBg: 'rgba(127,168,255,0.14)', goodBg: 'rgba(198,242,78,0.12)', trainingBg: 'rgba(166,140,255,0.16)', trainingSeg: 'rgba(166,140,255,0.40)', shadow: 'none', tabBar: 'rgba(33,36,31,0.96)', tabBorder: 'rgba(255,255,255,0.08)', tabPill: 'rgba(255,255,255,0.08)', tabActive: '#C6F24E', tabIdle: '#A9AD9F', floatShadow: '0 10px 30px rgba(0,0,0,0.55)', fold: 'rgba(242,244,236,0.35)', pastFill: '#5E6257', board: '#050604', phoneEdge: '#2A2D27', behind: '#000000', peek: '#1B1D18', keyboard: '#2C2D2A', pressed: '#2C2F29', onAlert: '#1A0705' },
+      light: { bg: '#F3F4EE', surface: '#FFFFFF', raised: '#EBEDE5', line: '#DADDD2', track: '#E2E4DB', text: '#11130E', text2: '#55594E', text3: '#686C61', accent: '#C6F24E', onAccent: '#1A2400', accentLine: '#557F00', accentText: '#476B00', protein: '#C92F6B', carbs: '#0B73B0', fat: '#9A6400', training: '#6644D6', alert: '#CC2E26', warn: '#B25500', info: '#2D5BD1', good: '#476B00', alertBg: '#FBE7E5', warnBg: '#FBEDDD', infoBg: '#E7EDFB', goodBg: '#ECF4D6', trainingBg: '#EEE9FB', trainingSeg: 'rgba(102,68,214,0.30)', shadow: '0 1px 3px rgba(17,19,14,0.07)', tabBar: 'rgba(255,255,255,0.97)', tabBorder: 'rgba(17,19,14,0.08)', tabPill: 'rgba(17,19,14,0.06)', tabActive: '#476B00', tabIdle: '#55594E', floatShadow: '0 8px 24px rgba(17,19,14,0.14)', fold: 'rgba(17,19,14,0.35)', pastFill: '#9DA194', board: '#E4E6DE', phoneEdge: '#CFD2C7', behind: '#B9BCB2', peek: '#D9DBD3', keyboard: '#D3D5CC', pressed: '#DFE2D8', onAlert: '#FFFFFF' }
+    };
+  }
+  renderVals() {
+    const theme = this.props.theme === 'light' ? 'light' : 'dark';
+    const c = this.palette()[theme];
+    const f = (n) => Math.round(Math.abs(n)).toLocaleString('en-GB');
+    const it = (amt, name, kcal, p, cb, fa, o) => Object.assign({ amt, name, meta: f(kcal) + ' kcal · P ' + p + ' · C ' + cb + ' · F ' + fa, n: kcal, op: 1, fixed: false, logged: false, open: true, c }, o || {});
+    const grp = (name, items) => ({ name, items, total: f(items.reduce((s, x) => s + x.n, 0)) + ' kcal', c });
+    const onGroups = [
+      grp('MEAL 1', [
+        it('60 g', 'Oats', 228, 8, 40, 4, { logged: true, open: false, op: 0.5 }),
+        it('2 eggs · 120 g', 'Eggs, whole', 172, 15, 1, 12, { fixed: true }),
+        it('250 g', 'Greek yoghurt 0%', 143, 25, 9, 0)
+      ]),
+      grp('MEAL 2', [
+        it('220 g', 'Chicken breast (raw)', 264, 51, 0, 6),
+        it('100 g', 'Basmati rice (dry)', 351, 8, 77, 1),
+        it('150 g', 'Broccoli', 51, 4, 7, 1)
+      ])
+    ];
+    const gapGroups = [
+      grp('MEAL 1', [
+        it('3 eggs · 180 g', 'Eggs, whole', 258, 23, 1, 18, { fixed: true }),
+        it('300 g', 'Greek yoghurt 0%', 171, 30, 11, 0),
+        it('1 banana · 118 g', 'Banana', 105, 1, 27, 0)
+      ]),
+      grp('MEAL 2', [
+        it('240 g', 'Chicken breast (raw)', 288, 55, 0, 6),
+        it('100 g · max', 'Basmati rice (dry)', 351, 8, 77, 1),
+        it('200 g', 'Broccoli', 68, 6, 9, 1)
+      ])
+    ];
+    const D = (label, dot, v, t, diff, bad) => ({ label, dot, v: f(v), t: f(t) + ' g', diff: diff === 0 ? 'exact' : (diff > 0 ? '+' : '−') + f(diff) + ' g', col: bad ? c.alert : c.text, diffCol: bad ? c.alert : c.text2, c });
+    const planned = [
+      {
+        caption: '3 · Planned · on target', captionSub: 'Amount is the hero. Logged rows dim; fixed amounts are marked.',
+        kcal: '2,296',
+        diffs: [D('Protein', c.protein, 146, 147, -1), D('Carbs', c.carbs, 305, 308, -3), D('Fat', c.fat, 53, 53, 0)],
+        ok: true, gap: false, status: 'On target. Every macro within 5 g.', statusBg: c.goodBg, statusCol: c.good,
+        note: 'Rice and oats carry the extra carbs for padel tonight. Eggs kept at the 2 you asked for.',
+        groups: onGroups, c
+      },
+      {
+        caption: '4 · Planned · gap', captionSub: 'A gap the amounts can’t close gets an alert and one clear fix.',
+        kcal: '2,136',
+        diffs: [D('Protein', c.protein, 147, 147, 0), D('Carbs', c.carbs, 268, 308, -40, true), D('Fat', c.fat, 52, 53, -1)],
+        ok: false, gap: true, status: 'Carbs 40 g short: add a carb food', statusBg: c.alertBg, statusCol: c.alert,
+        note: 'Rice is at its 100 g max and nothing else on the list is mostly carbs.',
+        groups: gapGroups, c
+      }
+    ];
+    const skeleton = [{ w: '70%', op: 1 }, { w: '52%', op: 0.7 }, { w: '62%', op: 0.45 }].map((s) => Object.assign(s, { c }));
+    const S = (k, d) => ({ k, d, c });
+    const spec = [
+      S('Screen + large title', 'Screen (ScrollView) · native large title 34/41 · gutter 16 · card gap 12 · bottom inset 120 so the last row clears the tab bar.'),
+      S('PlanInput', 'Field multiline · min 232 pt, grows to 320 · r16 · pad 12/14 · body 17/24 · placeholder text3 · focus ring 2 pt accentLine.'),
+      S('Keyboard', 'ScrollView automaticallyAdjustKeyboardInsets + keyboardDismissMode interactive keeps the box and button above the keyboard.'),
+      S('Plan my amounts', 'Button L primary · 56 · r18 · disabled (40 %) while empty · loading = spinner + “Planning…”, width locked, list read-only.'),
+      S('PlanProgress', 'Card · title headline 17/600 · one-line footnote · 3 skeleton rows (18 + 12 bars, raised) · opacity pulse 0.5↔1, 900 ms withRepeat.'),
+      S('PlanSummary', 'Card pad 16 · overline · num 40/44 Archivo 800 · count-up 600 ms when the plan arrives.'),
+      S('MacroDiff', 'Grid 3 · dot 8 + caption · value num.xs / target · diff caption; alert colour when |diff| > 5 g.'),
+      S('StatusLine', 'InsightRow compact on its tint · r14 · pad 10/12 · good = check, alert = octagon + S button (32) with the one fix.'),
+      S('AI note', 'footnote 13/18 text2 · max 3 lines, tap to expand.'),
+      S('MealGroup', 'Card r20 · header 44: overline name + total num 14 text2 · rows separated by hairlines.'),
+      S('PlanFoodRow', 'min 64 · pad 10/8 · amount num.m 22/26 (hero) · name body 15 · meta footnote · chevron → Planned food sheet.'),
+      S('Logged / fixed', 'Logged: 28 pt accent check, row 50 % · Fixed: 22 pt pill “FIXED” with lock glyph, raised.'),
+      S('Header action', 'Edit list · M secondary 44 pill → returns to PlanInput with the list, Plan again replaces rows.'),
+      S('Add / Clear', 'Add foods = M secondary · Clear plan = ghost in alert → native ActionSheet confirm (destructive).'),
+      S('Motion', 'Rows enter FadeInDown 220 ms, stagger 30 · re-plan uses LinearTransition · log/un-log fades opacity 180 ms.'),
+      S('Tab bar', 'NativeTabs · Plan = list.bullet.clipboard / .fill selected · tint tabActive.')
+    ];
+    return { c, themeName: theme === 'light' ? 'Light' : 'Dark', planned, skeleton, spec, listText: 'Oats\n2 eggs\nChicken breast\nBasmati rice\nBroccoli\nGreek yoghurt\nBanana\nProtein bar' };
+  }
+}
+</script>
+</body>
+</html>
