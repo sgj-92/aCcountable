@@ -80,7 +80,14 @@ export default function TodayScreen() {
       <View style={{ flex: 1, backgroundColor: c.bg }}>
         <Screen padBottom={BOTTOM_PAD}>
           {header}
-          {error ? <ErrorText message={error} /> : <TodaySkeleton />}
+          {error ? (
+            <>
+              <ErrorText message={error} />
+              <Button title="Try again" variant="secondary" onPress={reload} style={{ alignSelf: 'flex-start' }} />
+            </>
+          ) : (
+            <TodaySkeleton />
+          )}
         </Screen>
         {dock}
       </View>
