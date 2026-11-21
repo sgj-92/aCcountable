@@ -5,11 +5,15 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { SheetClose } from '@/components/sheet';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
 import { ProfileProvider } from '@/hooks/use-profile';
 import { AppThemeProvider, useTheme, useThemeMode } from '@/hooks/use-theme';
 
 SplashScreen.preventAutoHideAsync();
+
+/** Sheets: page-sheet modal, ✕ on the left, centred title. */
+const sheet = { presentation: 'modal', headerLeft: () => <SheetClose /> } as const;
 
 function RootNavigator() {
   const { session, initialising } = useAuth();
@@ -25,15 +29,15 @@ function RootNavigator() {
 
   const signedIn = !!session;
   return (
-    <Stack screenOptions={{ headerBackTitle: 'Back' }}>
+    <Stack screenOptions={{ headerBackTitle: 'Back', headerShadowVisible: false, headerTitleAlign: 'center' }}>
       <Stack.Protected guard={signedIn}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="scan" options={{ presentation: 'modal', title: 'Scan a meal' }} />
-        <Stack.Screen name="food" options={{ presentation: 'modal', title: 'Food' }} />
-        <Stack.Screen name="training" options={{ presentation: 'modal', title: 'Training session' }} />
-        <Stack.Screen name="plan-item" options={{ presentation: 'modal', title: 'Planned food' }} />
-        <Stack.Screen name="weigh-in" options={{ presentation: 'modal', title: 'Weight' }} />
-        <Stack.Screen name="whoop-import" options={{ presentation: 'modal', title: 'WHOOP history' }} />
+        <Stack.Screen name="scan" options={{ ...sheet, title: 'Scan a meal' }} />
+        <Stack.Screen name="food" options={{ ...sheet, title: 'Food' }} />
+        <Stack.Screen name="training" options={{ ...sheet, title: 'Training session' }} />
+        <Stack.Screen name="plan-item" options={{ ...sheet, title: 'Planned food' }} />
+        <Stack.Screen name="weigh-in" options={{ ...sheet, title: 'Weight' }} />
+        <Stack.Screen name="whoop-import" options={{ ...sheet, title: 'WHOOP history' }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="sign-in" options={{ headerShown: false }} />

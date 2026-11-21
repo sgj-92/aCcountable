@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { BarcodeScanner } from '@/components/barcode-scanner';
-import { Button, Card, Divider, ErrorText, fmt, Row, T } from '@/components/ui';
+import { Icon } from '@/components/icon';
+import { Overline } from '@/components/sheet';
+import { Skeleton } from '@/components/skeleton';
+import { Button, Card, ErrorText, fmt, Num, Row, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { lookupBarcode, searchFoods, type FoodResult, type FoodSearchResponse } from '@/lib/foods';
@@ -14,6 +17,7 @@ import { lookupBarcode, searchFoods, type FoodResult, type FoodSearchResponse } 
 export function FoodSearch({ onSelect }: { onSelect: (food: FoodResult) => void }) {
   const c = useTheme();
   const [query, setQuery] = useState('');
+  const [focused, setFocused] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState<FoodSearchResponse | null>(null);
@@ -61,54 +65,94 @@ export function FoodSearch({ onSelect }: { onSelect: (food: FoodResult) => void 
 
   return (
     <View style={{ gap: Spacing.md }}>
-      <Row>
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          onSubmitEditing={search}
-          placeholder="Search foods, e.g. chicken breast raw"
-          placeholderTextColor={c.textMuted}
-          returnKeyType="search"
-          autoCorrect={false}
-          accessibilityLabel="Search foods"
+      <Row gap={Spacing.sm}>
+        <View
           style={{
             flex: 1,
-            backgroundColor: c.card,
-            color: c.text,
+            height: 52,
             borderRadius: Radius.md,
-            paddingHorizontal: Spacing.md,
-            paddingVertical: 12,
-            fontSize: 16,
-          }}
+            backgroundColor: c.raised,
+            borderWidth: 2,
+            borderColor: focused ? c.accentLine : 'transparent',
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingLeft: 12,
+          }}>
+          <Icon name="search" size={18} color={c.text3} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            onSubmitEditing={search}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder="Search foods, e.g. chicken breast raw"
+            placeholderTextColor={c.text3}
+            selectionColor={c.accentLine}
+            returnKeyType="search"
+            autoCorrect={false}
+            accessibilityLabel="Search foods"
+            style={{ flex: 1, height: '100%', color: c.text, fontSize: 17, paddingHorizontal: Spacing.sm }}
+          />
+          {query ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Clear search"
+              onPress={() => {
+                setQuery('');
+                setResults(null);
+              }}
+              style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: c.text3, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="close" size={12} color={c.raised} strokeWidth={3} />
+              </View>
+            </Pressable>
+          ) : null}
+        </View>
+        <Button
+          title="Search"
+          onPress={search}
+          disabled={query.trim().length < 2 || busy}
+          style={{ height: 52 }}
         />
-        <Button title="Search" onPress={search} disabled={query.trim().length < 2 || busy} />
       </Row>
 
       {scanning ? (
         <BarcodeScanner onScanned={onBarcode} onClose={() => setScanning(false)} />
       ) : (
-        <Button title="Scan barcode" icon="▥" variant="secondary" onPress={() => setScanning(true)} />
+        <Button title="Scan barcode" icon="▥" variant="secondary" onPress={() => setScanning(true)} style={{ height: 52 }} />
       )}
 
-      {busy ? (
-        <Row style={{ justifyContent: 'center', paddingVertical: Spacing.md }} gap={Spacing.md}>
-          <ActivityIndicator color={c.primary} />
-          <T variant="muted">Searching…</T>
-        </Row>
-      ) : null}
       <ErrorText message={error} />
+
+      {busy ? (
+        <>
+          {[0, 1].map((s) => (
+            <View key={s} style={{ gap: Spacing.sm }}>
+              <Skeleton width={140} height={14} radius={7} />
+              <Card style={{ gap: Spacing.md }}>
+                {[0, 1, 2].map((i) => (
+                  <View key={i} style={{ gap: 6 }}>
+                    <Skeleton width="70%" height={14} radius={7} />
+                    <Skeleton width="45%" height={12} radius={6} />
+                  </View>
+                ))}
+              </Card>
+            </View>
+          ))}
+        </>
+      ) : null}
 
       {results && !busy ? (
         <>
           {results.errors.map((e) => (
-            <T key={e} variant="small" color={c.danger}>
+            <T key={e} variant="footnote" color={c.warn}>
               {e}
             </T>
           ))}
-          <ResultSection title="Whole foods" subtitle="USDA FoodData Central" items={results.usda} onSelect={onSelect} />
-          <ResultSection title="Branded & packaged" subtitle="Open Food Facts" items={results.off} onSelect={onSelect} />
+          <ResultSection title="Whole foods" badge="USDA" items={results.usda} onSelect={onSelect} />
+          <ResultSection title="Branded" badge="Open Food Facts" items={results.off} onSelect={onSelect} />
           {results.usda.length === 0 && results.off.length === 0 && results.errors.length === 0 ? (
-            <T variant="muted">No matches. Try fewer or different words.</T>
+            <T variant="footnote">No matches. Try fewer or different words.</T>
           ) : null}
         </>
       ) : null}
@@ -118,55 +162,76 @@ export function FoodSearch({ onSelect }: { onSelect: (food: FoodResult) => void 
 
 function ResultSection({
   title,
-  subtitle,
+  badge,
   items,
   onSelect,
 }: {
   title: string;
-  subtitle: string;
+  badge: string;
   items: FoodResult[];
   onSelect: (f: FoodResult) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   if (items.length === 0) return null;
-  const shown = expanded ? items : items.slice(0, 6);
+  const shown = expanded ? items : items.slice(0, 10);
   return (
-    <Card style={{ gap: 0 }}>
-      <Row style={{ justifyContent: 'space-between', marginBottom: Spacing.xs }}>
-        <T variant="heading">{title}</T>
-        <T variant="small">{subtitle}</T>
-      </Row>
-      {shown.map((f, i) => (
-        <View key={f.id}>
-          {i > 0 ? <Divider /> : null}
-          <ResultRow food={f} onPress={() => onSelect(f)} />
-        </View>
-      ))}
-      {items.length > shown.length ? (
-        <Button title={`Show ${items.length - shown.length} more`} variant="ghost" onPress={() => setExpanded(true)} />
-      ) : null}
-    </Card>
+    <View style={{ gap: Spacing.sm }}>
+      <Overline badge={badge}>{title}</Overline>
+      <Card style={{ gap: 0, paddingVertical: 4, paddingRight: Spacing.sm }}>
+        {shown.map((f, i) => (
+          <ResultRow key={f.id} food={f} first={i === 0} onPress={() => onSelect(f)} />
+        ))}
+        {items.length > shown.length ? (
+          <Button
+            title={`Show ${items.length - shown.length} more`}
+            variant="ghost"
+            size="S"
+            onPress={() => setExpanded(true)}
+            style={{ alignSelf: 'flex-start', marginVertical: Spacing.sm }}
+          />
+        ) : null}
+      </Card>
+    </View>
   );
 }
 
-function ResultRow({ food, onPress }: { food: FoodResult; onPress: () => void }) {
+function ResultRow({ food, first, onPress }: { food: FoodResult; first: boolean; onPress: () => void }) {
   const c = useTheme();
   const p = food.per100g;
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" style={{ paddingVertical: Spacing.sm }}>
-      <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }} gap={Spacing.md}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <T numberOfLines={2}>{food.name}</T>
-          <T variant="small" numberOfLines={1}>
-            {food.brand ? `${food.brand} · ` : ''}P {fmt(p.protein_g)} · C {fmt(p.carbs_g)} · F {fmt(p.fat_g)}
-            {food.incomplete ? ' · some values missing' : ''}
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${food.name}${food.brand ? `, ${food.brand}` : ''}, ${fmt(p.kcal)} kcal per 100 grams`}
+      style={({ pressed }) => ({
+        minHeight: 60,
+        paddingVertical: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.md,
+        borderTopWidth: first ? 0 : 1,
+        borderTopColor: c.line,
+        opacity: pressed ? 0.6 : 1,
+      })}>
+      <View style={{ flex: 1, gap: 2 }}>
+        <T numberOfLines={2}>{food.name}</T>
+        {food.brand ? (
+          <T variant="footnote" numberOfLines={1}>
+            {food.brand}
           </T>
-        </View>
-        <View style={{ alignItems: 'flex-end' }}>
-          <T color={c.text}>{fmt(p.kcal)}</T>
-          <T variant="small">kcal/100 g</T>
-        </View>
-      </Row>
+        ) : null}
+        <T variant="footnote" numberOfLines={1} style={{ fontVariant: ['tabular-nums'] }}>
+          P {fmt(p.protein_g)} · C {fmt(p.carbs_g)} · F {fmt(p.fat_g)} per 100 g
+        </T>
+        {food.incomplete ? (
+          <Row gap={4}>
+            <Icon name="warn" size={13} color={c.warn} strokeWidth={2.2} />
+            <Text style={{ fontSize: 12, fontWeight: '600', color: c.warn }}>Some values missing</Text>
+          </Row>
+        ) : null}
+      </View>
+      <Num size="s">{fmt(p.kcal)}</Num>
+      <Icon name="chevron-right" size={16} color={c.text3} strokeWidth={2.2} />
     </Pressable>
   );
 }

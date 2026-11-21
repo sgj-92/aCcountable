@@ -1,14 +1,21 @@
+import * as Haptics from 'expo-haptics';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { Alert, Platform, Pressable, View } from 'react-native';
 
 import { FoodSearch } from '@/components/food-search';
+import { Icon } from '@/components/icon';
 import { MealPicker } from '@/components/meal-picker';
-import { Button, Card, Chip, Divider, ErrorText, Field, fmt, Loading, Row, Screen, T } from '@/components/ui';
-import { Spacing } from '@/constants/theme';
+import { PressableScale } from '@/components/pressable-scale';
+import { GramsField, Overline, ServingChips, SourceBadge } from '@/components/sheet';
+import { Button, Card, ErrorText, Field, fmt, Loading, Num, Row, Screen, T } from '@/components/ui';
+import { Radius, Spacing } from '@/constants/theme';
+import { useCountUp } from '@/hooks/use-count-up';
+import { useMealSlots } from '@/hooks/use-profile';
 import { useTheme } from '@/hooks/use-theme';
 import {
   addFood,
+  addFoodEntry,
   deleteFood,
   getFood,
   recentFoods,
@@ -91,6 +98,10 @@ export default function FoodEditor() {
   const [manualGrams, setManualGrams] = useState('');
 
   const [recent, setRecent] = useState<FoodEntry[]>([]);
+  const [logged, setLogged] = useState<{ id: string; label: string } | null>(null);
+  const [triedSave, setTriedSave] = useState(false);
+  const slots = useMealSlots();
+  const isToday = date === today();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -248,142 +259,241 @@ export default function FoodEditor() {
     ]);
   }
 
+  async function quickLog(f: FoodEntry) {
+    setError(null);
+    try {
+      const { id: _id, created_at: _created, ...rest } = f;
+      const newId = await addFoodEntry({ ...rest, date, meal });
+      if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      setLogged({ id: newId, label: `${f.name} · ${fmt(f.kcal)} kcal` });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  async function undoQuickLog() {
+    if (!logged) return;
+    const was = logged;
+    setLogged(null);
+    try {
+      await deleteFood(was.id);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
   if (!loaded) {
     return <Screen padTop={false}>{error ? <ErrorText message={error} /> : <Loading />}</Screen>;
   }
 
+  const mealLabel = slots.find((s) => s.key === meal)?.label ?? 'log';
+  const per = basis?.per100g;
+
   return (
     <Screen padTop={false}>
-      <Stack.Screen options={{ title: id ? 'Edit food' : `Add food · ${formatDay(date)}` }} />
+      <Stack.Screen options={{ title: id ? 'Edit food' : isToday ? 'Add food' : `Add food · ${formatDay(date)}` }} />
       <MealPicker value={meal} onChange={setMeal} />
+
+      {logged ? (
+        <Row
+          style={{ backgroundColor: c.goodBg, borderRadius: Radius.md, paddingLeft: Spacing.lg, minHeight: 48 }}
+          gap={Spacing.sm}>
+          <Icon name="check" size={16} color={c.accentText} strokeWidth={2.6} />
+          <T style={{ flex: 1, fontSize: 14 }} numberOfLines={1}>
+            Logged {logged.label}
+          </T>
+          <Button title="Undo" variant="ghost" size="S" onPress={undoQuickLog} />
+          <Button title="Done" variant="ghost" size="S" onPress={() => router.back()} />
+        </Row>
+      ) : null}
 
       {mode === 'search' ? (
         <>
           <FoodSearch onSelect={chooseResult} />
           <Button title="Enter manually" variant="ghost" onPress={() => setMode('manual')} />
           {recent.length > 0 ? (
-            <Card style={{ gap: 0 }}>
-              <T variant="heading" style={{ marginBottom: Spacing.sm }}>
-                Recent
-              </T>
-              {recent.map((f, i) => (
-                <View key={f.id}>
-                  {i > 0 ? <Divider /> : null}
-                  <Pressable onPress={() => chooseRecent(f)} style={{ paddingVertical: Spacing.sm }}>
-                    <Row style={{ justifyContent: 'space-between' }}>
-                      <View style={{ flex: 1 }}>
-                        <T numberOfLines={1}>{f.name}</T>
-                        {f.serving ? <T variant="small">{f.serving}</T> : null}
+            <View style={{ gap: Spacing.sm }}>
+              <Overline>Recent</Overline>
+              <Card style={{ gap: 0, paddingVertical: 4, paddingRight: 4, borderRadius: 22 }}>
+                {recent.map((f, i) => (
+                  <Row
+                    key={f.id}
+                    gap={Spacing.sm}
+                    style={{ minHeight: 56, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: c.line }}>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`${f.name}, ${fmt(f.kcal)} kcal. Choose amount`}
+                      onPress={() => chooseRecent(f)}
+                      style={{ flex: 1, paddingVertical: 10, gap: 2 }}>
+                      <T numberOfLines={1}>{f.name}</T>
+                      {f.serving ? <T variant="footnote">{f.serving}</T> : null}
+                    </Pressable>
+                    <Num size="xs">{fmt(f.kcal)}</Num>
+                    <PressableScale
+                      accessibilityRole="button"
+                      accessibilityLabel={`Log ${f.name} again to ${mealLabel}`}
+                      onPress={() => quickLog(f)}
+                      style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+                      <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: c.raised, alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon name="plus" size={16} color={c.accentText} strokeWidth={2.4} />
                       </View>
-                      <T color={c.textMuted}>{fmt(f.kcal)}</T>
-                    </Row>
-                  </Pressable>
-                </View>
-              ))}
-            </Card>
+                    </PressableScale>
+                  </Row>
+                ))}
+              </Card>
+            </View>
           ) : null}
         </>
       ) : null}
 
-      {mode === 'weigh' && basis ? (
+      {mode === 'weigh' && basis && per ? (
         <>
-          <Card style={{ gap: Spacing.md }}>
-            <View style={{ gap: 2 }}>
-              <T variant="heading">{basis.name}</T>
-              {basis.brand || basis.detail ? (
-                <T variant="small">{[basis.brand, basis.detail].filter(Boolean).join(' · ')}</T>
-              ) : null}
-              {basis.incomplete ? (
-                <T variant="small" color={c.danger}>
+          {!id ? (
+            <Pressable accessibilityRole="button" onPress={() => setMode('search')} hitSlop={8} style={{ alignSelf: 'flex-start' }}>
+              <Row gap={2}>
+                <Icon name="chevron-left" size={18} color={c.accentText} strokeWidth={2.4} />
+                <T color={c.accentText} style={{ fontWeight: '600' }}>
+                  Back to search
+                </T>
+              </Row>
+            </Pressable>
+          ) : null}
+          <View style={{ gap: 4 }}>
+            <T variant="title" style={{ fontSize: 20, lineHeight: 25 }}>
+              {basis.name}
+            </T>
+            <Row gap={Spacing.sm} style={{ flexWrap: 'wrap' }}>
+              <SourceBadge label={SOURCE_LABEL[basis.source]} />
+              <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
+                {[basis.brand, basis.detail].filter(Boolean).join(' · ')}
+                {basis.brand || basis.detail ? ' · ' : ''}per 100 g: {fmt(per.kcal)} kcal
+              </T>
+            </Row>
+            {basis.incomplete ? (
+              <Row gap={4}>
+                <Icon name="warn" size={14} color={c.warn} strokeWidth={2.2} />
+                <T variant="footnote" color={c.warn} style={{ flex: 1 }}>
                   Some values were missing from the source and are counted as 0.
                 </T>
-              ) : null}
-            </View>
-            <Field
-              label="Weight (g)"
-              value={grams}
-              onChangeText={setGrams}
-              keyboardType="decimal-pad"
-              selectTextOnFocus
-              autoFocus={!id}
-            />
-            <Row style={{ flexWrap: 'wrap' }}>
-              {basis.servings.map((s) => (
-                <Chip
-                  key={s.label}
-                  label={`${s.label} · ${fmt(s.grams)} g`}
-                  active={g === s.grams}
-                  onPress={() => setGrams(String(s.grams))}
-                />
-              ))}
-              <Chip label="100 g" active={g === 100} onPress={() => setGrams('100')} />
-            </Row>
-            {weighed ? (
-              <View style={{ gap: Spacing.xs }}>
-                <T variant="big">{fmt(weighed.kcal)} kcal</T>
-                <T variant="muted">
-                  P {weighed.protein_g} g · C {weighed.carbs_g} g · F {weighed.fat_g} g
-                </T>
-                <T variant="small">
-                  Per 100 g: {fmt(basis.per100g.kcal)} kcal · P {fmt(basis.per100g.protein_g)} · C{' '}
-                  {fmt(basis.per100g.carbs_g)} · F {fmt(basis.per100g.fat_g)}
-                </T>
-              </View>
+              </Row>
             ) : null}
-          </Card>
+          </View>
+          <GramsField value={grams} onChangeText={setGrams} autoFocus={!id} />
+          <ServingChips
+            grams={g}
+            onPick={(v) => {
+              if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
+              setGrams(String(v));
+            }}
+            options={[
+              ...basis.servings.map((s) => ({ label: `${s.label} · ${fmt(s.grams)} g`, grams: s.grams })),
+              ...(basis.servings.some((s) => s.grams === 100) ? [] : [{ label: '100 g', grams: 100 }]),
+            ]}
+          />
+          {weighed ? <LiveMacros kcal={weighed.kcal} p={weighed.protein_g} c={weighed.carbs_g} f={weighed.fat_g} /> : null}
           <ErrorText message={gramsInvalid ?? error} />
-          <Button title={id ? 'Save changes' : 'Add to log'} onPress={save} loading={busy} disabled={!!gramsInvalid} />
+          <Button
+            title={id ? 'Save changes' : `Add ${fmt(g)} g to ${mealLabel}`}
+            size="L"
+            onPress={save}
+            loading={busy}
+            disabled={!!gramsInvalid}
+          />
           <Button title="Edit values directly" variant="ghost" onPress={switchToManual} />
-          {!id ? <Button title="Choose a different food" variant="ghost" onPress={() => setMode('search')} /> : null}
         </>
       ) : null}
 
       {mode === 'manual' ? (
         <>
-          <Card style={{ gap: Spacing.md }}>
-            <Field label="Food" value={name} onChangeText={setName} placeholder="e.g. Homemade chilli" />
-            <Row gap={Spacing.sm}>
-              <Field
-                style={{ flex: 2 }}
-                label="Serving (optional)"
-                value={serving}
-                onChangeText={setServing}
-                placeholder="e.g. 1 bowl"
-              />
-              <Field
-                style={{ flex: 1 }}
-                label="Weight g"
-                value={manualGrams}
-                onChangeText={setManualGrams}
-                keyboardType="decimal-pad"
-              />
-            </Row>
-            <Field label="Calories (kcal)" value={kcal} onChangeText={setKcal} keyboardType="decimal-pad" />
-            <Row gap={Spacing.sm}>
-              <Field style={{ flex: 1 }} label="Protein g" value={protein} onChangeText={setProtein} keyboardType="decimal-pad" />
-              <Field style={{ flex: 1 }} label="Carbs g" value={carbs} onChangeText={setCarbs} keyboardType="decimal-pad" />
-              <Field style={{ flex: 1 }} label="Fat g" value={fat} onChangeText={setFat} keyboardType="decimal-pad" />
-            </Row>
-            {fromMacros > 0 ? (
-              <T variant="small">
+          <Field label="Food" value={name} onChangeText={setName} placeholder="e.g. Homemade chilli" />
+          <Row gap={Spacing.sm} style={{ alignItems: 'flex-start' }}>
+            <Field style={{ flex: 2 }} label="Serving · optional" value={serving} onChangeText={setServing} placeholder="e.g. 1 bowl" />
+            <Field style={{ flex: 1 }} label="Weight g" value={manualGrams} onChangeText={setManualGrams} keyboardType="decimal-pad" />
+          </Row>
+          <Row gap={Spacing.sm} style={{ alignItems: 'flex-start' }}>
+            <Field
+              style={{ flex: 1 }}
+              label="Calories kcal"
+              value={kcal}
+              onChangeText={setKcal}
+              keyboardType="decimal-pad"
+              error={triedSave && manualInvalid === 'Enter calories or macros' ? manualInvalid : null}
+            />
+            <Field style={{ flex: 1 }} label="Protein g" value={protein} onChangeText={setProtein} keyboardType="decimal-pad" />
+          </Row>
+          <Row gap={Spacing.sm} style={{ alignItems: 'flex-start' }}>
+            <Field style={{ flex: 1 }} label="Carbs g" value={carbs} onChangeText={setCarbs} keyboardType="decimal-pad" />
+            <Field style={{ flex: 1 }} label="Fat g" value={fat} onChangeText={setFat} keyboardType="decimal-pad" />
+          </Row>
+          {fromMacros > 0 ? (
+            <Row gap={Spacing.sm} style={{ flexWrap: 'wrap' }}>
+              <T variant="footnote" style={{ flex: 1 }}>
                 Macros add up to {fmt(fromMacros)} kcal
                 {kcal.trim() !== '' && Math.abs(fromMacros - values.kcal) > Math.max(30, values.kcal * 0.15)
                   ? ', which differs from the calories entered.'
                   : '.'}
               </T>
-            ) : null}
-            {source === 'photo' ? <T variant="small">📷 Estimated from a photo. Adjust if it looks off.</T> : null}
-            {manualGrams.trim() ? (
-              <T variant="small">With a weight saved, you can re-weigh this food next time you log it.</T>
-            ) : null}
-          </Card>
-          <ErrorText message={manualInvalid && name ? manualInvalid : error} />
-          <Button title={id ? 'Save changes' : 'Add to log'} onPress={save} loading={busy} disabled={!!manualInvalid} />
+              {Math.round(fromMacros) !== Math.round(values.kcal) ? (
+                <Button title={`Use ${fmt(fromMacros)}`} variant="secondary" size="S" onPress={() => setKcal(String(Math.round(fromMacros)))} />
+              ) : null}
+            </Row>
+          ) : null}
+          {source === 'photo' ? <T variant="footnote">Estimated from a photo. Adjust if it looks off.</T> : null}
+          {manualGrams.trim() ? (
+            <T variant="footnote">With a weight saved, you can re-weigh this food next time you log it.</T>
+          ) : null}
+          <ErrorText message={triedSave && manualInvalid && manualInvalid !== 'Enter calories or macros' ? manualInvalid : error} />
+          <Button
+            title={id ? 'Save changes' : `Add to ${mealLabel}`}
+            size="L"
+            onPress={() => {
+              setTriedSave(true);
+              save();
+            }}
+            loading={busy}
+          />
           {!id ? <Button title="Search the food database" variant="ghost" onPress={() => setMode('search')} /> : null}
         </>
       ) : null}
 
-      {id ? <Button title="Delete entry" variant="ghost" onPress={remove} /> : null}
+      {id ? <Button title="Delete entry" variant="ghost" onPress={remove} style={{ alignSelf: 'center' }} /> : null}
     </Screen>
+  );
+}
+
+const SOURCE_LABEL: Record<FoodEntry['source'], string> = {
+  usda: 'USDA',
+  off: 'Open Food Facts',
+  photo: 'Photo estimate',
+  manual: 'Your entry',
+};
+
+function LiveMacros({ kcal, p, c: carbs, f }: { kcal: number; p: number; c: number; f: number }) {
+  const c = useTheme();
+  const shown = useCountUp(kcal, 200);
+  const dot = (color: string, label: string, v: number) => (
+    <Row gap={5}>
+      <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color }} />
+      <T variant="footnote" color={c.text} style={{ fontVariant: ['tabular-nums'] }}>
+        {label} {fmt(v)} g
+      </T>
+    </Row>
+  );
+  return (
+    <Card style={{ borderRadius: Radius.lg, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', gap: Spacing.lg }}>
+      <View>
+        <Num size="m" style={{ fontSize: 24, lineHeight: 28 }}>
+          {fmt(shown)}
+        </Num>
+        <T variant="caption" style={{ fontWeight: '400' }}>
+          kcal
+        </T>
+      </View>
+      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md }}>
+        {dot(c.protein, 'P', p)}
+        {dot(c.carbs, 'C', carbs)}
+        {dot(c.fat, 'F', f)}
+      </View>
+    </Card>
   );
 }
