@@ -321,6 +321,7 @@ export function Field({
   label,
   hint,
   error,
+  invalid,
   style,
   onFocus,
   onBlur,
@@ -330,12 +331,14 @@ export function Field({
   hint?: string;
   /** Shows a red ring and this message under the field. */
   error?: string | null;
+  /** Red ring only, when the message is shown elsewhere. */
+  invalid?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
   const c = useTheme();
   const [focused, setFocused] = useState(false);
   const disabled = props.editable === false;
-  const ring = error ? c.alert : focused ? c.accentLine : 'transparent';
+  const ring = error || invalid ? c.alert : focused ? c.accentLine : 'transparent';
   return (
     <View style={[{ gap: 6, opacity: disabled ? 0.4 : 1 }, style]}>
       <T variant="footnote">{label}</T>

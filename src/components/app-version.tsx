@@ -1,9 +1,10 @@
 import Constants from 'expo-constants';
 import * as Updates from 'expo-updates';
 import { useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, View } from 'react-native';
 
-import { Button, Card, T } from '@/components/ui';
+import { StatusPill } from '@/components/tiles';
+import { Button, Row, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -46,20 +47,22 @@ export function AppVersion() {
     }
   }
 
+  const isOta = Updates.isEnabled && !Updates.isEmbeddedLaunch && !!Updates.createdAt;
   return (
-    <Card style={{ gap: Spacing.sm }}>
-      <T variant="heading">App version</T>
-      <T variant="muted">
-        aCcountable {version} · {running}
+    <View style={{ gap: Spacing.sm }}>
+      <Row style={{ justifyContent: 'space-between' }}>
+        <T variant="footnote">aCcountable {version}</T>
+        {isOta ? <StatusPill label="Over-the-air update" tone="good" /> : null}
+      </Row>
+      <T variant="footnote" color={c.text}>
+        {running}
       </T>
       {Updates.isEnabled && Updates.updateId ? (
-        <T variant="small" color={c.textMuted}>
+        <T variant="footnote" color={c.text3}>
           Update {Updates.updateId.slice(0, 8)} · channel {Updates.channel ?? 'none'}
         </T>
       ) : null}
-      {Updates.isEnabled ? (
-        <Button title="Check for updates" variant="secondary" onPress={check} loading={busy} />
-      ) : null}
-    </Card>
+      {Updates.isEnabled ? <Button title="Check for updates" variant="secondary" onPress={check} loading={busy} /> : null}
+    </View>
   );
 }

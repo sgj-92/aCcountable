@@ -204,19 +204,24 @@ export function WeekStrip({
   viewedDate,
   summary,
   onPress = () => router.navigate('/week'),
+  interactive = true,
 }: {
   days: WeekDay[];
   viewedDate: string;
-  summary: WeekSummary;
+  /** Omit to show the bars only. */
+  summary?: WeekSummary;
   onPress?: () => void;
+  /** False on Week itself, where the strip isn't a link. */
+  interactive?: boolean;
 }) {
   const c = useTheme();
   const scale = Math.max(1, ...days.map((d) => Math.max(d.eaten, d.adjusted))) * 1.15;
-  const dot = { good: c.good, info: c.info, warn: c.warn }[summary.tone];
+  const dot = summary ? { good: c.good, info: c.info, warn: c.warn }[summary.tone] : c.text2;
   return (
     <Pressable
-      accessibilityRole="link"
-      accessibilityLabel={`This week: ${summary.head} ${summary.tail}. Opens Week`}
+      accessibilityRole={interactive ? 'link' : undefined}
+      accessibilityLabel={summary ? `This week: ${summary.head} ${summary.tail}.${interactive ? ' Opens Week' : ''}` : undefined}
+      disabled={!interactive}
       onPress={onPress}
       style={({ pressed }) => ({ alignSelf: 'stretch', gap: Spacing.sm, opacity: pressed ? 0.7 : 1 })}>
       <View style={{ flexDirection: 'row', gap: 4 }}>
@@ -224,6 +229,7 @@ export function WeekStrip({
           <WeekBar key={d.date} day={d} index={i} scale={scale} viewed={d.date === viewedDate} />
         ))}
       </View>
+      {summary ? (
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm }}>
         <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: dot }} />
         <Text
@@ -233,8 +239,9 @@ export function WeekStrip({
           <Text style={{ fontWeight: '600', color: summary.tone === 'good' ? c.accentText : dot }}>{summary.head}</Text>
           <Text style={{ color: c.text2 }}> {summary.tail}</Text>
         </Text>
-        <Icon name="chevron-right" size={16} color={c.text3} strokeWidth={2.2} />
+        {interactive ? <Icon name="chevron-right" size={16} color={c.text3} strokeWidth={2.2} /> : null}
       </View>
+      ) : null}
     </Pressable>
   );
 }

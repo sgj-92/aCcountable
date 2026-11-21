@@ -1,15 +1,21 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, RefreshControl, TextInput, View } from 'react-native';
+import { Alert, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
+import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 
-import { Button, Card, Divider, ErrorText, fmt, Loading, Row, Screen, Stepper, T } from '@/components/ui';
+import { Icon } from '@/components/icon';
+import { Overline } from '@/components/sheet';
+import { Skeleton } from '@/components/skeleton';
+import { TabHeader } from '@/components/tab-header';
+import { Button, Card, ErrorText, fmt, Loading, Num, Row, Screen, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
+import { useCountUp } from '@/hooks/use-count-up';
 import { useTheme } from '@/hooks/use-theme';
 import { computeWeek, loadWeek } from '@/lib/adaptive';
 import { isProfileComplete } from '@/lib/api';
 import { resolveSlots, slotsForData } from '@/lib/meals';
-import { addDays, formatDay, today } from '@/lib/dates';
+import { addDays, formatDay, formatLongDay, today } from '@/lib/dates';
 import { sumTotals } from '@/lib/nutrition';
 import { addMacros, macrosFor, planGaps, solvePlan, subtractMacros, type Macros } from '@/lib/planner';
 import {
@@ -33,6 +39,8 @@ export default function PlanScreen() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [notes, setNotes] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
 
   const { data, error, reload, refreshing, refresh } = useAsync(async () => {
     const [week, items] = await Promise.all([loadWeek(date), listPlanItems(date)]);
@@ -40,10 +48,12 @@ export default function PlanScreen() {
   }, date);
 
   const stepper = (
-    <Stepper
-      label={date === today() ? `Today · ${formatDay(date)}` : formatDay(date)}
+    <TabHeader
+      sub={date === today() ? `Today · ${formatDay(date)}` : formatLongDay(date)}
+      title="Plan"
       onPrev={() => setDate(addDays(date, -1))}
       onNext={() => setDate(addDays(date, 1))}
+      back={date === today() ? null : { label: 'Back to today', onPress: () => setDate(today()) }}
     />
   );
 
@@ -117,140 +127,180 @@ export default function PlanScreen() {
   }
 
   const input = (
-    <Card style={{ gap: Spacing.md }}>
-      <T variant="heading">{items.length ? 'Add more foods' : 'What are you eating today?'}</T>
-      <T variant="muted">
-        List the foods, by meal if you like. No amounts needed: they’re worked out to hit your targets.
-      </T>
-      <TextInput
-        value={text}
-        onChangeText={setText}
-        placeholder={EXAMPLE}
-        placeholderTextColor={c.textMuted}
-        multiline
-        accessibilityLabel="Foods for the day"
-        style={{
-          minHeight: 120,
-          backgroundColor: c.input,
-          color: c.text,
-          borderRadius: Radius.sm,
-          padding: Spacing.md,
-          fontSize: 16,
-          textAlignVertical: 'top',
-        }}
-      />
+    <View style={{ gap: Spacing.md }}>
       {busy ? (
-        <Row style={{ justifyContent: 'center', paddingVertical: Spacing.sm }} gap={Spacing.md}>
-          <ActivityIndicator color={c.primary} />
-          <T variant="muted">Working out your foods…</T>
-        </Row>
+        <Card hero style={{ gap: Spacing.md }}>
+          <T variant="headline">Working out your foods…</T>
+          <T variant="footnote">Finding each food’s nutrition, then the amounts that hit your targets.</T>
+          {[0, 1, 2].map((i) => (
+            <View key={i} style={{ gap: 6 }}>
+              <Skeleton width="65%" height={18} radius={9} />
+              <Skeleton width="40%" height={12} radius={6} />
+            </View>
+          ))}
+        </Card>
       ) : (
-        <Button
-          title={items.length ? 'Add to plan' : 'Plan my amounts'}
-          icon="✨"
-          onPress={addFoods}
-          disabled={text.trim().length < 2}
-        />
+        <>
+          <View style={{ gap: 4, paddingHorizontal: 4 }}>
+            <T variant="headline">{items.length ? 'Add more foods' : 'What are you eating today?'}</T>
+            <T variant="footnote">List the foods, by meal if you like. No amounts needed: they’re worked out to hit your targets.</T>
+          </View>
+          <TextInput
+            value={text}
+            onChangeText={setText}
+            placeholder={EXAMPLE}
+            placeholderTextColor={c.text3}
+            selectionColor={c.accentLine}
+            multiline
+            accessibilityLabel="Foods for the day"
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
+            style={{
+              minHeight: items.length ? 140 : 232,
+              maxHeight: 320,
+              backgroundColor: c.raised,
+              color: c.text,
+              borderRadius: 16,
+              borderWidth: 2,
+              borderColor: inputFocused ? c.accentLine : 'transparent',
+              paddingHorizontal: 14,
+              paddingTop: 12,
+              paddingBottom: 12,
+              fontSize: 17,
+              lineHeight: 24,
+              textAlignVertical: 'top',
+            }}
+          />
+        </>
       )}
-      {items.length ? <Button title="Cancel" variant="ghost" onPress={() => setAdding(false)} /> : null}
-    </Card>
+      <Button
+        title={busy ? 'Planning…' : items.length ? 'Add to plan' : 'Plan my amounts'}
+        size="L"
+        onPress={addFoods}
+        loading={busy}
+        disabled={text.trim().length < 2}
+      />
+      {items.length && !busy ? <Button title="Cancel" variant="ghost" onPress={() => setAdding(false)} /> : null}
+    </View>
   );
 
   return (
-    <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
+    <Screen padBottom={120} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
       {stepper}
       <ErrorText message={error ?? actionError} />
 
       {!isProfileComplete(profile) || !target ? (
-        <Card>
-          <T variant="heading">Set up your profile</T>
-          <T variant="muted">The plan needs your daily targets, which come from your profile.</T>
+        <Card hero>
+          <T variant="headline">Set up your profile</T>
+          <T variant="footnote">The plan needs your daily targets, which come from your profile.</T>
           <Button title="Go to profile" onPress={() => router.navigate('/profile')} />
         </Card>
       ) : items.length === 0 ? (
         input
       ) : (
         <>
-          {/* Planned vs target */}
-          <Card style={{ gap: Spacing.sm }}>
-            <Row style={{ justifyContent: 'space-between', alignItems: 'flex-end' }}>
-              <View>
-                <T variant="small">Planned for the day</T>
-                <T variant="big">{fmt(planned!.kcal)}</T>
-              </View>
-              <View style={{ alignItems: 'flex-end' }}>
-                <T variant="heading">of {fmt(target.kcal)} kcal</T>
-                <T variant="small">{consumed.kcal > 0 ? `${fmt(consumed.kcal)} already eaten` : 'nothing logged yet'}</T>
-              </View>
-            </Row>
-            <Row style={{ flexWrap: 'wrap' }} gap={Spacing.md}>
-              <MacroDiff label="P" planned={planned!.protein_g} target={target.protein_g} color={c.protein} />
-              <MacroDiff label="C" planned={planned!.carbs_g} target={target.carbs_g} color={c.carbs} />
-              <MacroDiff label="F" planned={planned!.fat_g} target={target.fat_g} color={c.fat} />
+          <Card hero style={{ gap: Spacing.md }}>
+            <View>
+              <Overline>Planned for the day</Overline>
+              <Row gap={Spacing.sm} style={{ alignItems: 'baseline', paddingHorizontal: 4 }}>
+                <CountUpNum value={planned!.kcal} />
+                <T variant="headline" color={c.text2}>
+                  of {fmt(target.kcal)} kcal
+                </T>
+              </Row>
+              <T variant="footnote" style={{ paddingHorizontal: 4 }}>
+                {consumed.kcal > 0 ? `${fmt(consumed.kcal)} already eaten` : 'Nothing logged yet'}
+              </T>
+            </View>
+            <Row gap={Spacing.md} style={{ alignItems: 'flex-start' }}>
+              <MacroDiff label="Protein" planned={planned!.protein_g} target={target.protein_g} color={c.protein} />
+              <MacroDiff label="Carbs" planned={planned!.carbs_g} target={target.carbs_g} color={c.carbs} />
+              <MacroDiff label="Fat" planned={planned!.fat_g} target={target.fat_g} color={c.fat} />
             </Row>
             {gaps.length === 0 ? (
-              <T variant="small" color={c.success}>
-                On target. Weigh as you go and log what you actually eat; the rest re-balances.
-              </T>
+              <StatusLine level="good" text="On target. Weigh as you go and log what you actually eat; the rest re-balances." />
             ) : (
               gaps.map((g) => (
-                <T key={g.key} variant="small" color={c.danger}>
-                  {g.label} {fmt(Math.abs(g.diff))} {g.unit} {g.diff < 0 ? 'short' : 'over'}:{' '}
-                  {g.diff < 0
-                    ? `add a ${g.key === 'protein_g' ? 'protein' : g.key === 'fat_g' ? 'fat' : g.key === 'carbs_g' ? 'carb' : 'more filling'} food, or allow bigger portions.`
-                    : 'swap something out, or allow smaller portions.'}
-                </T>
+                <StatusLine
+                  key={g.key}
+                  level="alert"
+                  text={`${g.label} ${fmt(Math.abs(g.diff))} ${g.unit} ${g.diff < 0 ? 'short' : 'over'}: ${
+                    g.diff < 0
+                      ? `add a ${g.key === 'protein_g' ? 'protein' : g.key === 'fat_g' ? 'fat' : g.key === 'carbs_g' ? 'carb' : 'more filling'} food, or allow bigger portions.`
+                      : 'swap something out, or allow smaller portions.'
+                  }`}
+                  action={g.diff < 0 ? { label: 'Add', onPress: () => setAdding(true) } : undefined}
+                />
               ))
             )}
-            {notes ? <T variant="small">{notes}</T> : null}
+            {notes ? (
+              <Pressable onPress={() => setNotesOpen(!notesOpen)} accessibilityRole="button" accessibilityHint="Shows the whole note">
+                <T variant="footnote" numberOfLines={notesOpen ? undefined : 3}>
+                  {notes}
+                </T>
+              </Pressable>
+            ) : null}
           </Card>
 
-          {/* Foods by meal */}
           {slotsForData(
             slots,
             items.map((i) => i.meal),
           ).map(({ key: meal, label }) => {
             const mealItems = items.filter((i) => i.meal === meal);
             if (mealItems.length === 0) return null;
+            const rows = mealItems.map((item) => {
+              const logged = isLogged(item);
+              const grams = logged ? (loggedGrams.get(item.logged_entry_id!) ?? 0) : (solution?.grams[item.id] ?? item.typical_g);
+              return { item, logged, grams, m: macrosFor(per100gOf(item), grams) };
+            });
+            const total = rows.reduce((t, r) => t + r.m.kcal, 0);
             return (
-              <Card key={meal} style={{ gap: 0 }}>
-                <T variant="heading" style={{ marginBottom: Spacing.xs }}>
-                  {label}
-                </T>
-                {mealItems.map((item, idx) => {
-                  const logged = isLogged(item);
-                  const grams = logged
-                    ? (loggedGrams.get(item.logged_entry_id!) ?? 0)
-                    : (solution?.grams[item.id] ?? item.typical_g);
-                  const m = macrosFor(per100gOf(item), grams);
-                  return (
-                    <View key={item.id}>
-                      {idx > 0 ? <Divider /> : null}
-                      <Pressable
-                        accessibilityRole="button"
-                        onPress={() =>
-                          router.push({ pathname: '/plan-item', params: { id: item.id, planned: String(grams) } })
-                        }
-                        style={{ paddingVertical: Spacing.sm, opacity: logged ? 0.6 : 1 }}>
-                        <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }} gap={Spacing.md}>
-                          <View style={{ flex: 1, gap: 2 }}>
-                            <T numberOfLines={2}>
-                              {logged ? '✓ ' : ''}
-                              {item.name}
-                            </T>
-                            <T variant="small">
-                              {fmt(m.kcal)} kcal · P {fmt(m.protein_g)} · C {fmt(m.carbs_g)} · F {fmt(m.fat_g)}
-                              {item.fixed_g != null && !logged ? ' · fixed' : ''}
-                            </T>
-                          </View>
-                          <T variant="heading" color={logged ? c.textMuted : c.primary}>
-                            {amountLabel(item, grams)}
+              <Card key={meal} style={{ gap: 0, paddingVertical: 4, paddingRight: Spacing.sm }}>
+                <Row style={{ minHeight: 44, justifyContent: 'space-between' }}>
+                  <Overline>{label}</Overline>
+                  <Num size="xxs" color={c.text2} style={{ fontSize: 14, marginRight: Spacing.sm }}>
+                    {fmt(total)} kcal
+                  </Num>
+                </Row>
+                {rows.map(({ item, logged, grams, m }, idx) => (
+                  <Animated.View key={item.id} entering={FadeInDown.duration(220).delay(idx * 30)} layout={LinearTransition}>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`${item.name}, ${amountLabel(item, grams)}${logged ? ', logged' : ''}`}
+                      onPress={() => router.push({ pathname: '/plan-item', params: { id: item.id, planned: String(grams) } })}
+                      style={({ pressed }) => ({
+                        minHeight: 64,
+                        paddingVertical: 10,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: Spacing.md,
+                        borderTopWidth: 1,
+                        borderTopColor: c.line,
+                        opacity: logged ? 0.5 : pressed ? 0.7 : 1,
+                      })}>
+                      {logged ? (
+                        <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' }}>
+                          <Icon name="check" size={15} color={c.onAccent} strokeWidth={2.8} />
+                        </View>
+                      ) : null}
+                      <View style={{ flex: 1, gap: 2 }}>
+                        <Num size="m">{amountLabel(item, grams)}</Num>
+                        <T numberOfLines={2}>{item.name}</T>
+                        <Row gap={6}>
+                          <T variant="footnote" style={{ fontVariant: ['tabular-nums'], flexShrink: 1 }} numberOfLines={1}>
+                            {fmt(m.kcal)} kcal · P {fmt(m.protein_g)} · C {fmt(m.carbs_g)} · F {fmt(m.fat_g)}
                           </T>
+                          {item.fixed_g != null && !logged ? (
+                            <View style={{ height: 22, paddingHorizontal: 8, borderRadius: 11, backgroundColor: c.raised, justifyContent: 'center' }}>
+                              <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, color: c.text2 }}>🔒 FIXED</Text>
+                            </View>
+                          ) : null}
                         </Row>
-                      </Pressable>
-                    </View>
-                  );
-                })}
+                      </View>
+                      <Icon name="chevron-right" size={16} color={c.text3} strokeWidth={2.2} />
+                    </Pressable>
+                  </Animated.View>
+                ))}
               </Card>
             );
           })}
@@ -263,7 +313,7 @@ export default function PlanScreen() {
               <Button title="Clear plan" variant="ghost" onPress={clearPlan} style={{ flex: 1 }} />
             </Row>
           )}
-          <T variant="small" style={{ textAlign: 'center' }}>
+          <T variant="footnote" style={{ textAlign: 'center' }}>
             Tap a food to log what you ate, fix an amount, or check its nutrition.
           </T>
         </>
@@ -275,18 +325,48 @@ export default function PlanScreen() {
 function MacroDiff({ label, planned, target, color }: { label: string; planned: number; target: number; color: string }) {
   const c = useTheme();
   const diff = Math.round(planned - target);
+  const off = Math.abs(diff) > 5;
   return (
-    <Row gap={Spacing.xs}>
-      <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color }} />
-      <T variant="muted">
-        {label} {fmt(planned)}/{fmt(target)} g
+    <View style={{ flex: 1, gap: 2 }}>
+      <Row gap={5}>
+        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color }} />
+        <T variant="caption">{label}</T>
+      </Row>
+      <Text maxFontSizeMultiplier={1.3}>
+        <Num size="xs" color={off ? c.alert : c.text}>
+          {fmt(planned)}
+        </Num>
+        <Text style={{ fontSize: 13, color: c.text2 }}> / {fmt(target)} g</Text>
+      </Text>
+      <T variant="caption" color={off ? c.alert : c.text2} style={{ fontWeight: '400', fontVariant: ['tabular-nums'] }}>
+        {diff === 0 ? 'exact' : `${diff > 0 ? '+' : '−'}${Math.abs(diff)} g`}
       </T>
-      {Math.abs(diff) >= 1 ? (
-        <T variant="small" color={Math.abs(diff) > Math.max(5, target * 0.05) ? c.danger : c.textMuted}>
-          ({diff > 0 ? '+' : ''}
-          {diff})
-        </T>
-      ) : null}
+    </View>
+  );
+}
+
+/** One-line status on its tint, e.g. "On target" or a gap with its fix. */
+function StatusLine({
+  level,
+  text,
+  action,
+}: {
+  level: 'good' | 'alert';
+  text: string;
+  action?: { label: string; onPress: () => void };
+}) {
+  const c = useTheme();
+  return (
+    <Row gap={Spacing.sm} style={{ backgroundColor: level === 'good' ? c.goodBg : c.alertBg, borderRadius: Radius.md, paddingVertical: 10, paddingHorizontal: 12 }}>
+      <Icon name={level === 'good' ? 'good' : 'alert'} size={18} color={level === 'good' ? c.good : c.alert} />
+      <T variant="footnote" color={c.text} style={{ flex: 1 }}>
+        {text}
+      </T>
+      {action ? <Button title={action.label} variant="secondary" size="S" onPress={action.onPress} /> : null}
     </Row>
   );
+}
+
+function CountUpNum({ value }: { value: number }) {
+  return <Num size="xl">{fmt(useCountUp(value))}</Num>;
 }

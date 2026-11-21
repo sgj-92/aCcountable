@@ -8,11 +8,11 @@ import { MacroBars, TargetLedger, WeekStrip } from '@/components/hero';
 import { InsightsCard } from '@/components/insights-card';
 import { MealCard } from '@/components/meal-card';
 import { showMenu } from '@/components/menu';
-import { PressableScale } from '@/components/pressable-scale';
 import { QuickDock } from '@/components/quick-dock';
 import { Skeleton } from '@/components/skeleton';
+import { TabHeader } from '@/components/tab-header';
 import { AddSlot, DotNote, Sparkline, Tile, TileValue } from '@/components/tiles';
-import { Button, Card, Divider, ErrorText, fmt, IconButton, Num, Row, Screen, T } from '@/components/ui';
+import { Button, Card, Divider, ErrorText, fmt, Num, Row, Screen, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
@@ -56,12 +56,13 @@ export default function TodayScreen() {
   const defaultMeal = isToday ? defaultSlotForNow(slots, new Date(), fastingWindow) : slots[slots.length - 1].key;
 
   const header = (
-    <DayHeader
-      date={date}
-      isToday={isToday}
+    <TabHeader
+      sub={formatLongDay(date)}
+      title={isToday ? 'Today' : formatDay(date)}
       onPrev={() => setDate(addDays(date, -1))}
       onNext={() => setDate(addDays(date, 1))}
-      onToday={() => setDate(today())}
+      nextDim={isToday}
+      back={isToday ? null : { label: 'Back to today', onPress: () => setDate(today()) }}
     />
   );
 
@@ -107,50 +108,6 @@ export default function TodayScreen() {
       </Screen>
       {dock}
     </View>
-  );
-}
-
-function DayHeader({
-  date,
-  isToday,
-  onPrev,
-  onNext,
-  onToday,
-}: {
-  date: string;
-  isToday: boolean;
-  onPrev: () => void;
-  onNext: () => void;
-  onToday: () => void;
-}) {
-  const c = useTheme();
-  return (
-    <Row style={{ alignItems: 'flex-end', justifyContent: 'space-between', paddingBottom: 2 }}>
-      <View style={{ gap: 2, flexShrink: 1 }}>
-        <T variant="footnote" style={{ fontWeight: '600' }} numberOfLines={1}>
-          {formatLongDay(date)}
-        </T>
-        <T variant="largeTitle" numberOfLines={1}>
-          {isToday ? 'Today' : formatDay(date)}
-        </T>
-      </View>
-      <Row gap={Spacing.sm}>
-        {!isToday ? (
-          <PressableScale
-            accessibilityRole="button"
-            accessibilityLabel="Back to today"
-            onPress={onToday}
-            hitSlop={6}
-            style={{ height: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: c.goodBg, justifyContent: 'center' }}>
-            <T color={c.accentText} style={{ fontSize: 13, fontWeight: '700' }}>
-              ↩ Today
-            </T>
-          </PressableScale>
-        ) : null}
-        <IconButton glyph="‹" label="Previous day" onPress={onPrev} />
-        <IconButton glyph="›" label="Next day" onPress={onNext} color={isToday ? c.text3 : c.text} />
-      </Row>
-    </Row>
   );
 }
 
