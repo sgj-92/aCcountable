@@ -104,18 +104,28 @@ export function GramsField({
   kcal,
   unit = 'g',
   autoFocus,
+  error,
+  height = 80,
   ...props
-}: Omit<TextInputProps, 'style'> & { value: string; onChangeText: (v: string) => void; kcal?: number; unit?: string }) {
+}: Omit<TextInputProps, 'style'> & {
+  value: string;
+  onChangeText: (v: string) => void;
+  kcal?: number;
+  unit?: string;
+  /** Turns the ring alert (show the message with ErrorText). */
+  error?: boolean;
+  height?: number;
+}) {
   const c = useTheme();
   const [focused, setFocused] = useState(false);
   return (
     <View
       style={{
-        height: 80,
+        height,
         borderRadius: Radius.lg,
         backgroundColor: c.raised,
         borderWidth: 2,
-        borderColor: focused ? c.accentLine : 'transparent',
+        borderColor: error ? c.alert : focused ? c.accentLine : 'transparent',
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 18,
@@ -141,7 +151,7 @@ export function GramsField({
         }}
         style={{
           fontFamily: 'Archivo_800ExtraBold',
-          fontSize: 40,
+          fontSize: height >= 72 ? 40 : 32,
           color: c.text,
           minWidth: 60,
           padding: 0,

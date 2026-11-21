@@ -314,7 +314,7 @@ export default function ScanScreen() {
                 Shoot from above with the whole plate in frame. Cutlery or a hand in shot helps judge portion size.
               </T>
             </Card>
-            <Button title="Take photo" size="L" icon="📷" onPress={() => pick('camera')} />
+            <Button title="Take photo" size="L" onPress={() => pick('camera')} />
             <Button title="Choose from library" size="L" variant="secondary" onPress={() => pick('library')} />
           </>
         ) : (

@@ -9,6 +9,7 @@ import {
   type StyleProp,
   type TextInputProps,
   type TextStyle,
+  type ViewProps,
   type ViewStyle,
 } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, withTiming } from 'react-native-reanimated';
@@ -62,7 +63,8 @@ export function Card({
   children,
   style,
   hero,
-}: {
+  ...rest
+}: Omit<ViewProps, 'style'> & {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   /** Radius 24 for the main card on a screen. */
@@ -71,6 +73,7 @@ export function Card({
   const c = useTheme();
   return (
     <View
+      {...rest}
       style={[
         {
           backgroundColor: c.surface,
@@ -122,17 +125,20 @@ export function T({
   color,
   style,
   numberOfLines,
+  ellipsizeMode,
 }: {
   children: ReactNode;
   variant?: TextVariant;
   color?: string;
   style?: StyleProp<TextStyle>;
   numberOfLines?: number;
+  ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
 }) {
   const c = useTheme();
   return (
     <Text
       numberOfLines={numberOfLines}
+      ellipsizeMode={ellipsizeMode}
       maxFontSizeMultiplier={variant === 'big' ? 1.3 : undefined}
       style={[textStyles[variant], { color: color ?? (MUTED.includes(variant) ? c.text2 : c.text) }, style]}>
       {children}
@@ -211,8 +217,10 @@ export function Button({
   disabled,
   style,
   icon,
+  accessibilityLabel,
 }: {
   title: string;
+  accessibilityLabel?: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   size?: ButtonSize;
@@ -234,7 +242,7 @@ export function Button({
   return (
     <PressableScale
       accessibilityRole="button"
-      accessibilityLabel={title}
+      accessibilityLabel={accessibilityLabel ?? title}
       accessibilityState={{ disabled: !!isDisabled, busy: !!loading }}
       onPress={onPress}
       disabled={isDisabled}
@@ -373,10 +381,12 @@ export function Segmented<V extends string>({
   options,
   value,
   onChange,
+  height = 40,
 }: {
   options: { label: string; value: V }[];
   value: V;
   onChange: (v: V) => void;
+  height?: number;
 }) {
   const c = useTheme();
   const reduceMotion = useReducedMotion();
@@ -406,7 +416,7 @@ export function Segmented<V extends string>({
     <View
       accessibilityRole="radiogroup"
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
-      style={{ flexDirection: 'row', height: 40, backgroundColor: c.raised, borderRadius: 12, padding: PAD, gap: PAD }}>
+      style={{ flexDirection: 'row', height, backgroundColor: c.raised, borderRadius: height > 44 ? Radius.md : 12, padding: PAD, gap: PAD }}>
       {thumbW > 0 && options.some((o) => o.value === value) ? (
         <Animated.View
           pointerEvents="none"
@@ -417,7 +427,7 @@ export function Segmented<V extends string>({
               bottom: PAD,
               left: PAD,
               width: thumbW,
-              borderRadius: 9,
+              borderRadius: height > 44 ? 10 : 9,
               backgroundColor: c.thumb,
               boxShadow: c.e1 === 'none' ? undefined : '0px 1px 3px rgba(17,19,14,0.15)',
             },

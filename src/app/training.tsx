@@ -1,9 +1,12 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, Switch, TextInput, View } from 'react-native';
 
-import { Button, Card, Chip, ErrorText, Field, fmt, Loading, Row, Screen, Segmented, Stepper, T } from '@/components/ui';
-import { Spacing } from '@/constants/theme';
+import { FOOTER_SPACE, Overline, SheetFooter } from '@/components/sheet';
+import { StatusPill } from '@/components/tiles';
+import { Button, Card, Chip, ErrorText, Field, fmt, IconButton, Loading, Num, Row, Screen, Segmented, T } from '@/components/ui';
+import { Radius, Spacing } from '@/constants/theme';
+import { useCountUp } from '@/hooks/use-count-up';
 import { useTheme } from '@/hooks/use-theme';
 import { deleteSession, getProfile, getSession, listWhoopWorkouts, saveSession, type Profile } from '@/lib/api';
 import { addDays, formatDay, isValidISODate, today } from '@/lib/dates';
@@ -33,6 +36,8 @@ export default function TrainingEditor() {
   const [actualKcal, setActualKcal] = useState('');
   const [actualDuration, setActualDuration] = useState('');
   const [notes, setNotes] = useState('');
+  const [showOverride, setShowOverride] = useState(false);
+  const [durationFocused, setDurationFocused] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,6 +59,7 @@ export default function TrainingEditor() {
           setDuration(String(s.duration_min));
           setIntensity(s.intensity);
           setOverride(s.kcal_override != null ? String(s.kcal_override) : '');
+          setShowOverride(s.kcal_override != null);
           setActualKcal(s.actual_kcal != null ? String(s.actual_kcal) : '');
           setActualDuration(s.actual_duration_min != null ? String(s.actual_duration_min) : '');
           setWhoopActivity(s.whoop_activity);
@@ -103,15 +109,36 @@ export default function TrainingEditor() {
         )
       : null;
 
+  // What the estimate would be without your own figure, for the override note.
+  const overrideBase =
+    profile && !invalid && kcalOverride != null
+      ? sessionKcalDetail(
+          profile,
+          {
+            id: id ?? 'new',
+            date,
+            activity,
+            duration_min: durationMin,
+            intensity,
+            kcal_override: null,
+            actual_kcal: null,
+            actual_duration_min: null,
+            whoop_activity: whoopActivity,
+            notes: null,
+          },
+          ratesForModel(whoopRates, whoopNamed),
+        )?.net
+      : null;
+
   const sourceText = !detail
     ? null
     : detail.source === 'actual'
       ? 'Confirmed from WHOOP'
       : detail.source === 'manual'
-        ? 'Your estimate'
+        ? 'Your own number'
         : detail.source === 'history'
           ? `Estimated from your ${detail.samples} WHOOP “${rate?.label ?? ''}” session${detail.samples === 1 ? '' : 's'}`
-          : 'Generic estimate. Import WHOOP history for your own rates';
+          : 'Typical estimate for this activity. Import WHOOP history for your own rates';
 
   async function save() {
     if (invalid) return;
@@ -164,28 +191,52 @@ export default function TrainingEditor() {
       ? [...whoopNamed, { label: whoopActivity, activity, kcalPerMin: 0, samples: 0, typicalMin: durationMin }]
       : whoopNamed;
 
+  const estimateOnly =
+    profile && !invalid && canConfirm && actual != null
+      ? sessionKcalDetail(
+          profile,
+          {
+            id: id ?? 'new',
+            date,
+            activity,
+            duration_min: durationMin,
+            intensity,
+            kcal_override: kcalOverride,
+            actual_kcal: null,
+            actual_duration_min: null,
+            whoop_activity: whoopActivity,
+            notes: null,
+          },
+          ratesForModel(whoopRates, whoopNamed),
+        )
+      : null;
+  const confirmed = detail?.source === 'actual';
+  const shownAdded = useCountUp(detail?.added ?? 0, 400);
+  const dayLabel = date === today() ? 'today’s' : `${formatDay(date)}’s`;
+
   if (!loaded) {
     return <Screen padTop={false}>{error ? <ErrorText message={error} /> : <Loading />}</Screen>;
   }
 
   return (
-    <Screen padTop={false}>
-      <Stack.Screen options={{ title: id ? 'Edit session' : 'Add session' }} />
-      <Card>
-        <Stepper label={formatDay(date)} onPrev={() => setDate(addDays(date, -1))} onNext={() => setDate(addDays(date, 1))} />
-      </Card>
+    <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <Screen padTop={false} padBottom={FOOTER_SPACE + Spacing.lg}>
+        <Stack.Screen options={{ title: id ? 'Edit session' : 'Add session' }} />
+        <Row style={{ height: 44, borderRadius: 22, backgroundColor: c.raised, justifyContent: 'space-between' }}>
+          <IconButton glyph="‹" label="Previous day" background="transparent" onPress={() => setDate(addDays(date, -1))} />
+          <T variant="headline">{date === today() ? `Today · ${formatDay(date)}` : formatDay(date)}</T>
+          <IconButton glyph="›" label="Next day" background="transparent" onPress={() => setDate(addDays(date, 1))} />
+        </Row>
 
-      <Card style={{ gap: Spacing.md }}>
         {whoopChoices.length > 0 ? (
           <>
-            <T variant="heading">Your WHOOP activities</T>
+            <Overline>Your WHOOP activities</Overline>
             <Row style={{ flexWrap: 'wrap' }}>
               {whoopChoices.map((r) => (
                 <Chip
                   key={r.label}
                   label={r.label}
                   active={whoopActivity?.toLowerCase() === r.label.toLowerCase()}
-                  color={c.training}
                   onPress={() => {
                     setWhoopActivity(r.label);
                     setActivity(r.activity);
@@ -196,17 +247,15 @@ export default function TrainingEditor() {
               ))}
             </Row>
             {named ? (
-              <T variant="small">
-                Usually {named.typicalMin} min · about {fmt(named.kcalPerMin * named.typicalMin)} kcal on WHOOP ·{' '}
+              <T variant="footnote" style={{ fontVariant: ['tabular-nums'], paddingHorizontal: 4 }}>
+                Usually {named.typicalMin} min · about {fmt(named.kcalPerMin * named.typicalMin)} kcal ·{' '}
                 {named.samples} session{named.samples === 1 ? '' : 's'}
               </T>
             ) : null}
-            <T variant="heading" style={{ marginTop: Spacing.sm }}>
-              Other activities
-            </T>
+            <Overline>Other activities</Overline>
           </>
         ) : (
-          <T variant="heading">Activity</T>
+          <Overline>Activity</Overline>
         )}
         <Row style={{ flexWrap: 'wrap' }}>
           {ACTIVITIES.map((a) => (
@@ -214,7 +263,6 @@ export default function TrainingEditor() {
               key={a}
               label={ACTIVITY_LABELS[a]}
               active={!whoopActivity && activity === a}
-              color={c.training}
               onPress={() => {
                 setWhoopActivity(null);
                 setActivity(a);
@@ -224,78 +272,147 @@ export default function TrainingEditor() {
             />
           ))}
         </Row>
-        <Field label="Duration (minutes)" value={duration} onChangeText={setDuration} keyboardType="number-pad" />
-        <View style={{ gap: Spacing.xs }}>
-          <T variant="small">Intensity</T>
-          <Segmented
-            value={intensity}
-            onChange={setIntensity}
-            options={[
-              { label: 'Easy', value: 'easy' },
-              { label: 'Moderate', value: 'moderate' },
-              { label: 'Hard', value: 'hard' },
-            ]}
-          />
-        </View>
-        <Field label="Notes (optional)" value={notes} onChangeText={setNotes} placeholder="e.g. doubles, 2 sets" />
-      </Card>
 
-      {canConfirm ? (
-        <Card style={{ gap: Spacing.md }}>
-          <T variant="heading">How did it go?</T>
-          <T variant="small">
-            After the session, enter what WHOOP recorded. The day’s target and the rest of the week re-balance on the
-            real number. Re-importing your WHOOP export fills this in automatically.
-          </T>
-          <Row gap={Spacing.md}>
-            <Field
-              style={{ flex: 1 }}
-              label="WHOOP calories"
-              placeholder="e.g. 820"
-              value={actualKcal}
-              onChangeText={setActualKcal}
-              keyboardType="number-pad"
+        <Row gap={Spacing.sm} style={{ alignItems: 'flex-end' }}>
+          <View style={{ width: 120, gap: 6 }}>
+            <T variant="footnote">Duration</T>
+            <Row
+              gap={4}
+              style={{ height: 52, borderRadius: Radius.md, backgroundColor: c.raised, paddingHorizontal: 14, borderWidth: 2, borderColor: durationFocused ? c.accentLine : 'transparent' }}>
+              <TextInput
+                value={duration}
+                onChangeText={setDuration}
+                keyboardType="number-pad"
+                selectTextOnFocus
+                accessibilityLabel="Duration in minutes"
+                onFocus={() => setDurationFocused(true)}
+                onBlur={() => setDurationFocused(false)}
+                selectionColor={c.accentLine}
+                maxFontSizeMultiplier={1.3}
+                style={{ flex: 1, fontFamily: 'Archivo_800ExtraBold', fontSize: 20, color: c.text, padding: 0 }}
+              />
+              <T variant="footnote">min</T>
+            </Row>
+          </View>
+          <View style={{ flex: 1, gap: 6 }}>
+            <T variant="footnote">Intensity</T>
+            <Segmented
+              height={52}
+              value={intensity}
+              onChange={setIntensity}
+              options={[
+                { label: 'Easy', value: 'easy' },
+                { label: 'Moderate', value: 'moderate' },
+                { label: 'Hard', value: 'hard' },
+              ]}
             />
-            <Field
-              style={{ flex: 1 }}
-              label="Actual minutes"
-              placeholder={duration}
-              value={actualDuration}
-              onChangeText={setActualDuration}
-              keyboardType="number-pad"
-            />
-          </Row>
-        </Card>
-      ) : null}
+          </View>
+        </Row>
+        <Field label="Notes · optional" value={notes} onChangeText={setNotes} placeholder="e.g. doubles, 2 sets" />
 
-      {detail ? (
-        <Card>
-          <T variant="small">Adds to {formatDay(date)}’s target</T>
-          <T variant="big" color={c.training}>
-            +{fmt(detail.added)} kcal
-          </T>
-          <T variant="small">{sourceText}</T>
-          <T variant="small">
-            WHOOP calories include your resting burn for that time, which your base target already covers, so that part
-            is taken off.
-            {profile && profile.training_eat_back_pct !== 100 ? ` Includes your ${profile.training_eat_back_pct}% eat-back setting.` : ''}
-          </T>
-        </Card>
-      ) : null}
+        {detail ? (
+          <View
+            accessible
+            accessibilityLabel={`Adds ${confirmed ? '' : 'about '}${fmt(detail.net)} kcal to ${dayLabel} target, ${fmt(detail.added)} counted. ${sourceText}`}
+            style={{ backgroundColor: c.trainingBg, borderRadius: 20, paddingVertical: 14, paddingHorizontal: Spacing.lg, gap: 4 }}>
+            <Row gap={Spacing.sm} style={{ alignItems: 'baseline' }}>
+              <Num size="l" color={c.training}>
+                {confirmed ? '' : '≈ '}+{fmt(shownAdded)}
+              </Num>
+              <T style={{ fontWeight: '600', flex: 1 }}>kcal adds to {dayLabel} target</T>
+            </Row>
+            {profile && profile.training_eat_back_pct !== 100 ? (
+              <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
+                {fmt(detail.net)} burned beyond resting · {profile.training_eat_back_pct}% eaten back
+              </T>
+            ) : (
+              <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
+                {fmt(detail.net)} burned beyond resting
+              </T>
+            )}
+            {confirmed ? (
+              <View style={{ marginTop: 4 }}>
+                <StatusPill label="✓ Confirmed from WHOOP" tone="good" />
+              </View>
+            ) : (
+              <T variant="caption" style={{ fontWeight: '400' }}>
+                {sourceText}
+              </T>
+            )}
+          </View>
+        ) : null}
 
-      {detail?.source !== 'actual' ? (
-        <Field
-          label="Override the estimate (optional)"
-          placeholder="Total calories you expect, as WHOOP would show them"
-          value={override}
-          onChangeText={setOverride}
-          keyboardType="number-pad"
+        {canConfirm ? (
+          <Card hero style={{ gap: Spacing.md, borderRadius: 22 }}>
+            <T variant="headline">How did it go?</T>
+            <T variant="footnote">
+              Enter what WHOOP recorded; the day and the rest of the week re-balance on the real number. Re-importing your WHOOP
+              export fills this in for you.
+            </T>
+            <Row gap={Spacing.md} style={{ alignItems: 'flex-start' }}>
+              <Field style={{ flex: 1 }} label="WHOOP calories" placeholder="e.g. 820" value={actualKcal} onChangeText={setActualKcal} keyboardType="number-pad" />
+              <Field style={{ flex: 1 }} label="Actual minutes" placeholder={duration} value={actualDuration} onChangeText={setActualDuration} keyboardType="number-pad" />
+            </Row>
+            {confirmed && estimateOnly && detail ? (
+              <T variant="footnote" color={c.text}>
+                {detail.added === estimateOnly.added
+                  ? 'Exactly what was estimated.'
+                  : `${fmt(Math.abs(detail.added - estimateOnly.added))} ${detail.added > estimateOnly.added ? 'more' : 'less'} than the estimate of +${fmt(estimateOnly.added)}.`}
+              </T>
+            ) : null}
+          </Card>
+        ) : null}
+
+        {!confirmed ? (
+          <Card style={{ gap: Spacing.sm }}>
+            <Row style={{ minHeight: 44, justifyContent: 'space-between' }}>
+              <T style={{ fontWeight: '600', flex: 1 }}>Use my own burn figure</T>
+              <Switch
+                value={showOverride}
+                onValueChange={(v) => {
+                  setShowOverride(v);
+                  if (!v) setOverride('');
+                }}
+                trackColor={{ true: c.switchOn, false: c.track }}
+                thumbColor="#FFFFFF"
+                accessibilityLabel="Use my own burn figure"
+              />
+            </Row>
+            {showOverride ? (
+              <>
+                <Field
+                  label="Total calories, as WHOOP would show them"
+                  placeholder="e.g. 700"
+                  value={override}
+                  onChangeText={setOverride}
+                  keyboardType="number-pad"
+                  autoFocus={!override}
+                />
+                {overrideBase ? (
+                  <T variant="footnote" color={c.warn}>
+                    Overrides the estimate of {fmt(overrideBase)} kcal.
+                  </T>
+                ) : null}
+              </>
+            ) : null}
+          </Card>
+        ) : null}
+
+        <ErrorText message={invalid ?? error} />
+        {id ? (
+          <Button title="Delete session" variant="ghost" onPress={remove} style={{ alignSelf: 'center' }} />
+        ) : null}
+      </Screen>
+      <SheetFooter>
+        <Button
+          title={`${id ? 'Save changes' : 'Add session'}${detail ? ` · +${fmt(detail.added)} kcal` : ''}`}
+          accessibilityLabel={id ? 'Save changes' : 'Add session'}
+          size="L"
+          onPress={save}
+          loading={busy}
+          disabled={!!invalid}
         />
-      ) : null}
-
-      <ErrorText message={invalid ?? error} />
-      <Button title={id ? 'Save changes' : 'Add session'} onPress={save} loading={busy} disabled={!!invalid} />
-      {id ? <Button title="Delete session" variant="ghost" onPress={remove} /> : null}
-    </Screen>
+      </SheetFooter>
+    </View>
   );
 }
