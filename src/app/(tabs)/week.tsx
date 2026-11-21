@@ -149,13 +149,12 @@ export default function WeekScreen() {
                   {r.sessions.map((s) => (
                     <Chip
                       key={s.id}
-                      active
-                      color={c.training}
+                      kind="session"
                       label={`${s.actual_kcal != null ? '✓ ' : ''}${sessionLabel(s)} ${s.actual_duration_min ?? s.duration_min}′`}
                       onPress={() => router.push({ pathname: '/training', params: { id: s.id, date: r.date } })}
                     />
                   ))}
-                  <Chip label="+ Session" onPress={() => router.push({ pathname: '/training', params: { date: r.date } })} />
+                  <Chip kind="add" label="+ Session" onPress={() => router.push({ pathname: '/training', params: { date: r.date } })} />
                 </Row>
               </View>
             </View>

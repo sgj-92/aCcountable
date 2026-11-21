@@ -44,6 +44,10 @@ const base = {
     floatBg: 'rgba(33,36,31,0.96)',
     floatBorder: 'rgba(255,255,255,0.08)',
     shadow: 'transparent',
+    thumb: '#3A3D36',
+    // Dark mode steps surfaces up in lightness instead of using shadows.
+    e1: 'none',
+    e2: '0px 8px 24px rgba(0,0,0,0.35)',
   },
   light: {
     bg: '#F3F4EE',
@@ -81,6 +85,9 @@ const base = {
     floatBg: 'rgba(255,255,255,0.97)',
     floatBorder: 'rgba(17,19,14,0.08)',
     shadow: '#11130E',
+    thumb: '#FFFFFF',
+    e1: '0px 1px 3px rgba(17,19,14,0.07)',
+    e2: '0px 8px 24px rgba(17,19,14,0.14)',
   },
 } as const;
 
