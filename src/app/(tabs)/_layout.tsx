@@ -1,12 +1,16 @@
 import { NativeTabs } from 'expo-router/native-tabs';
 
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme, useThemeMode } from '@/hooks/use-theme';
 
 export default function TabsLayout() {
   const c = useTheme();
+  const { scheme } = useThemeMode();
   return (
     <NativeTabs
       backgroundColor={c.surface}
+      // Before iOS 26 the bar went fully transparent over content; keep its background.
+      disableTransparentOnScrollEdge
+      blurEffect={scheme === 'dark' ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
       tintColor={c.accentText}
       iconColor={{ default: c.text2, selected: c.accentText }}
       labelStyle={{ default: { color: c.text2 }, selected: { color: c.accentText } }}>
