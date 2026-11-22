@@ -304,7 +304,7 @@ export default function ScanScreen() {
         {!photo ? (
           <>
             <Card hero style={{ alignItems: 'center', paddingTop: Spacing.xxxl, paddingHorizontal: Spacing.xxl, paddingBottom: 28, gap: Spacing.md }}>
-              <View style={{ width: 72, height: 72, borderRadius: 24, backgroundColor: c.goodBg, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 72, height: 72, borderRadius: 24, backgroundColor: c.accentBg, alignItems: 'center', justifyContent: 'center' }}>
                 <Icon name="camera" size={34} color={c.accentText} strokeWidth={1.8} />
               </View>
               <T variant="title" style={{ textAlign: 'center' }}>
@@ -508,7 +508,7 @@ function PhotoView({ uri, analysing }: { uri: string; analysing: boolean }) {
       <Image source={{ uri }} style={{ width: '100%', height: '100%', opacity: analysing ? 0.45 : 1 }} contentFit="cover" />
       {analysing && !reduceMotion ? (
         <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: 0, right: 0, top: 0, height: 46 }, band]}>
-          <View style={{ height: 44, backgroundColor: c.goodBg }} />
+          <View style={{ height: 44, backgroundColor: c.accentBg }} />
           <View style={{ height: 2, backgroundColor: c.accentLine }} />
         </Animated.View>
       ) : null}
@@ -560,7 +560,7 @@ function Bubble({ text, mine }: { text: string; mine?: boolean }) {
         maxWidth: 280,
         paddingHorizontal: 14,
         paddingVertical: 9,
-        backgroundColor: mine ? c.raised : c.goodBg,
+        backgroundColor: mine ? c.raised : c.accentBg,
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
         borderBottomLeftRadius: mine ? 18 : 6,

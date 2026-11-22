@@ -236,7 +236,7 @@ export function WeekStrip({
           maxFontSizeMultiplier={1.3}
           style={{ flex: 1, fontSize: 13, lineHeight: 18, fontVariant: ['tabular-nums'] }}
           numberOfLines={2}>
-          <Text style={{ fontWeight: '600', color: summary.tone === 'good' ? c.accentText : dot }}>{summary.head}</Text>
+          <Text style={{ fontWeight: '600', color: dot }}>{summary.head}</Text>
           <Text style={{ color: c.text2 }}> {summary.tail}</Text>
         </Text>
         {interactive ? <Icon name="chevron-right" size={16} color={c.text3} strokeWidth={2.2} /> : null}

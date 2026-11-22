@@ -52,7 +52,7 @@ export type PillTone = 'good' | 'info' | 'plain' | 'training';
 export function StatusPill({ label, tone }: { label: string; tone: PillTone }) {
   const c = useTheme();
   const bg = { good: c.goodBg, info: c.infoBg, plain: c.raised, training: c.trainingBg }[tone];
-  const fg = { good: c.accentText, info: c.info, plain: c.text2, training: c.training }[tone];
+  const fg = { good: c.good, info: c.info, plain: c.text2, training: c.training }[tone];
   return (
     <View style={{ alignSelf: 'flex-start', height: 28, paddingHorizontal: 10, borderRadius: 14, backgroundColor: bg, justifyContent: 'center' }}>
       <Text maxFontSizeMultiplier={1.3} style={{ fontSize: 12, fontWeight: '600', color: fg }} numberOfLines={1}>

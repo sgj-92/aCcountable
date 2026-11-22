@@ -49,7 +49,7 @@ export function TabHeader({
               accessibilityLabel={back.label}
               onPress={back.onPress}
               hitSlop={6}
-              style={{ height: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: c.goodBg, justifyContent: 'center' }}>
+              style={{ height: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: c.accentBg, justifyContent: 'center' }}>
               <T color={c.accentText} style={{ fontSize: 13, fontWeight: '700' }}>
                 ↩ {back.label.replace(/^Back to /, '').replace(/^./, (s) => s.toUpperCase())}
               </T>
