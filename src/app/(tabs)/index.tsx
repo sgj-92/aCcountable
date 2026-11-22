@@ -94,6 +94,7 @@ export default function TodayScreen() {
       }
       onLogSession={() => router.push({ pathname: '/training', params: { date } })}
       onWeighIn={() => router.push('/weigh-in')}
+      onLogDay={() => router.push({ pathname: '/log-day', params: { date } })}
     />
   );
 

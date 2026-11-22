@@ -378,6 +378,12 @@ export default function FoodEditor() {
         <>
           <FoodSearch onSelect={chooseResult} onQuickAdd={quickAddAi} />
           <Button title="Enter manually" variant="ghost" onPress={() => setMode('manual')} />
+          <Button
+            title="Log several foods at once with AI"
+            variant="ghost"
+            onPress={() => router.replace({ pathname: '/log-day', params: { date } })}
+            style={{ marginTop: -Spacing.sm }}
+          />
           {recent.length > 0 ? (
             <View style={{ gap: Spacing.sm }}>
               <Overline>Recent</Overline>

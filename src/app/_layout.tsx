@@ -38,6 +38,7 @@ function RootNavigator() {
         <Stack.Screen name="plan-item" options={{ ...sheet, title: 'Planned food' }} />
         <Stack.Screen name="weigh-in" options={{ ...sheet, title: 'Weight' }} />
         <Stack.Screen name="whoop-import" options={{ ...sheet, title: 'WHOOP history' }} />
+        <Stack.Screen name="log-day" options={{ ...sheet, title: 'Log your day' }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="sign-in" options={{ headerShown: false }} />

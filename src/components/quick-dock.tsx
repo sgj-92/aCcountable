@@ -24,7 +24,10 @@ export function QuickDock({
   onAddFood,
   onLogSession,
   onWeighIn,
+  onLogDay,
 }: {
+  /** Describe the day so far and log it all at once with AI. */
+  onLogDay?: () => void;
   hidden?: boolean;
   onScan: () => void;
   onAddFood: () => void;
@@ -109,9 +112,10 @@ export function QuickDock({
         </PressableScale>
         <PressableScale
           accessibilityRole="button"
-          accessibilityLabel="More: log a session or weight"
+          accessibilityLabel="More: log your day, a session or weight"
           onPress={() =>
             showMenu([
+              ...(onLogDay ? [{ label: 'Log your day with AI', onPress: onLogDay }] : []),
               { label: 'Log session', onPress: onLogSession },
               { label: 'Weigh in', onPress: onWeighIn },
             ])

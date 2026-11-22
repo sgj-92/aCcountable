@@ -78,8 +78,19 @@ interface AiItem {
  * values, a typical serving and unit weights, and honours amounts given in the text.
  */
 export async function estimateFoods(description: string): Promise<FoodResult[]> {
-  const { data, error } = await supabase.functions.invoke<{ items: AiItem[]; notes: string }>('plan-day', {
-    body: { text: description },
+  return (await estimateMeals(description)).map((i) => i.food);
+}
+
+/**
+ * A whole day (or several meals) described in words, split into foods under the
+ * person's own meal names. Returns each food with the meal key it belongs to.
+ */
+export async function estimateMeals(
+  description: string,
+  meals?: { key: string; label: string }[],
+): Promise<{ meal: string; food: FoodResult }[]> {
+  const { data, error } = await supabase.functions.invoke<{ items: (AiItem & { meal: string })[]; notes: string }>('plan-day', {
+    body: { text: description, ...(meals ? { meals } : {}) },
   });
   if (error) {
     let message: string | undefined;
@@ -107,7 +118,7 @@ export async function estimateFoods(description: string): Promise<FoodResult[]> 
           : 'Typical serving';
       if (!unit || Math.abs(i.typical_g - unit.grams) > 0.5) servings.unshift({ label, grams: round1(i.typical_g) });
     }
-    return {
+    const food: FoodResult = {
       id: `ai:${n}:${i.name}`,
       source: 'ai' as const,
       ref: '',
@@ -119,6 +130,7 @@ export async function estimateFoods(description: string): Promise<FoodResult[]> 
       incomplete: false,
       unit,
     };
+    return { meal: i.meal, food };
   });
 }
 export const lookupBarcode = (barcode: string) => invoke({ barcode });
