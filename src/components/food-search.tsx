@@ -14,7 +14,14 @@ import { estimateFoods, lookupBarcode, searchFoods, type FoodResult, type FoodSe
  * Search USDA (whole foods) + Open Food Facts (branded foods) by name, or scan
  * a barcode. Calls `onSelect` with the chosen food.
  */
-export function FoodSearch({ onSelect }: { onSelect: (food: FoodResult) => void }) {
+export function FoodSearch({
+  onSelect,
+  onQuickAdd,
+}: {
+  onSelect: (food: FoodResult) => void;
+  /** Log an AI estimate straight away at the described amount. */
+  onQuickAdd?: (food: FoodResult) => void;
+}) {
   const c = useTheme();
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
@@ -156,7 +163,7 @@ export function FoodSearch({ onSelect }: { onSelect: (food: FoodResult) => void 
         </T>
       ) : null}
       {aiResults && aiResults.length > 0 ? (
-        <ResultSection title="AI estimate" badge="AI" items={aiResults} onSelect={onSelect} />
+        <ResultSection title="AI estimate" badge="AI" items={aiResults} onSelect={onSelect} onAdd={onQuickAdd} />
       ) : null}
 
       {scanning ? (
@@ -208,11 +215,13 @@ function ResultSection({
   badge,
   items,
   onSelect,
+  onAdd,
 }: {
   title: string;
   badge: string;
   items: FoodResult[];
   onSelect: (f: FoodResult) => void;
+  onAdd?: (f: FoodResult) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   if (items.length === 0) return null;
@@ -222,7 +231,7 @@ function ResultSection({
       <Overline badge={badge}>{title}</Overline>
       <Card style={{ gap: 0, paddingVertical: 4, paddingRight: Spacing.sm }}>
         {shown.map((f, i) => (
-          <ResultRow key={f.id} food={f} first={i === 0} onPress={() => onSelect(f)} />
+          <ResultRow key={f.id} food={f} first={i === 0} onPress={() => onSelect(f)} onAdd={onAdd ? () => onAdd(f) : undefined} />
         ))}
         {items.length > shown.length ? (
           <Button
@@ -238,7 +247,17 @@ function ResultSection({
   );
 }
 
-function ResultRow({ food, first, onPress }: { food: FoodResult; first: boolean; onPress: () => void }) {
+function ResultRow({
+  food,
+  first,
+  onPress,
+  onAdd,
+}: {
+  food: FoodResult;
+  first: boolean;
+  onPress: () => void;
+  onAdd?: () => void;
+}) {
   const c = useTheme();
   const p = food.per100g;
   return (
@@ -268,7 +287,7 @@ function ResultRow({ food, first, onPress }: { food: FoodResult; first: boolean;
         </T>
         {food.source === 'ai' && food.servings[0] ? (
           <T variant="footnote" color={c.text} style={{ fontVariant: ['tabular-nums'] }}>
-            {food.servings[0].label} · {fmt(food.servings[0].grams)} g ≈ {fmt((p.kcal * food.servings[0].grams) / 100)} kcal
+            {food.servings[0].label} · about {fmt(food.servings[0].grams)} g
           </T>
         ) : null}
         {food.incomplete ? (
@@ -278,8 +297,35 @@ function ResultRow({ food, first, onPress }: { food: FoodResult; first: boolean;
           </Row>
         ) : null}
       </View>
-      <Num size="s">{fmt(p.kcal)}</Num>
-      <Icon name="chevron-right" size={16} color={c.text3} strokeWidth={2.2} />
+      {food.source === 'ai' && food.servings[0] ? (
+        <View style={{ alignItems: 'flex-end' }}>
+          <Num size="s">≈ {fmt((p.kcal * food.servings[0].grams) / 100)}</Num>
+          <T variant="caption" style={{ fontWeight: '400' }}>
+            kcal
+          </T>
+        </View>
+      ) : (
+        <Num size="s">{fmt(p.kcal)}</Num>
+      )}
+      {onAdd ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Add ${food.servings[0]?.label ?? ''} ${food.name}`}
+          onPress={onAdd}
+          hitSlop={6}
+          style={({ pressed }) => ({
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            backgroundColor: pressed ? c.accentPressed : c.accent,
+            alignItems: 'center',
+            justifyContent: 'center',
+          })}>
+          <Icon name="plus" size={18} color={c.onAccent} strokeWidth={2.6} />
+        </Pressable>
+      ) : (
+        <Icon name="chevron-right" size={16} color={c.text3} strokeWidth={2.2} />
+      )}
     </Pressable>
   );
 }

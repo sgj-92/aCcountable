@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { per100gFromEntry, scale } from '../foods';
+import { countLabel, per100gFromEntry, scale } from '../foods';
 
 // Hoisted above the import by Jest; keeps the Supabase client out of the test.
 jest.mock('../supabase', () => ({ supabase: {} }));
@@ -31,5 +31,14 @@ describe('per100gFromEntry', () => {
 
   it('returns null without a weight', () => {
     expect(per100gFromEntry({ grams: null, kcal: 100, protein_g: 0, carbs_g: 0, fat_g: 0 })).toBeNull();
+  });
+});
+
+describe('countLabel', () => {
+  it('pluralises and keeps halves', () => {
+    expect(countLabel(1, 'muffin')).toBe('1 muffin');
+    expect(countLabel(2, 'muffin')).toBe('2 muffins');
+    expect(countLabel(1.5, 'slice')).toBe('1.5 slices');
+    expect(countLabel(2, 'glass')).toBe('2 glasses');
   });
 });

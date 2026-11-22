@@ -22,6 +22,15 @@ export interface FoodResult {
   per100g: Per100g;
   servings: { label: string; grams: number }[];
   incomplete: boolean;
+  /** Countable foods (AI estimates): the unit and its estimated weight, e.g. muffin · 90 g. */
+  unit?: { name: string; grams: number };
+}
+
+/** "1 muffin", "2 muffins", "1.5 slices". */
+export function countLabel(count: number, unit: string): string {
+  const n = Math.round(count * 10) / 10;
+  const plural = n === 1 ? unit : /(s|sh|ch|x)$/i.test(unit) ? `${unit}es` : `${unit}s`;
+  return `${n} ${plural}`;
 }
 
 export interface FoodSearchResponse {
@@ -86,9 +95,18 @@ export async function estimateFoods(description: string): Promise<FoodResult[]> 
   }
   return (data?.items ?? []).map((i, n) => {
     const fixedAmount = i.min_g === i.typical_g && i.typical_g === i.max_g;
+    const unit = i.unit_name && i.unit_g > 0 ? { name: i.unit_name, grams: round1(i.unit_g) } : undefined;
     const servings: FoodResult['servings'] = [];
-    if (i.unit_name && i.unit_g > 0) servings.push({ label: `1 ${i.unit_name}`, grams: round1(i.unit_g) });
-    if (i.typical_g > 0) servings.unshift({ label: fixedAmount ? 'As described' : 'Typical serving', grams: round1(i.typical_g) });
+    if (unit) servings.push({ label: `1 ${unit.name}`, grams: unit.grams });
+    if (i.typical_g > 0) {
+      // For countable foods describe the amount in pieces ("2 muffins"), not grams.
+      const label = unit
+        ? countLabel(i.typical_g / unit.grams, unit.name)
+        : fixedAmount
+          ? 'As described'
+          : 'Typical serving';
+      if (!unit || Math.abs(i.typical_g - unit.grams) > 0.5) servings.unshift({ label, grams: round1(i.typical_g) });
+    }
     return {
       id: `ai:${n}:${i.name}`,
       source: 'ai' as const,
@@ -99,6 +117,7 @@ export async function estimateFoods(description: string): Promise<FoodResult[]> 
       per100g: { kcal: i.kcal_100g, protein_g: i.protein_100g, carbs_g: i.carbs_100g, fat_g: i.fat_100g },
       servings,
       incomplete: false,
+      unit,
     };
   });
 }

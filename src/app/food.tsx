@@ -8,7 +8,7 @@ import { Icon } from '@/components/icon';
 import { MealPicker } from '@/components/meal-picker';
 import { PressableScale } from '@/components/pressable-scale';
 import { GramsField, Overline, ServingChips, SourceBadge } from '@/components/sheet';
-import { Button, Card, ErrorText, Field, fmt, Loading, Num, Row, Screen, T } from '@/components/ui';
+import { Button, Card, ErrorText, Field, fmt, IconButton, Loading, Num, Row, Screen, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
 import { useCountUp } from '@/hooks/use-count-up';
 import { useMealSlots } from '@/hooks/use-profile';
@@ -25,7 +25,7 @@ import {
   type NewFoodEntry,
 } from '@/lib/api';
 import { formatDay, isValidISODate, today } from '@/lib/dates';
-import { estimateFoods, per100gFromEntry, scale, type FoodResult, type Per100g } from '@/lib/foods';
+import { countLabel, estimateFoods, per100gFromEntry, scale, type FoodResult, type Per100g } from '@/lib/foods';
 import { SLOT_KEYS } from '@/lib/meals';
 import { kcalFromMacros } from '@/lib/nutrition';
 
@@ -44,6 +44,8 @@ interface Basis {
   incomplete: boolean;
   /** Estimated by the AI rather than taken from a database. */
   ai?: boolean;
+  /** Countable food: log by pieces, grams are an estimate. */
+  unit?: { name: string; grams: number };
 }
 
 type Mode = 'search' | 'weigh' | 'manual';
@@ -56,6 +58,7 @@ const basisFromResult = (f: FoodResult): Basis => ({
   source: f.source === 'ai' ? 'manual' : f.source,
   ref: f.source === 'ai' ? null : f.ref,
   ai: f.source === 'ai',
+  unit: f.unit,
   per100g: f.per100g,
   servings: f.servings,
   incomplete: f.incomplete,
@@ -211,7 +214,11 @@ export default function FoodEditor() {
         date,
         meal,
         name: fullName.slice(0, 200),
-        serving: `${fmt(g)} g`,
+        serving: basis.unit
+          ? `${countLabel(g / basis.unit.grams, basis.unit.name)} · about ${fmt(g)} g`
+          : basis.ai
+            ? `about ${fmt(g)} g`
+            : `${fmt(g)} g`,
         ...weighed,
         grams: Math.round(g * 10) / 10,
         source,
@@ -264,6 +271,31 @@ export default function FoodEditor() {
         },
       },
     ]);
+  }
+
+  /** Logs an AI estimate straight away at the amount described, no weighing needed. */
+  async function quickAddAi(f: FoodResult) {
+    setError(null);
+    const g = f.servings[0]?.grams ?? 100;
+    const v = scale(f.per100g, g);
+    const amount = f.unit ? countLabel(g / f.unit.grams, f.unit.name) : null;
+    try {
+      const newId = await addFoodEntry({
+        date,
+        meal,
+        name: f.name.slice(0, 200),
+        serving: amount ? `${amount} · about ${fmt(g)} g` : `about ${fmt(g)} g`,
+        ...v,
+        grams: Math.round(g * 10) / 10,
+        source: 'manual',
+        source_ref: null,
+        ai_confidence: null,
+      });
+      if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      setLogged({ id: newId, label: `${amount ?? f.name} · ${fmt(v.kcal)} kcal` });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
   }
 
   /** Fills the manual form from an AI estimate of the typed name (and serving, if given). */
@@ -344,7 +376,7 @@ export default function FoodEditor() {
 
       {mode === 'search' ? (
         <>
-          <FoodSearch onSelect={chooseResult} />
+          <FoodSearch onSelect={chooseResult} onQuickAdd={quickAddAi} />
           <Button title="Enter manually" variant="ghost" onPress={() => setMode('manual')} />
           {recent.length > 0 ? (
             <View style={{ gap: Spacing.sm }}>
@@ -413,7 +445,19 @@ export default function FoodEditor() {
               </Row>
             ) : null}
           </View>
-          <GramsField value={grams} onChangeText={setGrams} autoFocus={!id} />
+          {basis.unit ? (
+            <CountStepper
+              unit={basis.unit}
+              grams={Number.isFinite(g) ? g : 0}
+              onChange={(next) => setGrams(String(Math.round(next * 10) / 10))}
+            />
+          ) : null}
+          {basis.ai ? (
+            <T variant="footnote" style={{ paddingHorizontal: 4 }}>
+              {basis.unit ? 'Weight is estimated. ' : ''}Weighed it? Enter the grams; otherwise just add it.
+            </T>
+          ) : null}
+          <GramsField value={grams} onChangeText={setGrams} autoFocus={!id && !basis.ai} height={basis.ai ? 64 : 80} />
           <ServingChips
             grams={g}
             onPick={(v) => {
@@ -428,7 +472,13 @@ export default function FoodEditor() {
           {weighed ? <LiveMacros kcal={weighed.kcal} p={weighed.protein_g} c={weighed.carbs_g} f={weighed.fat_g} /> : null}
           <ErrorText message={gramsInvalid ?? error} />
           <Button
-            title={id ? 'Save changes' : `Add ${fmt(g)} g to ${mealLabel}`}
+            title={
+              id
+                ? 'Save changes'
+                : basis.unit && Number.isFinite(g)
+                  ? `Add ${countLabel(g / basis.unit.grams, basis.unit.name)} to ${mealLabel}`
+                  : `Add ${fmt(g)} g to ${mealLabel}`
+            }
             size="L"
             onPress={save}
             loading={busy}
@@ -541,5 +591,37 @@ function LiveMacros({ kcal, p, c: carbs, f }: { kcal: number; p: number; c: numb
         {dot(c.fat, 'F', f)}
       </View>
     </Card>
+  );
+}
+
+/** − 2 muffins + : pieces in half steps; grams follow the unit's estimated weight. */
+function CountStepper({
+  unit,
+  grams,
+  onChange,
+}: {
+  unit: { name: string; grams: number };
+  grams: number;
+  onChange: (grams: number) => void;
+}) {
+  const c = useTheme();
+  const count = Math.round((grams / unit.grams) * 2) / 2;
+  const step = (d: number) => {
+    const next = Math.max(0.5, count + d);
+    if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
+    onChange(next * unit.grams);
+  };
+  return (
+    <Row
+      style={{ height: 72, borderRadius: Radius.lg, backgroundColor: c.raised, paddingHorizontal: Spacing.sm, justifyContent: 'space-between' }}>
+      <IconButton glyph="−" label={`One less ${unit.name}`} onPress={() => step(-0.5)} disabled={count <= 0.5} background={c.surface} />
+      <View style={{ alignItems: 'center' }}>
+        <Num size="l">{countLabel(count, unit.name)}</Num>
+        <T variant="caption" style={{ fontWeight: '400' }}>
+          about {fmt(unit.grams)} g each
+        </T>
+      </View>
+      <IconButton glyph="+" label={`One more ${unit.name}`} onPress={() => step(0.5)} background={c.surface} />
+    </Row>
   );
 }
