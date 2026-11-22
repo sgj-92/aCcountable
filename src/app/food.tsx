@@ -25,7 +25,7 @@ import {
   type NewFoodEntry,
 } from '@/lib/api';
 import { formatDay, isValidISODate, today } from '@/lib/dates';
-import { per100gFromEntry, scale, type FoodResult, type Per100g } from '@/lib/foods';
+import { estimateFoods, per100gFromEntry, scale, type FoodResult, type Per100g } from '@/lib/foods';
 import { SLOT_KEYS } from '@/lib/meals';
 import { kcalFromMacros } from '@/lib/nutrition';
 
@@ -42,6 +42,8 @@ interface Basis {
   per100g: Per100g;
   servings: { label: string; grams: number }[];
   incomplete: boolean;
+  /** Estimated by the AI rather than taken from a database. */
+  ai?: boolean;
 }
 
 type Mode = 'search' | 'weigh' | 'manual';
@@ -49,9 +51,11 @@ type Mode = 'search' | 'weigh' | 'manual';
 const basisFromResult = (f: FoodResult): Basis => ({
   name: f.name,
   brand: f.brand,
-  detail: f.detail,
-  source: f.source,
-  ref: f.ref,
+  detail: f.source === 'ai' ? null : f.detail,
+  // AI estimates are saved as your own entry.
+  source: f.source === 'ai' ? 'manual' : f.source,
+  ref: f.source === 'ai' ? null : f.ref,
+  ai: f.source === 'ai',
   per100g: f.per100g,
   servings: f.servings,
   incomplete: f.incomplete,
@@ -102,6 +106,7 @@ export default function FoodEditor() {
   const [recent, setRecent] = useState<FoodEntry[]>([]);
   const [logged, setLogged] = useState<{ id: string; label: string } | null>(null);
   const [triedSave, setTriedSave] = useState(false);
+  const [aiFilling, setAiFilling] = useState(false);
   const slots = useMealSlots();
   const isToday = date === today();
   const [busy, setBusy] = useState(false);
@@ -145,8 +150,8 @@ export default function FoodEditor() {
   function chooseResult(f: FoodResult) {
     const b = basisFromResult(f);
     setBasis(b);
-    setSource(f.source);
-    setSourceRef(f.ref);
+    setSource(b.source);
+    setSourceRef(b.ref);
     setGrams(String(f.servings[0]?.grams ?? 100));
     setMode('weigh');
     setError(null);
@@ -261,6 +266,34 @@ export default function FoodEditor() {
     ]);
   }
 
+  /** Fills the manual form from an AI estimate of the typed name (and serving, if given). */
+  async function fillWithAi() {
+    const description = [name.trim(), serving.trim()].filter(Boolean).join(', ');
+    if (description.length < 2) return;
+    setAiFilling(true);
+    setError(null);
+    try {
+      const [first] = await estimateFoods(description);
+      if (!first) {
+        setError('The AI couldn’t estimate that. Try describing it differently.');
+        return;
+      }
+      const typed = parse(manualGrams);
+      const g = Number.isFinite(typed) && typed > 0 ? typed : (first.servings[0]?.grams ?? 100);
+      const v = scale(first.per100g, g);
+      setKcal(String(v.kcal));
+      setProtein(String(v.protein_g));
+      setCarbs(String(v.carbs_g));
+      setFat(String(v.fat_g));
+      if (!(typed > 0)) setManualGrams(String(g));
+      if (!serving.trim()) setServing(`${fmt(g)} g`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setAiFilling(false);
+    }
+  }
+
   async function quickLog(f: FoodEntry) {
     setError(null);
     try {
@@ -365,7 +398,7 @@ export default function FoodEditor() {
               {basis.name}
             </T>
             <Row gap={Spacing.sm} style={{ flexWrap: 'wrap' }}>
-              <SourceBadge label={SOURCE_LABEL[basis.source]} />
+              <SourceBadge label={basis.ai ? 'AI estimate' : SOURCE_LABEL[basis.source]} />
               <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
                 {[basis.brand, basis.detail].filter(Boolean).join(' · ')}
                 {basis.brand || basis.detail ? ' · ' : ''}per 100 g: {fmt(per.kcal)} kcal
@@ -411,6 +444,14 @@ export default function FoodEditor() {
             <T variant="footnote">Diary-only day: calories are optional. A name is enough to keep a record.</T>
           ) : null}
           <Field label="Food" value={name} onChangeText={setName} placeholder="e.g. Homemade chilli" />
+          <Button
+            title={aiFilling ? 'Asking AI…' : 'Estimate calories with AI'}
+            icon="✨"
+            variant="secondary"
+            onPress={fillWithAi}
+            loading={aiFilling}
+            disabled={name.trim().length < 2}
+          />
           <Row gap={Spacing.sm} style={{ alignItems: 'flex-start' }}>
             <Field style={{ flex: 2 }} label="Serving · optional" value={serving} onChangeText={setServing} placeholder="e.g. 1 bowl" />
             <Field style={{ flex: 1 }} label="Weight g" value={manualGrams} onChangeText={setManualGrams} keyboardType="decimal-pad" />

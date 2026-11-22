@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/skeleton';
 import { Button, Card, ErrorText, fmt, Num, Row, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { lookupBarcode, searchFoods, type FoodResult, type FoodSearchResponse } from '@/lib/foods';
+import { estimateFoods, lookupBarcode, searchFoods, type FoodResult, type FoodSearchResponse } from '@/lib/foods';
 
 /**
  * Search USDA (whole foods) + Open Food Facts (branded foods) by name, or scan
@@ -22,6 +22,26 @@ export function FoodSearch({ onSelect }: { onSelect: (food: FoodResult) => void 
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState<FoodSearchResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiResults, setAiResults] = useState<FoodResult[] | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  async function askAi() {
+    const q = query.trim();
+    if (q.length < 2) return;
+    setAiBusy(true);
+    setAiError(null);
+    try {
+      const r = await estimateFoods(q);
+      setAiResults(r);
+      if (r.length === 0) setAiError('The AI couldn’t find a food in that. Try describing it differently.');
+    } catch (e) {
+      setAiResults(null);
+      setAiError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setAiBusy(false);
+    }
+  }
 
   async function search() {
     const q = query.trim();
@@ -116,6 +136,29 @@ export function FoodSearch({ onSelect }: { onSelect: (food: FoodResult) => void 
         />
       </Row>
 
+      <Button
+        title={aiBusy ? 'Asking AI…' : 'Ask AI for the calories'}
+        icon="✨"
+        variant="secondary"
+        onPress={askAi}
+        loading={aiBusy}
+        disabled={query.trim().length < 2}
+        style={{ height: 52 }}
+      />
+      {query.trim().length < 2 && !aiResults ? (
+        <T variant="footnote" style={{ marginTop: -4, paddingHorizontal: 4 }}>
+          Type what you had, e.g. “latte with full fat milk” or “2 eggs and toast”, then search or ask AI.
+        </T>
+      ) : null}
+      {aiError ? (
+        <T variant="footnote" color={c.alert}>
+          {aiError}
+        </T>
+      ) : null}
+      {aiResults && aiResults.length > 0 ? (
+        <ResultSection title="AI estimate" badge="AI" items={aiResults} onSelect={onSelect} />
+      ) : null}
+
       {scanning ? (
         <BarcodeScanner onScanned={onBarcode} onClose={() => setScanning(false)} />
       ) : (
@@ -146,7 +189,7 @@ export function FoodSearch({ onSelect }: { onSelect: (food: FoodResult) => void 
         <>
           {results.errors.map((e) => (
             <T key={e} variant="footnote" color={c.warn}>
-              {e}
+              {e} {aiResults ? '' : 'You can still ask AI for the calories.'}
             </T>
           ))}
           <ResultSection title="Whole foods" badge="USDA" items={results.usda} onSelect={onSelect} />
@@ -223,6 +266,11 @@ function ResultRow({ food, first, onPress }: { food: FoodResult; first: boolean;
         <T variant="footnote" numberOfLines={1} style={{ fontVariant: ['tabular-nums'] }}>
           P {fmt(p.protein_g)} · C {fmt(p.carbs_g)} · F {fmt(p.fat_g)} per 100 g
         </T>
+        {food.source === 'ai' && food.servings[0] ? (
+          <T variant="footnote" color={c.text} style={{ fontVariant: ['tabular-nums'] }}>
+            {food.servings[0].label} · {fmt(food.servings[0].grams)} g ≈ {fmt((p.kcal * food.servings[0].grams) / 100)} kcal
+          </T>
+        ) : null}
         {food.incomplete ? (
           <Row gap={4}>
             <Icon name="warn" size={13} color={c.warn} strokeWidth={2.2} />
