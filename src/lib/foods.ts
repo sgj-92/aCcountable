@@ -24,6 +24,8 @@ export interface FoodResult {
   incomplete: boolean;
   /** Countable foods (AI estimates): the unit and its estimated weight, e.g. muffin · 90 g. */
   unit?: { name: string; grams: number };
+  /** Set when the food comes from the pantry (its pantry id). */
+  pantryId?: string;
 }
 
 /** "1 muffin", "2 muffins", "1.5 slices". */

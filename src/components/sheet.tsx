@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Keyboard, Platform, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
@@ -6,8 +7,9 @@ import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Icon } from '@/components/icon';
 import { PressableScale } from '@/components/pressable-scale';
-import { Chip, Num } from '@/components/ui';
+import { Chip, fmt, IconButton, Num, Row, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
+import { countLabel } from '@/lib/foods';
 import { useTheme } from '@/hooks/use-theme';
 
 /** Height of the keyboard while it is open (0 when closed). */
@@ -207,5 +209,37 @@ export function SheetClose() {
       })}>
       <Icon name="close" size={16} color={c.text2} strokeWidth={2.4} />
     </PressableScale>
+  );
+}
+
+/** − 2 muffins + : pieces in half steps; grams follow the unit's estimated weight. */
+export function CountStepper({
+  unit,
+  grams,
+  onChange,
+}: {
+  unit: { name: string; grams: number };
+  grams: number;
+  onChange: (grams: number) => void;
+}) {
+  const c = useTheme();
+  const count = Math.round((grams / unit.grams) * 2) / 2;
+  const step = (d: number) => {
+    const next = Math.max(0.5, count + d);
+    if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
+    onChange(next * unit.grams);
+  };
+  return (
+    <Row
+      style={{ height: 72, borderRadius: Radius.lg, backgroundColor: c.raised, paddingHorizontal: Spacing.sm, justifyContent: 'space-between' }}>
+      <IconButton glyph="−" label={`One less ${unit.name}`} onPress={() => step(-0.5)} disabled={count <= 0.5} background={c.surface} />
+      <View style={{ alignItems: 'center' }}>
+        <Num size="l">{countLabel(count, unit.name)}</Num>
+        <T variant="caption" style={{ fontWeight: '400' }}>
+          about {fmt(unit.grams)} g each
+        </T>
+      </View>
+      <IconButton glyph="+" label={`One more ${unit.name}`} onPress={() => step(0.5)} background={c.surface} />
+    </Row>
   );
 }

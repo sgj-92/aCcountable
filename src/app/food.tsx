@@ -7,8 +7,8 @@ import { FoodSearch } from '@/components/food-search';
 import { Icon } from '@/components/icon';
 import { MealPicker } from '@/components/meal-picker';
 import { PressableScale } from '@/components/pressable-scale';
-import { GramsField, Overline, ServingChips, SourceBadge } from '@/components/sheet';
-import { Button, Card, ErrorText, Field, fmt, IconButton, Loading, Num, Row, Screen, T } from '@/components/ui';
+import { CountStepper, GramsField, Overline, ServingChips, SourceBadge } from '@/components/sheet';
+import { Button, Card, ErrorText, Field, fmt, Loading, Num, Row, Screen, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
 import { useCountUp } from '@/hooks/use-count-up';
 import { useMealSlots } from '@/hooks/use-profile';
@@ -27,6 +27,7 @@ import {
 import { formatDay, isValidISODate, today } from '@/lib/dates';
 import { countLabel, estimateFoods, per100gFromEntry, scale, type FoodResult, type Per100g } from '@/lib/foods';
 import { SLOT_KEYS } from '@/lib/meals';
+import { listPantry, pantryFromFood, savePantryItems, type PantryItem } from '@/lib/pantry';
 import { kcalFromMacros } from '@/lib/nutrition';
 
 const isMeal = (m: unknown): m is Meal => typeof m === 'string' && (SLOT_KEYS as readonly string[]).includes(m);
@@ -46,6 +47,8 @@ interface Basis {
   ai?: boolean;
   /** Countable food: log by pieces, grams are an estimate. */
   unit?: { name: string; grams: number };
+  /** Came from the pantry. */
+  pantry?: boolean;
 }
 
 type Mode = 'search' | 'weigh' | 'manual';
@@ -57,7 +60,8 @@ const basisFromResult = (f: FoodResult): Basis => ({
   // AI estimates are saved as your own entry.
   source: f.source === 'ai' ? 'manual' : f.source,
   ref: f.source === 'ai' ? null : f.ref,
-  ai: f.source === 'ai',
+  ai: f.source === 'ai' && !f.pantryId,
+  pantry: !!f.pantryId,
   unit: f.unit,
   per100g: f.per100g,
   servings: f.servings,
@@ -81,7 +85,9 @@ const basisFromEntry = (e: FoodEntry): Basis | null => {
 
 export default function FoodEditor() {
   const c = useTheme();
-  const params = useLocalSearchParams<{ id?: string; date?: string; meal?: string; diary?: string }>();
+  const params = useLocalSearchParams<{ id?: string; date?: string; meal?: string; diary?: string; pantry?: string }>();
+  // Opened from the Pantry: weighing a food saves it to the pantry instead of logging it.
+  const forPantry = params.pantry === '1';
   // On a diary-only day calories are optional: a name is enough to keep a record.
   const diaryOnly = params.diary === '1';
   const id = params.id;
@@ -107,6 +113,8 @@ export default function FoodEditor() {
   const [manualGrams, setManualGrams] = useState('');
 
   const [recent, setRecent] = useState<FoodEntry[]>([]);
+  const [pantry, setPantry] = useState<PantryItem[]>([]);
+  const [savedToPantry, setSavedToPantry] = useState(false);
   const [logged, setLogged] = useState<{ id: string; label: string } | null>(null);
   const [triedSave, setTriedSave] = useState(false);
   const [aiFilling, setAiFilling] = useState(false);
@@ -137,6 +145,7 @@ export default function FoodEditor() {
       );
     } else {
       recentFoods().then(setRecent, () => {});
+      listPantry().then(setPantry, () => {});
     }
   }, [id]);
 
@@ -273,6 +282,40 @@ export default function FoodEditor() {
     ]);
   }
 
+  /** Saves the food being weighed to the pantry, with this amount as the usual portion for this meal. */
+  async function saveToPantry(thenClose: boolean) {
+    if (!basis || !Number.isFinite(g) || g <= 0) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await savePantryItems([
+        pantryFromFood(
+          {
+            id: '',
+            source: basis.ai ? 'ai' : basis.source === 'usda' || basis.source === 'off' ? basis.source : 'ai',
+            ref: basis.ref ?? '',
+            name: basis.name,
+            brand: basis.brand,
+            detail: '',
+            per100g: basis.per100g,
+            servings: [],
+            incomplete: false,
+            unit: basis.unit,
+          },
+          g,
+          meal,
+        ),
+      ]);
+      if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      if (thenClose) router.back();
+      else setSavedToPantry(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   /** Logs an AI estimate straight away at the amount described, no weighing needed. */
   async function quickAddAi(f: FoodResult) {
     setError(null);
@@ -358,7 +401,7 @@ export default function FoodEditor() {
 
   return (
     <Screen padTop={false}>
-      <Stack.Screen options={{ title: id ? 'Edit food' : isToday ? 'Add food' : `Add food · ${formatDay(date)}` }} />
+      <Stack.Screen options={{ title: forPantry ? 'Add to pantry' : id ? 'Edit food' : isToday ? 'Add food' : `Add food · ${formatDay(date)}` }} />
       <MealPicker value={meal} onChange={setMeal} />
 
       {logged ? (
@@ -376,7 +419,12 @@ export default function FoodEditor() {
 
       {mode === 'search' ? (
         <>
-          <FoodSearch onSelect={chooseResult} onQuickAdd={quickAddAi} />
+          <FoodSearch
+            onSelect={chooseResult}
+            onQuickAdd={forPantry ? undefined : quickAddAi}
+            pantry={forPantry ? undefined : pantry}
+            meal={meal}
+          />
           <Button title="Enter manually" variant="ghost" onPress={() => setMode('manual')} />
           <Button
             title="Log several foods at once with AI"
@@ -436,7 +484,7 @@ export default function FoodEditor() {
               {basis.name}
             </T>
             <Row gap={Spacing.sm} style={{ flexWrap: 'wrap' }}>
-              <SourceBadge label={basis.ai ? 'AI estimate' : SOURCE_LABEL[basis.source]} />
+              <SourceBadge label={basis.pantry ? 'Pantry' : basis.ai ? 'AI estimate' : SOURCE_LABEL[basis.source]} />
               <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
                 {[basis.brand, basis.detail].filter(Boolean).join(' · ')}
                 {basis.brand || basis.detail ? ' · ' : ''}per 100 g: {fmt(per.kcal)} kcal
@@ -477,19 +525,37 @@ export default function FoodEditor() {
           />
           {weighed ? <LiveMacros kcal={weighed.kcal} p={weighed.protein_g} c={weighed.carbs_g} f={weighed.fat_g} /> : null}
           <ErrorText message={gramsInvalid ?? error} />
-          <Button
-            title={
-              id
-                ? 'Save changes'
-                : basis.unit && Number.isFinite(g)
-                  ? `Add ${countLabel(g / basis.unit.grams, basis.unit.name)} to ${mealLabel}`
-                  : `Add ${fmt(g)} g to ${mealLabel}`
-            }
-            size="L"
-            onPress={save}
-            loading={busy}
-            disabled={!!gramsInvalid}
-          />
+          {forPantry ? (
+            <Button
+              title={`Save to pantry · usually ${basis.unit && Number.isFinite(g) ? countLabel(g / basis.unit.grams, basis.unit.name) : `${fmt(g)} g`}`}
+              size="L"
+              onPress={() => saveToPantry(true)}
+              loading={busy}
+              disabled={!!gramsInvalid}
+            />
+          ) : (
+            <Button
+              title={
+                id
+                  ? 'Save changes'
+                  : basis.unit && Number.isFinite(g)
+                    ? `Add ${countLabel(g / basis.unit.grams, basis.unit.name)} to ${mealLabel}`
+                    : `Add ${fmt(g)} g to ${mealLabel}`
+              }
+              size="L"
+              onPress={save}
+              loading={busy}
+              disabled={!!gramsInvalid}
+            />
+          )}
+          {!forPantry && !basis.pantry && !id ? (
+            <Button
+              title={savedToPantry ? '✓ Saved to pantry' : `Save to pantry as my usual ${mealLabel} portion`}
+              variant="ghost"
+              onPress={() => saveToPantry(false)}
+              disabled={savedToPantry || !!gramsInvalid}
+            />
+          ) : null}
           <Button title="Edit values directly" variant="ghost" onPress={switchToManual} />
         </>
       ) : null}
@@ -597,37 +663,5 @@ function LiveMacros({ kcal, p, c: carbs, f }: { kcal: number; p: number; c: numb
         {dot(c.fat, 'F', f)}
       </View>
     </Card>
-  );
-}
-
-/** − 2 muffins + : pieces in half steps; grams follow the unit's estimated weight. */
-function CountStepper({
-  unit,
-  grams,
-  onChange,
-}: {
-  unit: { name: string; grams: number };
-  grams: number;
-  onChange: (grams: number) => void;
-}) {
-  const c = useTheme();
-  const count = Math.round((grams / unit.grams) * 2) / 2;
-  const step = (d: number) => {
-    const next = Math.max(0.5, count + d);
-    if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
-    onChange(next * unit.grams);
-  };
-  return (
-    <Row
-      style={{ height: 72, borderRadius: Radius.lg, backgroundColor: c.raised, paddingHorizontal: Spacing.sm, justifyContent: 'space-between' }}>
-      <IconButton glyph="−" label={`One less ${unit.name}`} onPress={() => step(-0.5)} disabled={count <= 0.5} background={c.surface} />
-      <View style={{ alignItems: 'center' }}>
-        <Num size="l">{countLabel(count, unit.name)}</Num>
-        <T variant="caption" style={{ fontWeight: '400' }}>
-          about {fmt(unit.grams)} g each
-        </T>
-      </View>
-      <IconButton glyph="+" label={`One more ${unit.name}`} onPress={() => step(0.5)} background={c.surface} />
-    </Row>
   );
 }

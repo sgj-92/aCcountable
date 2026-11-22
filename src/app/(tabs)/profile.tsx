@@ -397,9 +397,10 @@ export default function ProfileScreen() {
           ) : null}
         </Card>
 
-        <Overline>Training data</Overline>
+        <Overline>Food and training data</Overline>
         <Card style={{ gap: 0, paddingVertical: 4 }}>
-          <NavRow icon="stopwatch" title="WHOOP history" meta="Your own burn rates per activity" onPress={() => router.push('/whoop-import')} />
+          <NavRow icon="file" title="Pantry" meta="Your foods and usual portions" onPress={() => router.push('/pantry')} />
+          <NavRow icon="stopwatch" title="WHOOP history" meta="Your own burn rates per activity" onPress={() => router.push('/whoop-import')} divider />
           <NavRow icon="scale" title="Weight & trend" meta="Weigh-ins and the smoothed trend" onPress={() => router.push('/weigh-in')} divider />
         </Card>
 

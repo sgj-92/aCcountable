@@ -8,7 +8,9 @@ import { Skeleton } from '@/components/skeleton';
 import { Button, Card, ErrorText, fmt, Num, Row, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import type { Meal } from '@/lib/api';
 import { estimateFoods, lookupBarcode, searchFoods, type FoodResult, type FoodSearchResponse } from '@/lib/foods';
+import { pantryToFood, portionKcal, portionLabel, type PantryItem } from '@/lib/pantry';
 
 /**
  * Search USDA (whole foods) + Open Food Facts (branded foods) by name, or scan
@@ -17,10 +19,16 @@ import { estimateFoods, lookupBarcode, searchFoods, type FoodResult, type FoodSe
 export function FoodSearch({
   onSelect,
   onQuickAdd,
+  pantry,
+  meal,
 }: {
   onSelect: (food: FoodResult) => void;
-  /** Log an AI estimate straight away at the described amount. */
+  /** Log an AI estimate or pantry food straight away at its amount. */
   onQuickAdd?: (food: FoodResult) => void;
+  /** Pantry foods to offer first (filtered by what's typed). */
+  pantry?: PantryItem[];
+  /** The meal being logged to: its usual pantry foods come first. */
+  meal?: Meal;
 }) {
   const c = useTheme();
   const [query, setQuery] = useState('');
@@ -162,6 +170,16 @@ export function FoodSearch({
           {aiError}
         </T>
       ) : null}
+      {pantry && pantry.length > 0 ? (
+        <PantrySection
+          items={pantry}
+          query={query}
+          meal={meal}
+          onSelect={(p) => onSelect(pantryToFood(p))}
+          onAdd={onQuickAdd ? (p) => onQuickAdd(pantryToFood(p)) : undefined}
+        />
+      ) : null}
+
       {aiResults && aiResults.length > 0 ? (
         <ResultSection title="AI estimate" badge="AI" items={aiResults} onSelect={onSelect} onAdd={onQuickAdd} />
       ) : null}
@@ -327,5 +345,89 @@ function ResultRow({
         <Icon name="chevron-right" size={16} color={c.text3} strokeWidth={2.2} />
       )}
     </Pressable>
+  );
+}
+
+/** Your pantry foods matching what's typed, usual foods for this meal first, each with + to log the usual portion. */
+function PantrySection({
+  items,
+  query,
+  meal,
+  onSelect,
+  onAdd,
+}: {
+  items: PantryItem[];
+  query: string;
+  meal?: Meal;
+  onSelect: (p: PantryItem) => void;
+  onAdd?: (p: PantryItem) => void;
+}) {
+  const c = useTheme();
+  const [expanded, setExpanded] = useState(false);
+  const q = query.trim().toLowerCase();
+  const matches = (q ? items.filter((p) => p.name.toLowerCase().includes(q)) : items)
+    .slice()
+    .sort((a, b) => Number(meal ? b.meals.includes(meal) : 0) - Number(meal ? a.meals.includes(meal) : 0));
+  if (matches.length === 0) return null;
+  const shown = expanded ? matches : matches.slice(0, 6);
+  return (
+    <View style={{ gap: Spacing.sm }}>
+      <Overline>Pantry</Overline>
+      <Card style={{ gap: 0, paddingVertical: 4, paddingRight: Spacing.sm }}>
+        {shown.map((p, i) => (
+          <Pressable
+            key={p.id}
+            accessibilityRole="button"
+            accessibilityLabel={`${p.name}, usually ${portionLabel(p, p.portion_g)}, ${portionKcal(p, p.portion_g)} kcal. Choose amount`}
+            onPress={() => onSelect(p)}
+            style={({ pressed }) => ({
+              minHeight: 56,
+              paddingVertical: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: Spacing.md,
+              borderTopWidth: i === 0 ? 0 : 1,
+              borderTopColor: c.line,
+              opacity: pressed ? 0.6 : 1,
+            })}>
+            <View style={{ flex: 1, gap: 2 }}>
+              <T numberOfLines={2}>{p.name}</T>
+              <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
+                Usually {portionLabel(p, p.portion_g)}
+              </T>
+            </View>
+            <Num size="s">{fmt(portionKcal(p, p.portion_g))}</Num>
+            {onAdd ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Log your usual ${p.name}`}
+                onPress={() => onAdd(p)}
+                hitSlop={6}
+                style={({ pressed }) => ({
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: pressed ? c.accentPressed : c.accent,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                })}>
+                <Icon name="plus" size={18} color={c.onAccent} strokeWidth={2.6} />
+              </Pressable>
+            ) : (
+              <Icon name="chevron-right" size={16} color={c.text3} strokeWidth={2.2} />
+            )}
+          </Pressable>
+        ))}
+        {matches.length > shown.length ? (
+          <Button
+            title={`Show ${matches.length - shown.length} more`}
+            variant="ghost"
+            size="S"
+            onPress={() => setExpanded(true)}
+            style={{ alignSelf: 'flex-start', marginVertical: Spacing.sm }}
+          />
+        ) : null}
+      </Card>
+    </View>
   );
 }

@@ -180,6 +180,13 @@ export default function PlanScreen() {
         loading={busy}
         disabled={text.trim().length < 2}
       />
+      {!busy ? (
+        <Button
+          title="Plan from my pantry"
+          variant="secondary"
+          onPress={() => router.push({ pathname: '/pantry', params: { pick: 'plan', date } })}
+        />
+      ) : null}
       {items.length && !busy ? <Button title="Cancel" variant="ghost" onPress={() => setAdding(false)} /> : null}
     </View>
   );
@@ -310,6 +317,12 @@ export default function PlanScreen() {
           ) : (
             <Row>
               <Button title="Add foods" variant="secondary" onPress={() => setAdding(true)} style={{ flex: 1 }} />
+              <Button
+                title="Pantry"
+                variant="secondary"
+                onPress={() => router.push({ pathname: '/pantry', params: { pick: 'plan', date } })}
+                style={{ flex: 1 }}
+              />
               <Button title="Clear plan" variant="ghost" onPress={clearPlan} style={{ flex: 1 }} />
             </Row>
           )}
