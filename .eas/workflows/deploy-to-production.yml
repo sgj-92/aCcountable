@@ -11,9 +11,9 @@
 
 name: Deploy to production
 
-on:
-  push:
-    branches: ['claude/keen-sagan-zqk0hi', 'main']
+# Manual only (eas workflow:run): pushes are handled by the GitHub Actions
+# workflow in .github/workflows/eas-deploy.yml, which doesn't use Expo's
+# limited CI minutes.
 
 jobs:
   fingerprint:
