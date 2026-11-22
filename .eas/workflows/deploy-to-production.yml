@@ -55,3 +55,15 @@ jobs:
     params:
       branch: production
       platform: ios
+
+  # Builds listen on the "production" channel; updates are published to the
+  # "production" branch. Make sure the channel points at that branch (a channel
+  # created without one makes the app report "no branches linked to the
+  # channel"). Safe to repeat on every run.
+  link_production_channel:
+    name: Point production channel at production branch
+    needs: [publish_ios_update]
+    steps:
+      - uses: eas/checkout
+      - name: Link channel to branch
+        run: npx --yes eas-cli@latest channel:edit production --branch production --non-interactive
