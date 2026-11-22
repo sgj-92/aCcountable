@@ -11,8 +11,9 @@ import { WeightChart } from '@/components/weight-chart';
 import { Radius, Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
-import { computeWeek, loadWeek } from '@/lib/adaptive';
-import { copyPreviousWeek, isProfileComplete } from '@/lib/api';
+import { computeWeek, loadWeek, type WeekView } from '@/lib/adaptive';
+import { useProfile } from '@/hooks/use-profile';
+import { copyPreviousWeek, isProfileComplete, updateProfile, type Profile } from '@/lib/api';
 import { addDays, dayName, formatWeekRange, parseISODate, startOfWeek, today, weekDates } from '@/lib/dates';
 import { sessionLabel } from '@/lib/targets';
 
@@ -215,6 +216,8 @@ export default function WeekScreen() {
 
       <Button title="Copy last week’s training" variant="secondary" onPress={copyLastWeek} loading={copying} />
 
+      {view && isProfileComplete(profile) ? <BurnCard view={view} profile={profile} onChanged={reload} /> : null}
+
       {view && view.trend.length > 0 ? (
         <Pressable onPress={() => router.push('/weigh-in')} accessibilityRole="button">
           <Card hero style={{ gap: Spacing.sm }}>
@@ -283,5 +286,89 @@ function SmallChip({ label, tone, onPress }: { label: string; tone: 'done' | 'es
         {label}
       </Text>
     </Pressable>
+  );
+}
+
+/** Weight-trend burn estimate (last 4 weeks) and, when it differs enough, an offer to update the base target. */
+function BurnCard({ view, profile, onChanged }: { view: WeekView; profile: Profile; onChanged: () => void }) {
+  const c = useTheme();
+  const { reload: reloadSharedProfile } = useProfile();
+  const [busy, setBusy] = useState(false);
+  const { estimate, suggestion } = view.burn;
+  const current = profile.maintenance_adjust_kcal ?? 0;
+  const signed = (n: number) => `${n > 0 ? '+' : n < 0 ? '−' : ''}${fmt(Math.abs(n))}`;
+
+  async function apply(value: number) {
+    setBusy(true);
+    try {
+      await updateProfile(profile.id, { maintenance_adjust_kcal: value });
+      await reloadSharedProfile();
+      onChanged();
+    } catch (e) {
+      Alert.alert('Couldn’t update', e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const confirmApply = (value: number) =>
+    Alert.alert(
+      'Update your base target?',
+      `Your maintenance estimate changes by ${signed(value - current)} kcal a day, so every day’s target moves by the same amount. You can reset it in Profile.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Update', onPress: () => apply(value) },
+      ],
+    );
+
+  return (
+    <Card hero style={{ gap: Spacing.sm }}>
+      <Overline>Your burn · last 4 weeks</Overline>
+      {estimate.burn === null ? (
+        <>
+          <T variant="headline" style={{ paddingHorizontal: 4 }}>
+            Not enough data yet
+          </T>
+          <T variant="footnote" style={{ paddingHorizontal: 4 }}>
+            {estimate.reason} It uses your weigh-ins and the days you fully tracked ({estimate.trackedDays} so far,{' '}
+            {estimate.weighIns} weigh-ins). Diary-only days aren’t counted.
+          </T>
+        </>
+      ) : (
+        <>
+          <Row gap={Spacing.sm} style={{ alignItems: 'baseline', paddingHorizontal: 4 }}>
+            <Num size="l">{fmt(estimate.burn)}</Num>
+            <T variant="footnote">kcal a day</T>
+          </Row>
+          <T variant="footnote" style={{ paddingHorizontal: 4 }}>
+            The formula says {fmt(estimate.model)} ({signed(estimate.difference)}). From {estimate.trackedDays} tracked days,{' '}
+            {estimate.weighIns} weigh-ins and a trend change of {estimate.trendChangeKg > 0 ? '+' : estimate.trendChangeKg < 0 ? '−' : ''}
+            {Math.abs(estimate.trendChangeKg).toFixed(1)} kg ·{' '}
+            <Text style={{ fontWeight: '600', color: estimate.confidence === 'high' ? c.good : estimate.confidence === 'medium' ? c.text : c.warn }}>
+              {estimate.confidence} confidence
+            </Text>
+          </T>
+          {suggestion != null ? (
+            <Button
+              title={`Update base target · ${signed(suggestion - current)} kcal`}
+              onPress={() => confirmApply(suggestion)}
+              loading={busy}
+            />
+          ) : (
+            <T variant="footnote" color={c.text} style={{ paddingHorizontal: 4 }}>
+              {estimate.confidence === 'low'
+                ? 'Keep logging and weighing in; a suggestion appears once the estimate is steadier.'
+                : 'Close enough to your current targets: no change needed.'}
+            </T>
+          )}
+        </>
+      )}
+      {current !== 0 ? (
+        <Row style={{ justifyContent: 'space-between', paddingHorizontal: 4 }}>
+          <T variant="footnote">Current correction {signed(current)} kcal</T>
+          <Button title="Reset" variant="ghost" size="S" onPress={() => apply(0)} />
+        </Row>
+      ) : null}
+    </Card>
   );
 }

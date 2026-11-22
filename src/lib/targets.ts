@@ -32,6 +32,7 @@ export function settingsFor(profile: Profile): TargetSettings {
     proteinGPerKg: profile.protein_g_per_kg,
     fatPct: profile.fat_pct,
     trainingEatBackPct: profile.training_eat_back_pct,
+    maintenanceAdjustKcal: profile.maintenance_adjust_kcal ?? 0,
   };
 }
 

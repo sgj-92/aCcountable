@@ -207,6 +207,12 @@ export default function ProfileScreen() {
             <T variant="footnote" style={{ paddingHorizontal: 4 }}>
               Training days add the estimated burn of each session on top, mostly as carbs.
             </T>
+            {profile.maintenance_adjust_kcal ? (
+              <T variant="footnote" color={c.text} style={{ paddingHorizontal: 4 }}>
+                Includes a {profile.maintenance_adjust_kcal > 0 ? '+' : '−'}
+                {fmt(Math.abs(profile.maintenance_adjust_kcal))} kcal correction from your weigh-ins (change it on Week).
+              </T>
+            ) : null}
           </Card>
         ) : null}
 

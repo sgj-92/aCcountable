@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
-import { RefreshControl, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, RefreshControl, Switch, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 
 import { CRing } from '@/components/c-ring';
 import { FastingBar } from '@/components/fasting-card';
@@ -17,7 +17,7 @@ import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
 import { computeWeek, loadWeek, type WeekData, type WeekView } from '@/lib/adaptive';
-import { isProfileComplete, type Profile, type TrainingSession } from '@/lib/api';
+import { isProfileComplete, setDiaryDay, type Profile, type TrainingSession } from '@/lib/api';
 import { addDays, formatDay, formatLongDay, isValidISODate, startOfWeek, today } from '@/lib/dates';
 import { parseClock } from '@/lib/fasting';
 import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
@@ -55,6 +55,25 @@ export default function TodayScreen() {
     windowStart != null && windowEnd != null ? { startMin: windowStart, endMin: windowEnd } : null;
   const defaultMeal = isToday ? defaultSlotForNow(slots, new Date(), fastingWindow) : slots[slots.length - 1].key;
 
+  const diaryDay = !!fresh?.diaryDays.includes(date);
+
+  // The quick bar slides away while scrolling down; it comes back on scrolling up, near the top, or after a pause.
+  const [dockHidden, setDockHidden] = useState(false);
+  const lastY = useRef(0);
+  const idle = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (idle.current) clearTimeout(idle.current);
+  }, []);
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const y = e.nativeEvent.contentOffset.y;
+    const dy = y - lastY.current;
+    lastY.current = y;
+    if (y < 40 || dy < -6) setDockHidden(false);
+    else if (dy > 6) setDockHidden(true);
+    if (idle.current) clearTimeout(idle.current);
+    idle.current = setTimeout(() => setDockHidden(false), 1500);
+  };
+
   const header = (
     <TabHeader
       sub={formatLongDay(date)}
@@ -68,8 +87,11 @@ export default function TodayScreen() {
 
   const dock = (
     <QuickDock
+      hidden={dockHidden}
       onScan={() => router.push({ pathname: '/scan', params: { date, meal: defaultMeal } })}
-      onAddFood={() => router.push({ pathname: '/food', params: { date, meal: defaultMeal } })}
+      onAddFood={() =>
+        router.push({ pathname: '/food', params: { date, meal: defaultMeal, ...(diaryDay ? { diary: '1' } : {}) } })
+      }
       onLogSession={() => router.push({ pathname: '/training', params: { date } })}
       onWeighIn={() => router.push('/weigh-in')}
     />
@@ -99,7 +121,10 @@ export default function TodayScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <Screen padBottom={BOTTOM_PAD} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
+      <Screen
+        padBottom={BOTTOM_PAD}
+        onScroll={onScroll}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
         {header}
         <ErrorText message={error} />
 
@@ -110,7 +135,7 @@ export default function TodayScreen() {
             <Button title="Go to profile" onPress={() => router.navigate('/profile')} />
           </Card>
         ) : (
-          <TodayBody data={fresh} view={view} date={date} isToday={isToday} slots={slots} fastingWindow={fastingWindow} onChanged={reload} />
+          <TodayBody key={date} data={fresh} view={view} date={date} isToday={isToday} slots={slots} fastingWindow={fastingWindow} onChanged={reload} />
         )}
       </Screen>
       {dock}
@@ -142,7 +167,20 @@ function TodayBody({
   const food = data.food.filter((f) => f.date === date);
   const eaten = sumTotals(food);
   const target = day.adjusted;
-  const closedUnder = date < today() && food.length > 0 && eaten.kcal < target;
+  const [diaryOverride, setDiaryOverride] = useState<boolean | null>(null);
+  const diary = diaryOverride ?? view.diary.has(date);
+  const closedUnder = !diary && date < today() && food.length > 0 && eaten.kcal < target;
+
+  async function toggleDiary(on: boolean) {
+    setDiaryOverride(on);
+    try {
+      await setDiaryDay(date, on);
+      onChanged();
+    } catch (e) {
+      setDiaryOverride(null);
+      Alert.alert('Couldn’t change that', e instanceof Error ? e.message : String(e));
+    }
+  }
   const trainingLabel =
     sessions.length === 1 ? sessionLabel(sessions[0]).toLowerCase() : sessions.length > 1 ? 'training' : 'rest day';
   const insights = view.insights.filter((i) => !WEEK_INSIGHT_IDS.includes(i.id));
@@ -151,7 +189,13 @@ function TodayBody({
     <>
       {/* Hero: today and the week in one card */}
       <Card hero style={{ alignItems: 'center', gap: Spacing.md, paddingBottom: 14 }}>
-        <CRing eaten={eaten.kcal} target={target} training={day.raw.training} closedUnder={closedUnder} />
+        <CRing
+          eaten={eaten.kcal}
+          target={target}
+          training={day.raw.training}
+          closedUnder={closedUnder}
+          note={diary ? 'Diary only · not counted' : undefined}
+        />
         <TargetLedger
           base={day.raw.base}
           training={day.raw.training}
@@ -189,6 +233,24 @@ function TodayBody({
         <WeightTile view={view} date={date} isToday={isToday} />
       </Row>
 
+      <Card style={{ gap: 2, paddingVertical: 12 }}>
+        <Row style={{ justifyContent: 'space-between', minHeight: 36 }}>
+          <T style={{ fontWeight: '600' }}>Diary only</T>
+          <Switch
+            value={diary}
+            onValueChange={toggleDiary}
+            trackColor={{ true: c.switchOn, false: c.track }}
+            thumbColor="#FFFFFF"
+            accessibilityLabel="Diary only for this day"
+          />
+        </Row>
+        <T variant="footnote">
+          {diary
+            ? 'Log food for the record, with or without calories. This day is left out of your week balance and burn estimate.'
+            : 'Not tracking properly today? Turn this on and the day won’t skew your week or your burn estimate.'}
+        </T>
+      </Card>
+
       <Row style={{ justifyContent: 'space-between', alignItems: 'baseline', paddingTop: Spacing.md, paddingHorizontal: 4 }}>
         <T variant="title" style={{ fontSize: 20, lineHeight: 25 }}>
           Meals
@@ -208,6 +270,7 @@ function TodayBody({
           date={date}
           items={food.filter((f) => f.meal === key)}
           slots={slots}
+          diary={diary}
           onChanged={onChanged}
         />
       ))}

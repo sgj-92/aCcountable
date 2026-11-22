@@ -26,6 +26,7 @@ export function CRing({
   target,
   training,
   closedUnder,
+  note,
   size = 208,
   stroke = 16,
 }: {
@@ -35,6 +36,8 @@ export function CRing({
   training: number;
   /** A finished past day that came in under: the number reads "kcal under" in good. */
   closedUnder?: boolean;
+  /** Replaces the "eaten of target" line, e.g. for a diary-only day. */
+  note?: string;
   size?: number;
   stroke?: number;
 }) {
@@ -78,7 +81,7 @@ export function CRing({
   const unit = over ? 'kcal over' : closedUnder ? 'kcal under' : 'kcal left';
   const numColor = over ? c.alert : closedUnder ? c.good : c.text;
   const unitColor = over ? c.alert : closedUnder ? c.good : c.text2;
-  const sub = left === 0 && eaten > 0 ? 'On target' : `${fmt(eaten)} eaten of ${fmt(target)}`;
+  const sub = note ? note : left === 0 && eaten > 0 ? 'On target' : `${fmt(eaten)} eaten of ${fmt(target)}`;
   const label = over
     ? `${fmt(-left)} kcal over a target of ${fmt(target)}`
     : `${fmt(left)} kcal ${closedUnder ? 'under' : 'left of'} ${fmt(target)}`;

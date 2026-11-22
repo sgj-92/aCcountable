@@ -35,6 +35,10 @@ export interface InsightInput {
   unconfirmed: { id: string; date: string; label: string }[];
   hasWhoopHistory: boolean;
   hasSessions: boolean;
+  /** Today is marked diary only: don't judge today's total. */
+  diaryToday?: boolean;
+  /** Weight-trend burn estimate that differs enough to suggest a target change. */
+  burn?: { burn: number; difference: number } | null;
 }
 
 const kcal = (n: number) => `${Math.round(Math.abs(n)).toLocaleString()} kcal`;
@@ -48,7 +52,7 @@ export function buildInsights(i: InsightInput): Insight[] {
 
   // Today
   const overToday = i.eatenToday - i.todayTarget;
-  if (overToday > Math.max(100, i.todayTarget * 0.05)) {
+  if (!i.diaryToday && overToday > Math.max(100, i.todayTarget * 0.05)) {
     out.push({
       id: 'over-today',
       level: 'alert',
@@ -144,6 +148,18 @@ export function buildInsights(i: InsightInput): Insight[] {
         detail: `Fast losses can cost muscle and performance. You could eat about ${kcal(gapPerDay)} more a day.`,
       });
     }
+  }
+
+  // Weight-trend burn
+  if (i.burn) {
+    const more = i.burn.difference > 0;
+    out.push({
+      id: 'burn',
+      level: 'info',
+      title: `Your weigh-ins say you burn about ${kcal(i.burn.burn)} a day`,
+      detail: `That’s ${kcal(i.burn.difference)} ${more ? 'more' : 'less'} than the formula assumes. You can update your base target to match.`,
+      action: { label: 'Review', pathname: '/week' },
+    });
   }
 
   // Training data

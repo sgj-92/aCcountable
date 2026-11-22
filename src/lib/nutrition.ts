@@ -50,6 +50,8 @@ export interface TargetSettings {
   fatPct: number;
   /** Percent of estimated training burn to add to the day's target (0–100+). */
   trainingEatBackPct: number;
+  /** Correction to the formula's maintenance, from the weight-trend burn estimate. */
+  maintenanceAdjustKcal?: number;
 }
 
 export interface SessionInput {
@@ -223,7 +225,7 @@ export function sessionBurn(session: SessionInput, ctx: BurnContext | number): n
 
 export function baseTarget(stats: BodyStats, settings: TargetSettings) {
   const b = bmr(stats);
-  const maintenance = b * LIFESTYLE_FACTORS[settings.lifestyle];
+  const maintenance = b * LIFESTYLE_FACTORS[settings.lifestyle] + (settings.maintenanceAdjustKcal ?? 0);
   const raw = maintenance + goalAdjustment(settings.goal, settings.goalRateKgPerWeek);
   const flooredAtBmr = raw < b;
   return { bmr: b, maintenance, base: flooredAtBmr ? b : raw, flooredAtBmr };

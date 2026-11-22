@@ -26,8 +26,11 @@ export function Screen({
   padTop = true,
   padBottom,
   refreshControl,
+  onScroll,
 }: {
   children: ReactNode;
+  /** Scroll events, e.g. to hide a floating bar while scrolling. */
+  onScroll?: React.ComponentProps<typeof ScrollView>['onScroll'];
   padTop?: boolean;
   /** Extra room at the bottom, e.g. 200 on Today to clear the floating dock. */
   padBottom?: number;
@@ -52,6 +55,8 @@ export function Screen({
       // Make room for the keyboard and keep the focused text box above it (iOS); drag down to dismiss.
       automaticallyAdjustKeyboardInsets
       keyboardDismissMode="interactive"
+      onScroll={onScroll}
+      scrollEventThrottle={onScroll ? 32 : undefined}
       refreshControl={refreshControl}>
       {children}
     </ScrollView>

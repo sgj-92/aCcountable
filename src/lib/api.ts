@@ -23,6 +23,8 @@ export interface Profile {
   /** Intermittent-fasting eating window as "HH:MM"; both null when not fasting. */
   eating_window_start: string | null;
   eating_window_end: string | null;
+  /** Accepted correction to estimated maintenance calories (from weigh-ins). */
+  maintenance_adjust_kcal: number;
 }
 
 export interface TrainingSession {
@@ -82,6 +84,8 @@ function normaliseProfile(p: Profile): Profile {
     // Postgres time comes back as "HH:MM:SS".
     eating_window_start: p.eating_window_start ? p.eating_window_start.slice(0, 5) : null,
     eating_window_end: p.eating_window_end ? p.eating_window_end.slice(0, 5) : null,
+    // 0 until the burn-correction migration is applied.
+    maintenance_adjust_kcal: p.maintenance_adjust_kcal == null ? 0 : num(p.maintenance_adjust_kcal),
   };
 }
 
@@ -231,6 +235,22 @@ export async function recentFoods(limit = 15): Promise<FoodEntry[]> {
   return out;
 }
 
+
+// ───────────── diary-only days ─────────────
+
+/** Dates marked "diary only" (food logged for the record, not counted). Empty if the table isn't there yet. */
+export async function listDiaryDays(from: string, to: string): Promise<string[]> {
+  const res = await supabase.from('diary_days').select('date').gte('date', from).lte('date', to);
+  if (res.error) return [];
+  return (res.data as { date: string }[]).map((d) => d.date);
+}
+
+export async function setDiaryDay(date: string, diaryOnly: boolean): Promise<void> {
+  const res = diaryOnly
+    ? await supabase.from('diary_days').upsert({ date }, { onConflict: 'user_id,date', ignoreDuplicates: true })
+    : await supabase.from('diary_days').delete().eq('date', date);
+  if (res.error) throw new Error(res.error.message);
+}
 
 // ───────────── weigh-ins ─────────────
 

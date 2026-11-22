@@ -1,10 +1,12 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Switch, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Switch, TextInput, View } from 'react-native';
 
-import { FOOTER_SPACE, Overline, SheetFooter } from '@/components/sheet';
+import { Icon } from '@/components/icon';
+
+import { FOOTER_SPACE, SheetFooter } from '@/components/sheet';
 import { StatusPill } from '@/components/tiles';
-import { Button, Card, Chip, ErrorText, Field, fmt, IconButton, Loading, Num, Row, Screen, Segmented, T } from '@/components/ui';
+import { Button, Card, ErrorText, Field, fmt, IconButton, Loading, Num, Row, Screen, Segmented, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
 import { useCountUp } from '@/hooks/use-count-up';
 import { useTheme } from '@/hooks/use-theme';
@@ -228,50 +230,29 @@ export default function TrainingEditor() {
           <IconButton glyph="›" label="Next day" background="transparent" onPress={() => setDate(addDays(date, 1))} />
         </Row>
 
-        {whoopChoices.length > 0 ? (
-          <>
-            <Overline>Your WHOOP activities</Overline>
-            <Row style={{ flexWrap: 'wrap' }}>
-              {whoopChoices.map((r) => (
-                <Chip
-                  key={r.label}
-                  label={r.label}
-                  active={whoopActivity?.toLowerCase() === r.label.toLowerCase()}
-                  onPress={() => {
-                    setWhoopActivity(r.label);
-                    setActivity(r.activity);
-                    // Start from the person's usual session length for this activity.
-                    if (!id && r.samples > 0) setDuration(String(r.typicalMin));
-                  }}
-                />
-              ))}
-            </Row>
-            {named ? (
-              <T variant="footnote" style={{ fontVariant: ['tabular-nums'], paddingHorizontal: 4 }}>
-                Usually {named.typicalMin} min · about {fmt(named.kcalPerMin * named.typicalMin)} kcal ·{' '}
-                {named.samples} session{named.samples === 1 ? '' : 's'}
-              </T>
-            ) : null}
-            <Overline>Other activities</Overline>
-          </>
-        ) : (
-          <Overline>Activity</Overline>
-        )}
-        <Row style={{ flexWrap: 'wrap' }}>
-          {ACTIVITIES.map((a) => (
-            <Chip
-              key={a}
-              label={ACTIVITY_LABELS[a]}
-              active={!whoopActivity && activity === a}
-              onPress={() => {
-                setWhoopActivity(null);
-                setActivity(a);
-                const r = whoopRates.find((x) => x.activity === a);
-                if (!id && r) setDuration(String(r.typicalMin));
-              }}
-            />
-          ))}
-        </Row>
+        <ActivityPicker
+          whoop={whoopChoices}
+          selected={whoopActivity ? { kind: 'whoop', label: whoopActivity } : { kind: 'generic', activity }}
+          onPick={(choice) => {
+            if (choice.kind === 'whoop') {
+              setWhoopActivity(choice.rate.label);
+              setActivity(choice.rate.activity);
+              // Start from the person's usual session length for this activity.
+              if (!id && choice.rate.samples > 0) setDuration(String(choice.rate.typicalMin));
+            } else {
+              setWhoopActivity(null);
+              setActivity(choice.activity);
+              const r = whoopRates.find((x) => x.activity === choice.activity);
+              if (!id && r) setDuration(String(r.typicalMin));
+            }
+          }}
+        />
+        {named ? (
+          <T variant="footnote" style={{ fontVariant: ['tabular-nums'], paddingHorizontal: 4 }}>
+            Usually {named.typicalMin} min · about {fmt(named.kcalPerMin * named.typicalMin)} kcal ·{' '}
+            {named.samples} session{named.samples === 1 ? '' : 's'}
+          </T>
+        ) : null}
 
         <Row gap={Spacing.sm} style={{ alignItems: 'flex-end' }}>
           <View style={{ width: 120, gap: 6 }}>
@@ -413,6 +394,129 @@ export default function TrainingEditor() {
           disabled={!!invalid}
         />
       </SheetFooter>
+    </View>
+  );
+}
+
+type Choice = { kind: 'whoop'; rate: ActivityRate } | { kind: 'generic'; activity: Activity };
+
+/** One field that opens a searchable, alphabetical list of your WHOOP activities and the generic ones. */
+function ActivityPicker({
+  whoop,
+  selected,
+  onPick,
+}: {
+  whoop: ActivityRate[];
+  selected: { kind: 'whoop'; label: string } | { kind: 'generic'; activity: Activity };
+  onPick: (c: Choice) => void;
+}) {
+  const c = useTheme();
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const label = selected.kind === 'whoop' ? selected.label : ACTIVITY_LABELS[selected.activity];
+
+  const all = [
+    ...whoop.map((r) => ({
+      key: `w:${r.label}`,
+      label: r.label,
+      meta: r.samples > 0 ? `WHOOP · ${r.samples} session${r.samples === 1 ? '' : 's'}` : 'WHOOP',
+      choice: { kind: 'whoop', rate: r } as Choice,
+      on: selected.kind === 'whoop' && selected.label.toLowerCase() === r.label.toLowerCase(),
+    })),
+    ...ACTIVITIES.map((a) => ({
+      key: `g:${a}`,
+      label: ACTIVITY_LABELS[a],
+      meta: 'Typical estimate',
+      choice: { kind: 'generic', activity: a } as Choice,
+      on: selected.kind === 'generic' && selected.activity === a,
+    })),
+  ].sort((x, y) => x.label.localeCompare(y.label) || (x.key.startsWith('w:') ? -1 : y.key.startsWith('w:') ? 1 : 0));
+  const q = query.trim().toLowerCase();
+  const shown = q ? all.filter((o) => o.label.toLowerCase().includes(q)) : all;
+
+  return (
+    <View style={{ gap: 6 }}>
+      <T variant="footnote">Activity</T>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Activity: ${label}. ${open ? 'Close list' : 'Change'}`}
+        onPress={() => {
+          setOpen(!open);
+          setQuery('');
+        }}
+        style={{
+          height: 52,
+          borderRadius: Radius.md,
+          backgroundColor: c.raised,
+          borderWidth: 2,
+          borderColor: open ? c.accentLine : 'transparent',
+          paddingHorizontal: 14,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.sm,
+        }}>
+        <T style={{ flex: 1, fontSize: 17 }} numberOfLines={1}>
+          {label}
+        </T>
+        {selected.kind === 'whoop' ? <StatusPill label="WHOOP" tone="training" /> : null}
+        <View style={{ transform: [{ rotate: open ? '-90deg' : '90deg' }] }}>
+          <Icon name="chevron-right" size={18} color={c.text2} strokeWidth={2.2} />
+        </View>
+      </Pressable>
+      {open ? (
+        <Card style={{ gap: 0, paddingVertical: 6 }}>
+          <Row gap={Spacing.sm} style={{ height: 44, backgroundColor: c.raised, borderRadius: 12, paddingHorizontal: 12, marginBottom: 6 }}>
+            <Icon name="search" size={16} color={c.text3} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              autoFocus
+              placeholder="Search activities"
+              placeholderTextColor={c.text3}
+              selectionColor={c.accentLine}
+              autoCorrect={false}
+              accessibilityLabel="Search activities"
+              style={{ flex: 1, height: '100%', color: c.text, fontSize: 16 }}
+            />
+          </Row>
+          <ScrollView style={{ maxHeight: 300 }} nestedScrollEnabled keyboardShouldPersistTaps="handled">
+            {shown.map((o, i) => (
+              <Pressable
+                key={o.key}
+                accessibilityRole="button"
+                accessibilityState={{ selected: o.on }}
+                onPress={() => {
+                  onPick(o.choice);
+                  setOpen(false);
+                }}
+                style={({ pressed }) => ({
+                  minHeight: 48,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: Spacing.sm,
+                  borderTopWidth: i === 0 ? 0 : 1,
+                  borderTopColor: c.line,
+                  opacity: pressed ? 0.6 : 1,
+                })}>
+                <View style={{ flex: 1 }}>
+                  <T style={{ fontWeight: o.on ? '700' : '400' }} color={o.on ? c.accentText : c.text}>
+                    {o.label}
+                  </T>
+                  <T variant="caption" style={{ fontWeight: '400' }} color={o.meta.startsWith('WHOOP') ? c.training : c.text3}>
+                    {o.meta}
+                  </T>
+                </View>
+                {o.on ? <Icon name="check" size={16} color={c.accentText} strokeWidth={2.6} /> : null}
+              </Pressable>
+            ))}
+            {shown.length === 0 ? (
+              <T variant="footnote" style={{ paddingVertical: Spacing.md }}>
+                No match. Pick “Other” for anything not listed.
+              </T>
+            ) : null}
+          </ScrollView>
+        </Card>
+      ) : null}
     </View>
   );
 }

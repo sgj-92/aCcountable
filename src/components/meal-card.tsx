@@ -19,8 +19,11 @@ export function MealCard({
   date,
   items,
   slots,
+  diary,
   onChanged,
 }: {
+  /** Diary-only day: food can be logged without calories. */
+  diary?: boolean;
   label: string;
   meal: string;
   date: string;
@@ -61,7 +64,7 @@ export function MealCard({
         <PressableScale
           accessibilityRole="button"
           accessibilityLabel={`Add food to ${label}`}
-          onPress={() => router.push({ pathname: '/food', params: { date, meal } })}
+          onPress={() => router.push({ pathname: '/food', params: { date, meal, ...(diary ? { diary: '1' } : {}) } })}
           style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
           <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: c.raised, alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="plus" size={18} color={c.accentText} strokeWidth={2.4} />

@@ -74,7 +74,9 @@ const basisFromEntry = (e: FoodEntry): Basis | null => {
 
 export default function FoodEditor() {
   const c = useTheme();
-  const params = useLocalSearchParams<{ id?: string; date?: string; meal?: string }>();
+  const params = useLocalSearchParams<{ id?: string; date?: string; meal?: string; diary?: string }>();
+  // On a diary-only day calories are optional: a name is enough to keep a record.
+  const diaryOnly = params.diary === '1';
   const id = params.id;
 
   const [loaded, setLoaded] = useState(!id);
@@ -189,7 +191,7 @@ export default function FoodEditor() {
   const fromMacros = kcalFromMacros(values.p, values.c, values.f);
   const manualInvalid = !name.trim()
     ? 'Give it a name'
-    : kcal.trim() === '' && fromMacros === 0
+    : !diaryOnly && kcal.trim() === '' && fromMacros === 0
       ? 'Enter calories or macros'
       : Object.values(values).some((v) => !Number.isFinite(v) || v < 0) || values.g > 10000
         ? 'Numbers must be zero or more'
@@ -405,6 +407,9 @@ export default function FoodEditor() {
 
       {mode === 'manual' ? (
         <>
+          {diaryOnly ? (
+            <T variant="footnote">Diary-only day: calories are optional. A name is enough to keep a record.</T>
+          ) : null}
           <Field label="Food" value={name} onChangeText={setName} placeholder="e.g. Homemade chilli" />
           <Row gap={Spacing.sm} style={{ alignItems: 'flex-start' }}>
             <Field style={{ flex: 2 }} label="Serving · optional" value={serving} onChangeText={setServing} placeholder="e.g. 1 bowl" />
