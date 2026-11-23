@@ -26,6 +26,7 @@ import { addDays, formatDay, formatLongDay, isValidISODate, startOfWeek, today }
 import { parseClock } from '@/lib/fasting';
 import { buildLedgerSnapshot, snapshotKey } from '@/lib/ledger';
 import { pushToLedger } from '@/lib/ledger-push';
+import MacroWidget from '@/widgets/macros';
 import { mealTimes } from '@/lib/meal-times';
 import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
 import { sumTotals } from '@/lib/nutrition';
@@ -230,6 +231,29 @@ function TodayBody({
     const t = setTimeout(() => pushToLedger(JSON.parse(ledgerKey)).catch(() => {}), 1500);
     return () => clearTimeout(t);
   }, [ledgerKey]);
+
+  // Home-screen widget: today's eaten against the targets, whenever either changes.
+  const widgetKey = isToday
+    ? JSON.stringify({
+        date,
+        kcal: Math.round(eaten.kcal),
+        kcalTarget: Math.round(target),
+        protein: Math.round(eaten.proteinG),
+        proteinTarget: Math.round(day.proteinG),
+        fat: Math.round(eaten.fatG),
+        fatTarget: Math.round(day.fatG),
+        carbs: Math.round(eaten.carbsG),
+        carbsTarget: Math.round(day.carbsG),
+      })
+    : null;
+  useEffect(() => {
+    if (!widgetKey) return;
+    try {
+      MacroWidget.show(JSON.parse(widgetKey));
+    } catch {
+      // A build without the widget (or Expo Go): nothing to update.
+    }
+  }, [widgetKey]);
 
   async function logPlanned(item: PlanItem, grams: number) {
     try {

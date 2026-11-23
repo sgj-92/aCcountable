@@ -57,6 +57,35 @@
           "microphonePermission": false,
           "recordAudioAndroid": false
         }
+      ],
+      [
+        "expo-widgets",
+        {
+          "enableAndroid": true,
+          "widgets": [
+            {
+              "name": "Macros",
+              "displayName": "Macros",
+              "description": "Today's calories, protein, fat and carbs against your targets.",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryRectangular"
+                ],
+                "initialLayout": "src/widgets/macros.ios.tsx"
+              },
+              "android": {
+                "targetCellWidth": 2,
+                "targetCellHeight": 2,
+                "minWidth": 110,
+                "minHeight": 110,
+                "resizeMode": "both",
+                "initialLayout": "src/widgets/macros.android.tsx"
+              }
+            }
+          ]
+        }
       ]
     ],
     "experiments": {

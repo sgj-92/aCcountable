@@ -103,11 +103,16 @@ jobs:
           npx --yes eas-cli@latest update --branch production --platform ios --environment production \
             --message "$msg" --non-interactive
 
+      # Fails (without stopping Android) when the build needs Apple signing that doesn't exist yet,
+      # e.g. for a new app extension such as the home-screen widget: that signing can only be
+      # created signed in to Apple, so run one iOS build from a Mac (see docs/widgets.md).
       - name: Start a new App Store build (iOS native code changed)
         if: steps.build.outputs.count == '0'
+        continue-on-error: true
         run: |
           npx --yes eas-cli@latest build --platform ios --profile production --auto-submit \
-            --non-interactive --no-wait
+            --non-interactive --no-wait \
+            || { echo "::warning::The iOS build couldn't start here. If it needs new Apple signing (e.g. the widget), run one iOS build from a Mac: see docs/widgets.md."; exit 1; }
 
       # ── Android (installable APK, same production channel) ──
       - name: Android fingerprint
