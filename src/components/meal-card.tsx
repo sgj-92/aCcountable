@@ -13,7 +13,7 @@ import { today } from '@/lib/dates';
 import { formatClock } from '@/lib/fasting';
 import type { MealTime } from '@/lib/meal-times';
 import type { MealSlot } from '@/lib/meals';
-import { amountLabel, type PlanItem } from '@/lib/plans';
+import { amountLabel, deletePlanItems, type PlanItem } from '@/lib/plans';
 
 /** One meal section on Today: name, total, a round + and its food rows. */
 export function MealCard({
@@ -78,6 +78,28 @@ export function MealCard({
             {fmt(total)} kcal
           </Num>
         ) : null}
+        {planned.length && onLogPlanned ? (
+          <PressableScale
+            accessibilityRole="button"
+            accessibilityLabel={`Scan what you're eating for ${label} instead of the plan`}
+            onPress={() =>
+              router.push({
+                pathname: '/scan',
+                params: {
+                  date,
+                  meal,
+                  replace: planned.map((p) => p.item.id).join(','),
+                  planned: planned.map((p) => `${p.item.name} ${amountLabel(p.item, p.grams)}`).join(', '),
+                  plannedKcal: String(Math.round(planned.reduce((t, p) => t + (p.item.kcal_100g * p.grams) / 100, 0))),
+                },
+              })
+            }
+            style={{ width: 40, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: c.raised, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="camera" size={17} color={c.accentText} strokeWidth={2.2} />
+            </View>
+          </PressableScale>
+        ) : null}
         <PressableScale
           accessibilityRole="button"
           accessibilityLabel={`Add food to ${label}`}
@@ -92,7 +114,13 @@ export function MealCard({
         <FoodRow key={f.id} entry={f} slots={slots} onChanged={onChanged} />
       ))}
       {planned.map(({ item, grams }) => (
-        <PlannedRow key={item.id} item={item} grams={grams} onLog={onLogPlanned ? () => onLogPlanned(item, grams) : undefined} />
+        <PlannedRow
+          key={item.id}
+          item={item}
+          grams={grams}
+          onLog={onLogPlanned ? () => onLogPlanned(item, grams) : undefined}
+          onChanged={onChanged}
+        />
       ))}
     </View>
   );
@@ -192,14 +220,45 @@ function FoodRow({ entry, slots, onChanged }: { entry: FoodEntry; slots: MealSlo
 }
 
 /** A planned food not eaten yet: tick to log it at the planned amount, tap to change the amount first. */
-function PlannedRow({ item, grams, onLog }: { item: PlanItem; grams: number; onLog?: () => void }) {
+function PlannedRow({
+  item,
+  grams,
+  onLog,
+  onChanged,
+}: {
+  item: PlanItem;
+  grams: number;
+  onLog?: () => void;
+  onChanged: () => void;
+}) {
   const c = useTheme();
   const kcal = Math.round((item.kcal_100g * grams) / 100);
+  const changeAmount = () => router.push({ pathname: '/plan-item', params: { id: item.id, planned: String(grams) } });
+  // Ate something else instead: take it off today's plan so the rest isn't shrunk to make room for it.
+  const remove = async () => {
+    try {
+      await deletePlanItems([item.id]);
+      onChanged();
+    } catch (e) {
+      Alert.alert('Couldn’t remove it', e instanceof Error ? e.message : String(e));
+    }
+  };
+  const longPress = () =>
+    showMenu(
+      [
+        ...(onLog ? [{ label: `Log ${amountLabel(item, grams)}`, onPress: onLog }] : []),
+        { label: 'Change amount', onPress: changeAmount },
+        { label: 'Remove from plan (ate something else)', onPress: remove, destructive: true },
+      ],
+      item.name,
+    );
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`Planned: ${item.name}, ${amountLabel(item, grams)}, ${kcal} kcal. Change amount`}
-      onPress={() => router.push({ pathname: '/plan-item', params: { id: item.id, planned: String(grams) } })}
+      accessibilityHint="Long-press for more, such as removing it from the plan."
+      onPress={changeAmount}
+      onLongPress={longPress}
       style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',

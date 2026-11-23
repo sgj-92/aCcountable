@@ -25,6 +25,7 @@ import { useCountUp } from '@/hooks/use-count-up';
 import { useMealSlots } from '@/hooks/use-profile';
 import { useTheme } from '@/hooks/use-theme';
 import { addFood, type Meal, type NewFoodEntry } from '@/lib/api';
+import { deletePlanItems } from '@/lib/plans';
 import { isValidISODate, today } from '@/lib/dates';
 import { SLOT_KEYS } from '@/lib/meals';
 import { analyzeFood, prepareImage, type ScanResult, type ScanTurn } from '@/lib/scan';
@@ -81,7 +82,20 @@ type Stage = 'preparing' | 'sending' | 'estimating';
 
 export default function ScanScreen() {
   const c = useTheme();
-  const params = useLocalSearchParams<{ date?: string; meal?: string }>();
+  const params = useLocalSearchParams<{
+    date?: string;
+    meal?: string;
+    /** Opened from a planned meal: the plan rows this photo replaces, what they were, and their kcal. */
+    replace?: string;
+    planned?: string;
+    plannedKcal?: string;
+  }>();
+  const replaceIds = (params.replace ?? '').split(',').filter(Boolean);
+  const plannedKcal = Number(params.plannedKcal) || 0;
+  // The plan as a guide for the AI; the photo (and anything you type) wins.
+  const planHint = params.planned
+    ? `I planned this meal as: ${params.planned}. Use that only as a guide to what and how much; the photo shows what I'm actually eating.`
+    : '';
   const date = params.date && isValidISODate(params.date) ? params.date : today();
   const slots = useMealSlots();
   const scroll = useRef<React.ComponentRef<typeof ScrollView>>(null);
@@ -133,6 +147,9 @@ export default function ScanScreen() {
     }
   }
 
+  /** What you typed, plus the planned meal when scanning instead of the plan (the AI takes 500 characters). */
+  const aiNote = () => [note.trim(), planHint].filter(Boolean).join('\n').slice(0, 500);
+
   async function analyse() {
     if (!photo) return;
     setError(null);
@@ -141,7 +158,7 @@ export default function ScanScreen() {
       const b64 = imageBase64 ?? (await prepareImage(photo));
       setImageBase64(b64);
       setStage('sending');
-      const pending = analyzeFood(b64, note);
+      const pending = analyzeFood(b64, aiNote());
       setStage('estimating');
       const r = await pending;
       if (!r.is_food || r.items.length === 0) {
@@ -183,7 +200,7 @@ export default function ScanScreen() {
     setError(null);
     const next = [...turns, { previous: currentEstimate(), reply: reply.trim() }];
     try {
-      const r = await analyzeFood(imageBase64, note, next);
+      const r = await analyzeFood(imageBase64, aiNote(), next);
       if (r.items.length === 0) {
         setError('The updated estimate came back empty. Try rephrasing, or edit the items directly.');
         return;
@@ -261,6 +278,8 @@ export default function ScanScreen() {
           }));
     try {
       await addFood(entries);
+      // Scanned instead of the plan: those planned foods are eaten (as this), so take them off.
+      if (replaceIds.length && meal === params.meal) await deletePlanItems(replaceIds).catch(() => {});
       if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       router.back();
     } catch (e) {
@@ -316,6 +335,12 @@ export default function ScanScreen() {
                 Shoot from above with the whole plate in frame. Cutlery or a hand in shot helps judge portion size.
               </T>
             </Card>
+            {params.planned ? (
+              <T variant="footnote" style={{ paddingHorizontal: Spacing.xs }}>
+                Instead of your plan ({params.planned}). The AI uses the plan as a guide and checks it against the
+                photo.
+              </T>
+            ) : null}
             <Button title="Take photo" size="L" onPress={() => pick('camera')} />
             <Button title="Choose from library" size="L" variant="secondary" onPress={() => pick('library')} />
           </>
@@ -368,6 +393,14 @@ export default function ScanScreen() {
                   </T>
                 </View>
               </Row>
+              {plannedKcal > 0 ? (
+                <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
+                  Your plan for this meal was ≈ {fmt(plannedKcal)} kcal
+                  {Math.abs(totals.kcal - plannedKcal) < 15
+                    ? ', about the same.'
+                    : `: this is ${fmt(Math.abs(totals.kcal - plannedKcal))} kcal ${totals.kcal > plannedKcal ? 'more' : 'less'}.`}
+                </T>
+              ) : null}
               {result.notes ? (
                 <View style={{ gap: 6 }}>
                   <Overline>What it assumed</Overline>
@@ -483,6 +516,13 @@ export default function ScanScreen() {
 
             <Overline>Meal</Overline>
             <MealPicker value={meal} onChange={setMeal} />
+            {replaceIds.length ? (
+              <T variant="footnote">
+                {meal === params.meal
+                  ? `Adding this takes the ${replaceIds.length === 1 ? 'planned food' : `${replaceIds.length} planned foods`} off ${mealLabel}: you ate this instead.`
+                  : 'Logged under a different meal, so your plan stays as it is.'}
+              </T>
+            ) : null}
             <Segmented
               value={combine}
               onChange={setCombine}
