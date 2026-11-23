@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  Platform,
   View,
   type StyleProp,
   type TextInputProps,
@@ -46,6 +47,8 @@ export function Screen({
         paddingTop: padTop ? insets.top + Spacing.md : Spacing.lg,
         paddingBottom: padBottom ?? insets.bottom + 96,
         gap: Spacing.md,
+        // In a wide browser window, keep a readable column rather than stretching edge to edge.
+        ...(Platform.OS === 'web' ? { width: '100%', maxWidth: 720, alignSelf: 'center' as const } : null),
       }}
       keyboardShouldPersistTaps="handled"
       // We pad for the safe area ourselves; without this, iOS adds its own inset to the first

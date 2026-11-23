@@ -3,8 +3,10 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import '@/lib/web-alert';
 import { MenuHost } from '@/components/menu';
 import { SheetClose } from '@/components/sheet';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
@@ -14,7 +16,12 @@ import { AppThemeProvider, useTheme, useThemeMode } from '@/hooks/use-theme';
 SplashScreen.preventAutoHideAsync();
 
 /** Sheets: page-sheet modal, ✕ on the left, centred title. */
-const sheet = { presentation: 'modal', headerLeft: () => <SheetClose /> } as const;
+const sheet = {
+  presentation: 'modal',
+  headerLeft: () => <SheetClose />,
+  // In a wide browser window, a readable column rather than edge to edge.
+  ...(Platform.OS === 'web' ? { contentStyle: { width: '100%', maxWidth: 720, alignSelf: 'center' as const } } : null),
+} as const;
 
 function RootNavigator() {
   const { session, initialising } = useAuth();

@@ -1,6 +1,6 @@
 import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import { useEffect } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Platform, StyleSheet, Text } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -11,7 +11,9 @@ import { Spacing } from '@/constants/theme';
 import { useTheme, useThemeMode } from '@/hooks/use-theme';
 
 /** Height of the system tab bar plus a 12 pt gap: the dock floats just above it. */
-const ABOVE_TAB_BAR = 62 + 12;
+// Native tabs draw over the screen, so the dock sits above them; web tabs sit beside or below it.
+const ABOVE_TAB_BAR = Platform.OS === 'web' ? 16 : 62 + 12;
+const WEB = Platform.OS === 'web';
 const GLASS = isLiquidGlassAvailable();
 
 /**
@@ -63,6 +65,8 @@ export function QuickDock({
           left: Spacing.lg,
           right: Spacing.lg,
           bottom: insets.bottom + ABOVE_TAB_BAR,
+          // Centred under the content column in a wide browser window.
+          ...(WEB ? { maxWidth: 688, marginHorizontal: 'auto' as const } : null),
           height: 66,
           borderRadius: 33,
           overflow: 'hidden',

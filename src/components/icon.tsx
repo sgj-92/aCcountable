@@ -17,7 +17,11 @@ export type IconName =
   | 'barcode'
   | 'scale'
   | 'stopwatch'
-  | 'file';
+  | 'file'
+  | 'ring'
+  | 'list'
+  | 'calendar'
+  | 'person';
 
 export function Icon({
   name,
@@ -97,6 +101,30 @@ export function Icon({
         <>
           <Path d="M7 3h7l5 5v13H7z" {...p} />
           <Path d="M14 3v5h5" {...p} />
+        </>
+      ) : null}
+      {name === 'ring' ? (
+        <>
+          <Circle cx={12} cy={12} r={8.5} {...p} />
+          <Path d="M15.5 8.6a4.8 4.8 0 1 0 0 6.8" {...p} />
+        </>
+      ) : null}
+      {name === 'list' ? (
+        <>
+          <Rect x={5} y={4} width={14} height={17} rx={2.5} {...p} />
+          <Path d="M9 3v2.5h6V3M8.5 11h7M8.5 15h5" {...p} />
+        </>
+      ) : null}
+      {name === 'calendar' ? (
+        <>
+          <Rect x={3.5} y={5} width={17} height={15.5} rx={3} {...p} />
+          <Path d="M3.5 10h17M8 3v4M16 3v4" {...p} />
+        </>
+      ) : null}
+      {name === 'person' ? (
+        <>
+          <Circle cx={12} cy={8.5} r={3.8} {...p} />
+          <Path d="M4.5 20.5c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5" {...p} />
         </>
       ) : null}
     </Svg>

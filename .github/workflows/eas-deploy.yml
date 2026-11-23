@@ -5,6 +5,7 @@
 # download on their next launch. If native code changed (new native library,
 # app.json native config, icons), start a new build instead: iOS goes to
 # TestFlight; Android is an installable APK (download link on expo.dev).
+# The website (accountable-app.expo.app) is rebuilt and published every time.
 #
 # Needs one repository secret: EXPO_TOKEN (an Expo access token).
 
@@ -141,3 +142,13 @@ jobs:
       - name: Link production channel
         if: steps.build.outputs.count != '0' || steps.builda.outputs.count != '0'
         run: npx --yes eas-cli@latest channel:edit production --branch production --non-interactive
+
+      # The website, https://accountable-app.expo.app: the same app built for the browser.
+      # Its Supabase address and publishable key come from the Expo "production" environment.
+      - name: Build the website
+        run: |
+          npx --yes eas-cli@latest env:pull --environment production --non-interactive
+          npx expo export --platform web
+
+      - name: Publish the website
+        run: npx --yes eas-cli@latest deploy --prod --non-interactive --dev-domain accountable-app
