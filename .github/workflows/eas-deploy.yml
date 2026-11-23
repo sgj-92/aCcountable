@@ -151,4 +151,4 @@ jobs:
           npx expo export --platform web
 
       - name: Publish the website
-        run: npx --yes eas-cli@latest deploy --prod --non-interactive --dev-domain accountable-app
+        run: npx --yes eas-cli@latest deploy --prod --non-interactive
