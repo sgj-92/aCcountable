@@ -16,6 +16,7 @@ import { useCountUp } from '@/hooks/use-count-up';
 import { useProfile } from '@/hooks/use-profile';
 import { useTheme, useThemeMode } from '@/hooks/use-theme';
 import { getProfile, updateProfile, type Profile } from '@/lib/api';
+import { ledgerSyncStatus } from '@/lib/ledger-push';
 import { dmyToIso, formatDmyInput, isoToDmy, today } from '@/lib/dates';
 import { FASTING_PRESETS, formatClock, formatClockInput, parseClock } from '@/lib/fasting';
 import { addSlot, CLASSIC_SLOTS, MAX_MEALS, numberedSlots, resolveSlots, type MealSlot } from '@/lib/meals';
@@ -130,6 +131,7 @@ export default function ProfileScreen() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
+  const { data: ledgerOn } = useAsync(ledgerSyncStatus, 'ledger-status');
   const insets = useSafeAreaInsets();
   const form = edited ?? (profile ? toForm(profile) : null);
 
@@ -403,6 +405,21 @@ export default function ProfileScreen() {
           <NavRow icon="file" title="Pantry" meta="Your foods and usual portions" onPress={() => router.push('/pantry')} divider />
           <NavRow icon="stopwatch" title="WHOOP history" meta="Your own burn rates per activity" onPress={() => router.push('/whoop-import')} divider />
           <NavRow icon="scale" title="Weight & trend" meta="Weigh-ins and the smoothed trend" onPress={() => router.push('/weigh-in')} divider />
+          <Row gap={Spacing.md} style={{ minHeight: 56, borderTopWidth: 1, borderTopColor: c.line }}>
+            <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: c.raised, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="check" size={16} color={ledgerOn ? c.good : c.text3} strokeWidth={2.4} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <T style={{ fontWeight: '600' }}>Ledger sync</T>
+              <T variant="footnote">
+                {ledgerOn == null
+                  ? 'Checking…'
+                  : ledgerOn
+                    ? 'On: training, meals, nutrition and weight sync with Ledger'
+                    : 'Not set up yet'}
+              </T>
+            </View>
+          </Row>
         </Card>
 
         <Overline>App</Overline>

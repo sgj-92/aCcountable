@@ -42,6 +42,8 @@ export interface TrainingSession {
   notes: string | null;
   /** Local start time "HH:MM", if given (used to time meals around training). */
   start_time?: string | null;
+  /** Set when the session came from Ledger: its reference there. */
+  external_ref?: string | null;
 }
 
 export interface FoodEntry {
@@ -132,7 +134,7 @@ export async function updateProfile(id: string, patch: Partial<Omit<Profile, 'id
 // ───────────── training ─────────────
 
 const SESSION_COLUMNS =
-  'id,date,activity,duration_min,intensity,kcal_override,actual_kcal,actual_duration_min,whoop_activity,notes,start_time';
+  'id,date,activity,duration_min,intensity,kcal_override,actual_kcal,actual_duration_min,whoop_activity,notes,start_time,external_ref';
 
 // Postgres time comes back as "HH:MM:SS".
 const normaliseSession = (s: TrainingSession): TrainingSession => ({ ...s, start_time: s.start_time ? s.start_time.slice(0, 5) : null });

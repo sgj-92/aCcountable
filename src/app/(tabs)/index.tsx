@@ -24,6 +24,8 @@ import { listPlanItems, logPlanItem, type PlanItem } from '@/lib/plans';
 import { isProfileComplete, setDiaryDay, type Profile, type TrainingSession } from '@/lib/api';
 import { addDays, formatDay, formatLongDay, isValidISODate, startOfWeek, today } from '@/lib/dates';
 import { parseClock } from '@/lib/fasting';
+import { buildLedgerSnapshot, snapshotKey } from '@/lib/ledger';
+import { pushToLedger } from '@/lib/ledger-push';
 import { mealTimes } from '@/lib/meal-times';
 import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
 import { sumTotals } from '@/lib/nutrition';
@@ -205,6 +207,27 @@ function TodayBody({
     .filter((s) => s.start_time && parseClock(s.start_time) != null)
     .map((s) => ({ startMin: parseClock(s.start_time)!, durationMin: s.actual_duration_min ?? s.duration_min }));
   const times = timedTraining.length ? mealTimes(shownSlots, timedTraining, fastingWindow) : null;
+
+  // Two-way sync with Ledger: send the day whenever it changes (skipped if not set up).
+  const ledgerSnapshot = buildLedgerSnapshot({
+    date,
+    sessions,
+    slots: shownSlots,
+    food,
+    plan: data.plan,
+    isLogged: dayPlan.isLogged,
+    gramsFor: dayPlan.gramsFor,
+    times,
+    target: { kcal: target, proteinG: day.proteinG, carbsG: day.carbsG, fatG: day.fatG },
+    dayType: day.raw.dayType ?? null,
+    diaryOnly: diary,
+    weightKg: data.weighIns.find((w) => w.date === date)?.weight_kg ?? null,
+  });
+  const ledgerKey = snapshotKey(ledgerSnapshot);
+  useEffect(() => {
+    const t = setTimeout(() => pushToLedger(JSON.parse(ledgerKey)).catch(() => {}), 1500);
+    return () => clearTimeout(t);
+  }, [ledgerKey]);
 
   async function logPlanned(item: PlanItem, grams: number) {
     try {

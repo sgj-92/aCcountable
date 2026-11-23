@@ -13,3 +13,7 @@ verify_jwt = true
 
 [functions.parse-day-types]
 verify_jwt = true
+
+# Ledger calls this with an HMAC signature instead of a user token; the app calls it signed in.
+[functions.ledger-sync]
+verify_jwt = false
