@@ -95,6 +95,8 @@ export default function ScanScreen() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [turns, setTurns] = useState<ScanTurn[]>([]);
   const [reply, setReply] = useState('');
+  // While typing a correction, the Add bar is hidden so it can't sit over the text box.
+  const [replyFocused, setReplyFocused] = useState(false);
   const [refining, setRefining] = useState(false);
   const [items, setItems] = useState<EditableItem[]>([]);
   const [editing, setEditing] = useState<number | null>(null);
@@ -295,7 +297,7 @@ export default function ScanScreen() {
         contentContainerStyle={{
           padding: Spacing.lg,
           paddingTop: Spacing.sm,
-          paddingBottom: footer ? FOOTER_SPACE + Spacing.lg : insets.bottom + Spacing.xl,
+          paddingBottom: footer && !replyFocused ? FOOTER_SPACE + Spacing.lg : insets.bottom + Spacing.xl,
           gap: Spacing.md,
         }}
         keyboardShouldPersistTaps="handled"
@@ -405,7 +407,15 @@ export default function ScanScreen() {
                   selectionColor={c.accentLine}
                   multiline
                   accessibilityLabel="Reply to the estimate"
-                  onFocus={() => setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 250)}
+                  // The scroll view keeps the box above the keyboard by itself; scrolling to the end
+                  // here jumped past it to the bottom of the page.
+                  onFocus={() => setReplyFocused(true)}
+                  onBlur={() => setReplyFocused(false)}
+                  returnKeyType="send"
+                  submitBehavior="blurAndSubmit"
+                  onSubmitEditing={() => {
+                    if (reply.trim() && !refining) refine();
+                  }}
                   style={{
                     flex: 1,
                     minHeight: 48,
@@ -484,7 +494,7 @@ export default function ScanScreen() {
           </>
         ) : null}
       </ScrollView>
-      {footer ? <SheetFooter>{footer}</SheetFooter> : null}
+      {footer && !replyFocused ? <SheetFooter>{footer}</SheetFooter> : null}
     </View>
   );
 }
