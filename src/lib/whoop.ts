@@ -5,7 +5,7 @@
  * Columns are found by name, not position, so small changes to WHOOP's export
  * format don't break the import; the import screen shows what was detected.
  */
-import type { Activity } from './nutrition';
+import { ACTIVITY_LABELS, type Activity } from './nutrition';
 
 export interface WhoopWorkout {
   /** Local start time as exported, "YYYY-MM-DD HH:MM:SS". */
@@ -85,7 +85,8 @@ function findColumn(headers: string[], tests: ((h: string) => boolean)[]): numbe
 export function mapWhoopActivity(name: string): Activity {
   const n = name.toLowerCase();
   const has = (...words: string[]) => words.some((w) => n.includes(w));
-  if (has('padel')) return 'padel';
+  // WHOOP calls padel "Paddle Tennis"; check before tennis.
+  if (has('padel', 'paddle')) return 'padel';
   if (has('tennis', 'squash', 'pickleball', 'badminton', 'racquet', 'table tennis')) return 'tennis';
   if (has('run', 'jog', 'treadmill', 'track')) return 'run';
   if (has('cycl', 'spin', 'bik', 'peloton')) return 'cycle';
@@ -256,12 +257,24 @@ export function ratesForModel(byActivity: ActivityRate[], byName: ActivityRate[]
   return { byActivity: activity, byName: name };
 }
 
+/**
+ * The name to show for an activity. WHOOP's own name, except for activities the app
+ * (and Ledger) name themselves: "Paddle Tennis" is Padel, "Weightlifting" is Strength.
+ * The WHOOP name is still kept on the session for matching its workouts.
+ */
+const OWN_NAMES: Partial<Record<Activity, string>> = { padel: 'Padel', strength: 'Strength', hiit: 'HIIT' };
+export function activityName(whoopName: string | null | undefined, activity: Activity): string {
+  if (!whoopName) return ACTIVITY_LABELS[activity];
+  return OWN_NAMES[mapWhoopActivity(whoopName)] ?? whoopName;
+}
+
 /** Rates from stored WHOOP rows (as the API returns them). */
 export function ratesFromRows(
   rows: { activity: Activity; activity_name: string; duration_min: number; kcal: number; started_at: string }[],
 ) {
   const input = rows.map((w) => ({
-    activity: w.activity,
+    // From the name, not the stored type, so rows imported before a mapping fix still group right.
+    activity: mapWhoopActivity(w.activity_name),
     activityName: w.activity_name,
     durationMin: w.duration_min,
     kcal: w.kcal,

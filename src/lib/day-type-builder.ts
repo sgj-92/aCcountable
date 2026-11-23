@@ -12,7 +12,7 @@ import { pantryToPlanRow, type PantryItem } from './pantry';
 import { solvePlan } from './planner';
 import { toPlanFood } from './plans';
 import { targetFor, type Rates } from './targets';
-import type { ActivityRate } from './whoop';
+import { activityName, type ActivityRate } from './whoop';
 
 const MAX_TRAINING_DAYS = 3;
 
@@ -72,7 +72,7 @@ export function buildDayTypes(
   const kinds: { name: string; sessions: DayTypeSession[] }[] = [
     { name: 'Rest day', sessions: [] },
     ...(training.length
-      ? training.map((s) => ({ name: `${s.whoop_activity} day`.slice(0, 40), sessions: [s] }))
+      ? training.map((s) => ({ name: `${activityName(s.whoop_activity, s.activity)} day`.slice(0, 40), sessions: [s] }))
       : [{ name: 'Training day', sessions: [{ activity: 'strength' as const, whoop_activity: null, duration_min: 60, intensity: 'moderate' as const }] }]),
   ];
   return kinds.map((k, i) => {

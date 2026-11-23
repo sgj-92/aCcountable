@@ -14,10 +14,9 @@ import { getProfile, isProfileComplete, listWhoopWorkouts } from '@/lib/api';
 import { today } from '@/lib/dates';
 import { buildDayTypes } from '@/lib/day-type-builder';
 import { listDayTypes, mealTotals, parseDayTypes, saveDayType, type DayType, type NewDayType } from '@/lib/day-types';
-import { ACTIVITY_LABELS } from '@/lib/nutrition';
 import { listPantry, savePantryItems, type PantryItem } from '@/lib/pantry';
 import { amountLabel } from '@/lib/plans';
-import { ratesForModel, ratesFromRows } from '@/lib/whoop';
+import { activityName, ratesForModel, ratesFromRows } from '@/lib/whoop';
 
 const EXAMPLE = `Rest day: 2,000 kcal, 180 g protein, 200 g carbs, 60 g fat
 Meal 1: 3 eggs, 50 g oats, 30 g whey
@@ -272,7 +271,7 @@ function DayTypeCard({
   const totals = mealTotals(d);
   const off = Math.round(totals.kcal - d.kcal);
   const training = d.sessions.length
-    ? d.sessions.map((s) => `${s.whoop_activity ?? ACTIVITY_LABELS[s.activity]} ${s.duration_min}′ ${s.intensity}`).join(' + ')
+    ? d.sessions.map((s) => `${activityName(s.whoop_activity, s.activity)} ${s.duration_min}′ ${s.intensity}`).join(' + ')
     : 'No training';
   return (
     <Pressable accessibilityRole={onPress ? 'button' : undefined} onPress={onPress} disabled={!onPress}>

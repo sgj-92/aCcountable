@@ -15,7 +15,7 @@ import { addDays, formatDay, isValidISODate, today } from '@/lib/dates';
 import { formatClock, formatClockInput, parseClock } from '@/lib/fasting';
 import { ACTIVITY_LABELS, type Activity, type Intensity } from '@/lib/nutrition';
 import { sessionKcalDetail } from '@/lib/targets';
-import { ratesForModel, ratesFromRows, type ActivityRate } from '@/lib/whoop';
+import { activityName, ratesForModel, ratesFromRows, type ActivityRate } from '@/lib/whoop';
 
 const ACTIVITIES = Object.keys(ACTIVITY_LABELS) as Activity[];
 
@@ -432,17 +432,27 @@ function ActivityPicker({
   const c = useTheme();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const label = selected.kind === 'whoop' ? selected.label : ACTIVITY_LABELS[selected.activity];
+  const label =
+    selected.kind === 'whoop' ? activityName(selected.label, whoop.find((r) => r.label === selected.label)?.activity ?? 'other') : ACTIVITY_LABELS[selected.activity];
 
-  const all = [
-    ...whoop.map((r) => ({
+  // WHOOP activities under the app's names ("Paddle Tennis" shows as Padel), WHOOP's name kept in the detail.
+  const whoopItems = whoop.map((r) => {
+    const name = activityName(r.label, r.activity);
+    const count = r.samples > 0 ? ` · ${r.samples} session${r.samples === 1 ? '' : 's'}` : '';
+    return {
       key: `w:${r.label}`,
-      label: r.label,
-      meta: r.samples > 0 ? `WHOOP · ${r.samples} session${r.samples === 1 ? '' : 's'}` : 'WHOOP',
+      label: name,
+      search: `${name} ${r.label}`.toLowerCase(),
+      meta: `WHOOP${name === r.label ? '' : ` “${r.label}”`}${count}`,
       choice: { kind: 'whoop', rate: r } as Choice,
       on: selected.kind === 'whoop' && selected.label.toLowerCase() === r.label.toLowerCase(),
-    })),
-    ...ACTIVITIES.map((a) => ({
+    };
+  });
+
+  const all = [
+    ...whoopItems,
+    // A generic type is left out when a WHOOP activity already shows under its name (it has real burns).
+    ...ACTIVITIES.filter((a) => !whoopItems.some((w) => w.label === ACTIVITY_LABELS[a])).map((a) => ({
       key: `g:${a}`,
       label: ACTIVITY_LABELS[a],
       meta: 'Typical estimate',
@@ -451,7 +461,7 @@ function ActivityPicker({
     })),
   ].sort((x, y) => x.label.localeCompare(y.label) || (x.key.startsWith('w:') ? -1 : y.key.startsWith('w:') ? 1 : 0));
   const q = query.trim().toLowerCase();
-  const shown = q ? all.filter((o) => o.label.toLowerCase().includes(q)) : all;
+  const shown = q ? all.filter((o) => ('search' in o ? String(o.search) : o.label.toLowerCase()).includes(q)) : all;
 
   return (
     <View style={{ gap: 6 }}>

@@ -6,6 +6,7 @@ import { judgePace, weeklyRate, weightTrend } from '../weight';
 import {
   burnRates,
   burnRatesByName,
+  activityName,
   mapWhoopActivity,
   matchToSessions,
   normaliseStart,
@@ -61,6 +62,17 @@ describe('WHOOP import', () => {
     expect(mapWhoopActivity('Spin')).toBe('cycle');
     expect(mapWhoopActivity('Soccer')).toBe('sport');
     expect(mapWhoopActivity('Meditation')).toBe('yoga');
+    expect(mapWhoopActivity('Paddle Tennis')).toBe('padel');
+    expect(mapWhoopActivity('Tennis')).toBe('tennis');
+  });
+
+  it('shows WHOOP activities under the app\'s (and Ledger\'s) names where it has its own', () => {
+    expect(activityName('Paddle Tennis', 'tennis')).toBe('Padel');
+    expect(activityName('Weightlifting', 'strength')).toBe('Strength');
+    expect(activityName('Functional Fitness', 'hiit')).toBe('HIIT');
+    expect(activityName('Running', 'run')).toBe('Running');
+    expect(activityName('Squash', 'tennis')).toBe('Squash');
+    expect(activityName(null, 'padel')).toBe('Padel');
     expect(mapWhoopActivity('Something new')).toBe('other');
   });
 

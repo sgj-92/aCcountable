@@ -21,7 +21,7 @@ import {
 import { ACTIVITY_LABELS, type Activity, type Intensity } from '@/lib/nutrition';
 import { listPantry, type PantryItem } from '@/lib/pantry';
 import { amountLabel } from '@/lib/plans';
-import { ratesFromRows, type ActivityRate } from '@/lib/whoop';
+import { activityName, ratesFromRows, type ActivityRate } from '@/lib/whoop';
 
 const num = (s: string) => (s.trim() === '' ? NaN : Number(s.replace(',', '.')));
 const ACTIVITIES = Object.keys(ACTIVITY_LABELS) as Activity[];
@@ -134,7 +134,7 @@ export default function DayTypeEditor() {
     showMenu(
       [
         ...whoop.map((r) => ({
-          label: `${r.label} (WHOOP)`,
+          label: `${activityName(r.label, r.activity)}${activityName(r.label, r.activity) === r.label ? '' : ` (WHOOP “${r.label}”)`}`,
           onPress: () => setSessions(sessions.map((s, j) => (j === i ? { ...s, activity: r.activity, whoop_activity: r.label } : s))),
         })),
         ...ACTIVITIES.map((a) => ({
@@ -207,7 +207,7 @@ export default function DayTypeEditor() {
                   accessibilityRole="button"
                   onPress={() => pickActivity(i)}
                   style={{ flex: 1, height: 44, borderRadius: Radius.md, backgroundColor: c.raised, paddingHorizontal: 14, justifyContent: 'center' }}>
-                  <T numberOfLines={1}>{s.whoop_activity ?? ACTIVITY_LABELS[s.activity]} ▾</T>
+                  <T numberOfLines={1}>{activityName(s.whoop_activity, s.activity)} ▾</T>
                 </Pressable>
                 <TextInput
                   value={String(s.duration_min)}

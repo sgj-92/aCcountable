@@ -8,7 +8,7 @@ import { Card, fmt, Row, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { assignDayType, type DayType } from '@/lib/day-types';
-import { ACTIVITY_LABELS } from '@/lib/nutrition';
+import { activityName } from '@/lib/whoop';
 
 /**
  * "What's today?": pick the day type for a date. Picking one sets the day's target
@@ -66,7 +66,7 @@ export function DayTypePicker({
   }
 
   const training = selected?.sessions.length
-    ? selected.sessions.map((s) => `${s.whoop_activity ?? ACTIVITY_LABELS[s.activity]} ${s.duration_min}′`).join(' + ')
+    ? selected.sessions.map((s) => `${activityName(s.whoop_activity, s.activity)} ${s.duration_min}′`).join(' + ')
     : 'no training';
 
   return (
