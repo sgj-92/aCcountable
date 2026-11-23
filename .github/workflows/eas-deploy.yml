@@ -45,7 +45,7 @@ jobs:
 
       - name: Deploy server functions
         if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_DB_PASSWORD != ''
-        run: supabase functions deploy --project-ref "$PROJECT_REF" --use-api
+        run: supabase functions deploy --project-ref "$PROJECT_REF" --use-api --yes
 
       - name: Supabase secrets not set
         if: env.SUPABASE_ACCESS_TOKEN == '' || env.SUPABASE_DB_PASSWORD == ''
