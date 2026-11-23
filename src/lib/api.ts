@@ -40,6 +40,8 @@ export interface TrainingSession {
   /** Exact WHOOP activity name it was picked as, e.g. "Running". */
   whoop_activity: string | null;
   notes: string | null;
+  /** Local start time "HH:MM", if given (used to time meals around training). */
+  start_time?: string | null;
 }
 
 export interface FoodEntry {
@@ -130,7 +132,10 @@ export async function updateProfile(id: string, patch: Partial<Omit<Profile, 'id
 // ───────────── training ─────────────
 
 const SESSION_COLUMNS =
-  'id,date,activity,duration_min,intensity,kcal_override,actual_kcal,actual_duration_min,whoop_activity,notes';
+  'id,date,activity,duration_min,intensity,kcal_override,actual_kcal,actual_duration_min,whoop_activity,notes,start_time';
+
+// Postgres time comes back as "HH:MM:SS".
+const normaliseSession = (s: TrainingSession): TrainingSession => ({ ...s, start_time: s.start_time ? s.start_time.slice(0, 5) : null });
 
 export async function listSessions(from: string, to: string): Promise<TrainingSession[]> {
   const res = await supabase
@@ -140,7 +145,7 @@ export async function listSessions(from: string, to: string): Promise<TrainingSe
     .lte('date', to)
     .order('date')
     .order('created_at');
-  return unwrap(res) as TrainingSession[];
+  return (unwrap(res) as TrainingSession[]).map(normaliseSession);
 }
 
 export async function getSession(id: string): Promise<TrainingSession> {
@@ -149,7 +154,7 @@ export async function getSession(id: string): Promise<TrainingSession> {
     .select(SESSION_COLUMNS)
     .eq('id', id)
     .single();
-  return unwrap(res) as TrainingSession;
+  return normaliseSession(unwrap(res) as TrainingSession);
 }
 
 export async function saveSession(session: NewTrainingSession, id?: string): Promise<void> {

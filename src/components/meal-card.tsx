@@ -10,6 +10,8 @@ import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { addFoodEntry, deleteFood, updateFood, type FoodEntry } from '@/lib/api';
 import { today } from '@/lib/dates';
+import { formatClock } from '@/lib/fasting';
+import type { MealTime } from '@/lib/meal-times';
 import type { MealSlot } from '@/lib/meals';
 import { amountLabel, type PlanItem } from '@/lib/plans';
 
@@ -23,8 +25,11 @@ export function MealCard({
   diary,
   planned = [],
   onLogPlanned,
+  time,
   onChanged,
 }: {
+  /** Suggested time for this meal (when training has a start time). */
+  time?: MealTime;
   /** Planned foods for this meal not eaten yet, with the amount the plan has for them. */
   planned?: { item: PlanItem; grams: number }[];
   onLogPlanned?: (item: PlanItem, grams: number) => void;
@@ -56,6 +61,12 @@ export function MealCard({
           <T variant="headline" numberOfLines={1}>
             {label}
           </T>
+          {time ? (
+            <T variant="footnote" color={time.tag ? c.training : c.text2} style={{ fontVariant: ['tabular-nums'] }}>
+              {formatClock(time.minutes)}
+              {time.tag === 'pre' ? ' · before training' : time.tag === 'post' ? ' · after training' : ''}
+            </T>
+          ) : null}
           {items.length === 0 ? (
             <T variant="footnote" color={c.text3}>
               {planned.length ? `${planned.length} planned · ≈ ${fmt(planned.reduce((t, p) => t + (p.item.kcal_100g * p.grams) / 100, 0))} kcal` : 'Nothing logged'}

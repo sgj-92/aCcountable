@@ -24,6 +24,7 @@ import { listPlanItems, logPlanItem, type PlanItem } from '@/lib/plans';
 import { isProfileComplete, setDiaryDay, type Profile, type TrainingSession } from '@/lib/api';
 import { addDays, formatDay, formatLongDay, isValidISODate, startOfWeek, today } from '@/lib/dates';
 import { parseClock } from '@/lib/fasting';
+import { mealTimes } from '@/lib/meal-times';
 import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
 import { sumTotals } from '@/lib/nutrition';
 import { sessionKcalDetail, sessionLabel } from '@/lib/targets';
@@ -198,6 +199,13 @@ function TodayBody({
   const plannedFor = (meal: string) =>
     data.plan.filter((i) => i.meal === meal && !dayPlan.isLogged(i)).map((item) => ({ item, grams: dayPlan.gramsFor(item) }));
 
+  // Meal times around training, once a session today has a start time.
+  const shownSlots = slotsForData(slots, [...food.map((f) => f.meal), ...data.plan.map((i) => i.meal)]);
+  const timedTraining = sessions
+    .filter((s) => s.start_time && parseClock(s.start_time) != null)
+    .map((s) => ({ startMin: parseClock(s.start_time)!, durationMin: s.actual_duration_min ?? s.duration_min }));
+  const times = timedTraining.length ? mealTimes(shownSlots, timedTraining, fastingWindow) : null;
+
   async function logPlanned(item: PlanItem, grams: number) {
     try {
       await logPlanItem(item, grams);
@@ -285,7 +293,7 @@ function TodayBody({
           {fmt(eaten.kcal)} kcal eaten
         </T>
       </Row>
-      {slotsForData(slots, [...food.map((f) => f.meal), ...data.plan.map((i) => i.meal)]).map(({ key, label }) => (
+      {shownSlots.map(({ key, label }) => (
         <MealCard
           key={key}
           label={label}
@@ -293,6 +301,7 @@ function TodayBody({
           date={date}
           items={food.filter((f) => f.meal === key)}
           planned={plannedFor(key)}
+          time={times?.[key]}
           onLogPlanned={logPlanned}
           slots={slots}
           diary={diary}

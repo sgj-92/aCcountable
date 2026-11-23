@@ -12,6 +12,7 @@ import { useCountUp } from '@/hooks/use-count-up';
 import { useTheme } from '@/hooks/use-theme';
 import { deleteSession, getProfile, getSession, listWhoopWorkouts, saveSession, type Profile } from '@/lib/api';
 import { addDays, formatDay, isValidISODate, today } from '@/lib/dates';
+import { formatClock, formatClockInput, parseClock } from '@/lib/fasting';
 import { ACTIVITY_LABELS, type Activity, type Intensity } from '@/lib/nutrition';
 import { sessionKcalDetail } from '@/lib/targets';
 import { ratesForModel, ratesFromRows, type ActivityRate } from '@/lib/whoop';
@@ -38,6 +39,7 @@ export default function TrainingEditor() {
   const [actualKcal, setActualKcal] = useState('');
   const [actualDuration, setActualDuration] = useState('');
   const [notes, setNotes] = useState('');
+  const [startTime, setStartTime] = useState('');
   const [showOverride, setShowOverride] = useState(false);
   const [durationFocused, setDurationFocused] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -66,6 +68,7 @@ export default function TrainingEditor() {
           setActualDuration(s.actual_duration_min != null ? String(s.actual_duration_min) : '');
           setWhoopActivity(s.whoop_activity);
           setNotes(s.notes ?? '');
+          setStartTime(s.start_time ?? '');
           setLoaded(true);
         },
         (e) => setError(e instanceof Error ? e.message : String(e)),
@@ -158,6 +161,7 @@ export default function TrainingEditor() {
           actual_duration_min: canConfirm && actualMin != null ? actualMin : null,
           whoop_activity: whoopActivity,
           notes: notes.trim() || null,
+          start_time: parseClock(startTime) != null ? formatClock(parseClock(startTime)!) : null,
         },
         id,
       );
@@ -289,7 +293,22 @@ export default function TrainingEditor() {
             />
           </View>
         </Row>
-        <Field label="Notes · optional" value={notes} onChangeText={setNotes} placeholder="e.g. doubles, 2 sets" />
+        <Row gap={Spacing.sm} style={{ alignItems: 'flex-start' }}>
+          <Field
+            style={{ width: 120 }}
+            label="Starts at"
+            value={startTime}
+            onChangeText={(v) => setStartTime(formatClockInput(v))}
+            placeholder="18:00"
+            keyboardType="number-pad"
+            maxLength={5}
+            error={startTime && parseClock(startTime) == null ? 'Use HH:MM' : null}
+          />
+          <Field style={{ flex: 1 }} label="Notes · optional" value={notes} onChangeText={setNotes} placeholder="e.g. doubles, 2 sets" />
+        </Row>
+        <T variant="footnote" style={{ marginTop: -Spacing.xs, paddingHorizontal: 4 }}>
+          Add a start time and your meals are timed around it: one about 2 h before, one about 1 h after.
+        </T>
 
         {detail ? (
           <View

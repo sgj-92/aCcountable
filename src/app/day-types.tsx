@@ -10,12 +10,14 @@ import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useMealSlots } from '@/hooks/use-profile';
 import { useTheme } from '@/hooks/use-theme';
-import { listWhoopWorkouts } from '@/lib/api';
+import { getProfile, isProfileComplete, listWhoopWorkouts } from '@/lib/api';
+import { today } from '@/lib/dates';
+import { buildDayTypes } from '@/lib/day-type-builder';
 import { listDayTypes, mealTotals, parseDayTypes, saveDayType, type DayType, type NewDayType } from '@/lib/day-types';
 import { ACTIVITY_LABELS } from '@/lib/nutrition';
 import { listPantry, savePantryItems, type PantryItem } from '@/lib/pantry';
 import { amountLabel } from '@/lib/plans';
-import { ratesFromRows } from '@/lib/whoop';
+import { ratesForModel, ratesFromRows } from '@/lib/whoop';
 
 const EXAMPLE = `Rest day: 2,000 kcal, 180 g protein, 200 g carbs, 60 g fat
 Meal 1: 3 eggs, 50 g oats, 30 g whey
@@ -31,12 +33,14 @@ export default function DayTypesScreen() {
   const c = useTheme();
   const slots = useMealSlots();
   const { data, error, reload } = useAsync(async () => {
-    const [dayTypes, pantry, whoop] = await Promise.all([
+    const [dayTypes, pantry, whoop, profile] = await Promise.all([
       listDayTypes(),
       listPantry().catch(() => [] as PantryItem[]),
       listWhoopWorkouts().catch(() => []),
+      getProfile(),
     ]);
-    return { dayTypes, pantry, whoopNames: ratesFromRows(whoop).byName.map((r) => r.label) };
+    const rates = ratesFromRows(whoop);
+    return { dayTypes, pantry, profile, rates, whoopNames: rates.byName.map((r) => r.label) };
   }, 'day-types');
   const [pasting, setPasting] = useState(false);
   const [text, setText] = useState('');
@@ -68,6 +72,36 @@ export default function DayTypesScreen() {
     } finally {
       setBusy(false);
     }
+  }
+
+  /** Day types worked out from your goal, usual training and pantry. */
+  function buildForMe() {
+    if (!data) return;
+    setActionError(null);
+    if (!isProfileComplete(data.profile)) {
+      setActionError('Complete your profile first: your targets come from it.');
+      return;
+    }
+    const built = buildDayTypes(
+      data.profile,
+      ratesForModel(data.rates.byActivity, data.rates.byName),
+      data.rates.byName,
+      data.pantry,
+      today(),
+    );
+    const filed = data.pantry.filter((p) => p.meals.length > 0).length;
+    setNotes(
+      [
+        'Rest day is your goal’s rest-day target. Each training day adds what that session usually burns (from your WHOOP history), as carbs; protein and fat stay the same.',
+        filed === 0
+          ? 'No meals yet: add foods to your pantry with the meals you usually have them at, then build again.'
+          : 'Meals use your pantry foods filed under each meal, sized to hit each day’s target.',
+        data.dayTypes.some((d) => built.some((b) => b.name === d.name)) ? 'Saving replaces your existing day types with the same names.' : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
+    );
+    setDrafts(built.map((d) => ({ ...d, include: true })));
   }
 
   async function saveDrafts() {
@@ -199,10 +233,12 @@ export default function DayTypesScreen() {
                   Each day type is a kind of day you agreed with your coach: its calorie and macro targets, the training it
                   assumes and the meals that make it up. Pick one on Today and the day is planned for you.
                 </T>
+                <Button title="Build them for me" icon="✨" size="L" onPress={buildForMe} />
                 <Row gap={Spacing.sm}>
-                  <Button title="Paste agreed plan" icon="✨" onPress={() => setPasting(true)} style={{ flex: 1 }} />
+                  <Button title="Paste agreed plan" variant="secondary" onPress={() => setPasting(true)} style={{ flex: 1 }} />
                   <Button title="New day type" variant="secondary" onPress={() => router.push('/day-type')} style={{ flex: 1 }} />
                 </Row>
+                <ErrorText message={actionError} />
               </>
             )}
             {!pasting
