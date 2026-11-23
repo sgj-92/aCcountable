@@ -1,7 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
 import type { FoodEntry, TrainingSession } from '../api';
-import { buildLedgerSnapshot, fromLedgerType, mealRef, toLedgerType } from '../ledger';
+import { buildLedgerSnapshot, carbLevel, fromLedgerType, mealRef, toLedgerType } from '../ledger';
 import type { PlanItem } from '../plans';
 
 jest.mock('../supabase', () => ({ supabase: {} }));
@@ -48,7 +48,9 @@ describe('ledger sync', () => {
       dayType: 'Padel day',
       diaryOnly: false,
       weightKg: 98.3,
+      restCarbsG: 180,
     });
+    expect(s.carbLevel).toBe('high');
     expect(s.training).toEqual([{ ref: 'acc:session:s1', type: 'padel', title: 'Padel', startTime: '18:00', durationMin: 90 }]);
     expect(s.meals.map((m) => [m.name, m.time, m.tag, m.kcal, m.done])).toEqual([
       ['Meal 1', '07:30', null, 143, true],
@@ -64,9 +66,19 @@ describe('ledger sync', () => {
   it('keeps Ledger’s reference on sessions that came from Ledger', () => {
     const s = buildLedgerSnapshot({
       date, sessions: [{ ...session, external_ref: 'ledger:2026-11-24:padel' }], slots: [], food: [], plan: [],
-      isLogged: () => false, gramsFor: () => 0, times: null, target: null, dayType: null, diaryOnly: false, weightKg: null,
+      isLogged: () => false, gramsFor: () => 0, times: null, target: null, dayType: null, diaryOnly: false, weightKg: null, restCarbsG: null,
     });
     expect(s.training[0].ref).toBe('ledger:2026-11-24:padel');
     expect(s.nutrition).toBeNull();
+  });
+
+  it('rates the day\'s carbs against a rest day', () => {
+    const base = { restCarbsG: 200, hasTraining: false, diaryOnly: false };
+    expect(carbLevel({ ...base, carbsG: 200 })).toBe('low');
+    expect(carbLevel({ ...base, carbsG: 205, hasTraining: true })).toBe('normal');
+    expect(carbLevel({ ...base, carbsG: 230 })).toBe('normal');
+    expect(carbLevel({ ...base, carbsG: 260, hasTraining: true })).toBe('high');
+    expect(carbLevel({ ...base, carbsG: 260, diaryOnly: true })).toBeNull();
+    expect(carbLevel({ ...base, carbsG: null })).toBeNull();
   });
 });

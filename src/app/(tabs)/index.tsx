@@ -29,7 +29,7 @@ import { pushToLedger } from '@/lib/ledger-push';
 import { mealTimes } from '@/lib/meal-times';
 import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
 import { sumTotals } from '@/lib/nutrition';
-import { sessionKcalDetail, sessionLabel } from '@/lib/targets';
+import { sessionKcalDetail, sessionLabel, targetFor } from '@/lib/targets';
 import { WEEK_INSIGHT_IDS, weekSummary } from '@/lib/week-summary';
 
 /** Clears the floating dock and the tab bar. */
@@ -222,6 +222,8 @@ function TodayBody({
     dayType: day.raw.dayType ?? null,
     diaryOnly: diary,
     weightKg: data.weighIns.find((w) => w.date === date)?.weight_kg ?? null,
+    // Training calories go to carbs, so a rest day's carbs are the day's less the training's.
+    restCarbsG: day.carbsG - (targetFor(profile, date, sessions, view.rates)?.training ?? 0) / 4,
   });
   const ledgerKey = snapshotKey(ledgerSnapshot);
   useEffect(() => {

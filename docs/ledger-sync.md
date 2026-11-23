@@ -11,6 +11,7 @@ day-planning app). One owner on each side, one day at a time.
 | Meals: name, suggested time, foods, kcal, done | aCcountable → Ledger | aCcountable |
 | Meal ticked done in Ledger | Ledger → aCcountable | Ledger's tick logs the planned foods in aCcountable |
 | Day's nutrition (eaten, targets, macros, food diary, day type) | aCcountable → Ledger | aCcountable |
+| Day's carb level (Ledger's Nutrition Plan) | aCcountable → Ledger | aCcountable, on days Shaun leaves to it |
 | Weight for the day | both ways | whichever app last changed it |
 
 Nothing is written unless something differs, so the echo of a change comes back as a no-op
@@ -39,6 +40,7 @@ Sent whenever the day changes in aCcountable (debounced; unchanged days are skip
   "v": 1,
   "origin": "accountable",
   "date": "2026-11-24",
+  "carbLevel": "high",
   "training": [
     { "ref": "acc:session:7f3c…", "type": "padel", "title": "Padel", "startTime": "18:00", "durationMin": 90 },
     { "ref": "ledger:2026-11-24:resistance", "type": "resistance", "title": "Strength", "startTime": "07:00", "durationMin": 45 }
@@ -69,6 +71,10 @@ Sent whenever the day changes in aCcountable (debounced; unchanged days are skip
 }
 ```
 
+- `carbLevel` sets Ledger's Nutrition Plan on days marked "TBD by aCcountable" (or left unset):
+  `"low"` on a rest day; `"normal"` when training, or carbs up to 30% above a rest day's; `"high"`
+  above that. `null` on a diary-only day or with no target. aCcountable has no whole-day fast,
+  so it never sends `"fasting"`.
 - `training.type` is one of Ledger's types: `padel`, `resistance`, `cardio`, `hiit`, `yoga`.
   (aCcountable maps tennis → padel; strength → resistance; run, cycle, swim, row, walk and
   sport → cardio.) `startTime` is `"HH:MM"` or `null`.

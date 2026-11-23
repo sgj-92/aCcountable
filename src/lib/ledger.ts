@@ -60,11 +60,29 @@ export interface LedgerNutrition {
   diary: string[];
 }
 
+/** The day's carbs, for Ledger's Nutrition Plan. aCcountable has no whole-day fast, so never "fasting". */
+export type CarbLevel = 'fasting' | 'low' | 'normal' | 'high';
+
+/**
+ * How the day's carb target compares with a rest day's (training calories go to carbs):
+ * a rest day is low; training, or carbs up to 30% above rest, is normal; more is high.
+ * Null on a diary-only day or with no target.
+ */
+export function carbLevel(i: { carbsG: number | null; restCarbsG: number | null; hasTraining: boolean; diaryOnly: boolean }): CarbLevel | null {
+  if (i.diaryOnly || i.carbsG == null || !i.restCarbsG || i.restCarbsG <= 0) return null;
+  const ratio = i.carbsG / i.restCarbsG;
+  if (ratio >= 1.3) return 'high';
+  if (ratio >= 1.1 || i.hasTraining) return 'normal';
+  return 'low';
+}
+
 /** aCcountable → Ledger: one day. */
 export interface LedgerSnapshot {
   v: 1;
   origin: 'accountable';
   date: string;
+  /** Sets Ledger's Nutrition Plan on days marked "TBD by aCcountable"; null = no opinion. */
+  carbLevel: CarbLevel | null;
   training: LedgerTraining[];
   meals: LedgerMeal[];
   nutrition: LedgerNutrition | null;
@@ -132,6 +150,8 @@ export interface SnapshotInput {
   dayType: string | null;
   diaryOnly: boolean;
   weightKg: number | null;
+  /** A rest day's carb target for the same date, to rate the day's carbs. */
+  restCarbsG: number | null;
 }
 
 const r = Math.round;
@@ -194,5 +214,11 @@ export function buildLedgerSnapshot(i: SnapshotInput): LedgerSnapshot {
         }
       : null;
 
-  return { v: 1, origin: 'accountable', date: i.date, training, meals, nutrition, weightKg: i.weightKg };
+  const level = carbLevel({
+    carbsG: i.target?.carbsG ?? null,
+    restCarbsG: i.restCarbsG,
+    hasTraining: training.length > 0,
+    diaryOnly: i.diaryOnly,
+  });
+  return { v: 1, origin: 'accountable', date: i.date, carbLevel: level, training, meals, nutrition, weightKg: i.weightKg };
 }

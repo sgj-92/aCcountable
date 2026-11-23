@@ -157,7 +157,10 @@ async function fromLedger(raw: string, req: Request) {
 
 async function ownerFromState(db: SupabaseClient): Promise<string | null> {
   const r = await db.from('ledger_sync_state').select('user_id').not('last_sent', 'is', null).order('updated_at', { ascending: false }).limit(1);
-  return r.data?.[0]?.user_id ?? null;
+  if (r.data?.[0]?.user_id) return r.data[0].user_id;
+  // Before aCcountable has sent anything: a one-person project can only mean its one profile.
+  const p = await db.from('profiles').select('id').limit(2);
+  return p.data?.length === 1 ? p.data[0].id : null;
 }
 
 // ───────────── from the app ─────────────
