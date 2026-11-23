@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { MenuHost } from '@/components/menu';
 import { SheetClose } from '@/components/sheet';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
 import { ProfileProvider } from '@/hooks/use-profile';
@@ -72,6 +73,7 @@ function ThemedNavigation() {
       <AuthProvider>
         <ProfileProvider>
           <RootNavigator />
+          <MenuHost />
         </ProfileProvider>
       </AuthProvider>
     </ThemeProvider>

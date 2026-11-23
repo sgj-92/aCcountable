@@ -1,10 +1,10 @@
-# Ship every push to the app (runs on GitHub's free minutes, not Expo's).
+# Ship every push to the app on iOS and Android (runs on GitHub's free minutes, not Expo's).
 #
 # If a build with this code's native fingerprint already exists, publish an
 # over-the-air update to the "production" branch, which installed copies
 # download on their next launch. If native code changed (new native library,
-# app.json native config, icons), start a new App Store build instead and
-# submit it to TestFlight.
+# app.json native config, icons), start a new build instead: iOS goes to
+# TestFlight; Android is an installable APK (download link on expo.dev).
 #
 # Needs one repository secret: EXPO_TOKEN (an Expo access token).
 
@@ -41,23 +41,24 @@ jobs:
 
       - run: npm ci
 
-      - name: Native fingerprint
+      # ── iOS ──
+      - name: iOS fingerprint
         id: fp
         run: |
           hash=$(npx expo-updates fingerprint:generate --platform ios | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).hash))')
-          echo "Fingerprint: $hash"
+          echo "iOS fingerprint: $hash"
           echo "hash=$hash" >> "$GITHUB_OUTPUT"
 
-      - name: Look for a build with this fingerprint
+      - name: Look for an iOS build with this fingerprint
         id: build
         run: |
           count=$(npx --yes eas-cli@latest build:list --platform ios --build-profile production \
             --fingerprint-hash "${{ steps.fp.outputs.hash }}" --limit 10 --json --non-interactive \
             | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const b=JSON.parse(s);console.log(b.filter(x=>!["ERRORED","CANCELED"].includes(String(x.status).toUpperCase())).length)})')
-          echo "Matching builds: $count"
+          echo "Matching iOS builds: $count"
           echo "count=$count" >> "$GITHUB_OUTPUT"
 
-      - name: Publish over-the-air update
+      - name: Publish iOS over-the-air update
         if: steps.build.outputs.count != '0'
         env:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
@@ -65,11 +66,46 @@ jobs:
           msg=$(printf '%s' "${COMMIT_MESSAGE:-Manual run}" | head -n 1 | cut -c1-200)
           npx --yes eas-cli@latest update --branch production --platform ios --environment production \
             --message "$msg" --non-interactive
-          # Builds listen on the "production" channel: make sure it points at this branch.
-          npx --yes eas-cli@latest channel:edit production --branch production --non-interactive
 
-      - name: Start a new App Store build (native code changed)
+      - name: Start a new App Store build (iOS native code changed)
         if: steps.build.outputs.count == '0'
         run: |
           npx --yes eas-cli@latest build --platform ios --profile production --auto-submit \
             --non-interactive --no-wait
+
+      # ── Android (installable APK, same production channel) ──
+      - name: Android fingerprint
+        id: fpa
+        run: |
+          hash=$(npx expo-updates fingerprint:generate --platform android | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).hash))')
+          echo "Android fingerprint: $hash"
+          echo "hash=$hash" >> "$GITHUB_OUTPUT"
+
+      - name: Look for an Android build with this fingerprint
+        id: builda
+        run: |
+          count=$(npx --yes eas-cli@latest build:list --platform android --build-profile android-apk \
+            --fingerprint-hash "${{ steps.fpa.outputs.hash }}" --limit 10 --json --non-interactive \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const b=JSON.parse(s);console.log(b.filter(x=>!["ERRORED","CANCELED"].includes(String(x.status).toUpperCase())).length)})')
+          echo "Matching Android builds: $count"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+
+      - name: Publish Android over-the-air update
+        if: steps.builda.outputs.count != '0'
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          msg=$(printf '%s' "${COMMIT_MESSAGE:-Manual run}" | head -n 1 | cut -c1-200)
+          npx --yes eas-cli@latest update --branch production --platform android --environment production \
+            --message "$msg" --non-interactive
+
+      - name: Start a new Android APK build (Android native code changed)
+        if: steps.builda.outputs.count == '0'
+        run: |
+          npx --yes eas-cli@latest build --platform android --profile android-apk \
+            --non-interactive --no-wait
+
+      # Builds listen on the "production" channel: make sure it points at the production branch.
+      - name: Link production channel
+        if: steps.build.outputs.count != '0' || steps.builda.outputs.count != '0'
+        run: npx --yes eas-cli@latest channel:edit production --branch production --non-interactive
