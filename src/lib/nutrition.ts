@@ -114,6 +114,8 @@ export interface DayTarget extends MacroTargets {
   kcal: number;
   /** True when the goal deficit was capped so the base doesn't drop below BMR. */
   flooredAtBmr: boolean;
+  /** Set when the day follows a day type: its name. `base` is then the agreed kcal. */
+  dayType?: string;
 }
 
 export const LIFESTYLE_FACTORS: Record<Lifestyle, number> = {

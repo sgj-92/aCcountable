@@ -42,6 +42,8 @@ function RootNavigator() {
         <Stack.Screen name="log-day" options={{ ...sheet, title: 'Log your day' }} />
         <Stack.Screen name="pantry" options={{ ...sheet, title: 'Pantry' }} />
         <Stack.Screen name="pantry-item" options={{ ...sheet, title: 'Pantry food' }} />
+        <Stack.Screen name="day-types" options={{ ...sheet, title: 'Day types' }} />
+        <Stack.Screen name="day-type" options={{ ...sheet, title: 'Day type' }} />
       </Stack.Protected>
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="sign-in" options={{ headerShown: false }} />

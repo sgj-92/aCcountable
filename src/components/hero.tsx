@@ -24,11 +24,17 @@ export function TargetLedger({
   trainingLabel,
   weekBalance,
   target,
+  baseLabel = 'base',
+  dayType = false,
 }: {
   base: number;
   training: number;
   /** e.g. "padel"; shown under the training figure. */
   trainingLabel: string;
+  /** "base", or the day type's name. */
+  baseLabel?: string;
+  /** Day-type day: training shows the difference from what the day assumed. */
+  dayType?: boolean;
   weekBalance: number;
   target: number;
 }) {
@@ -56,10 +62,12 @@ export function TargetLedger({
       accessible
       accessibilityLabel={`Base ${fmt(base)}, training ${signed(training)}, week balance ${signed(weekBalance)}, target ${fmt(target)}`}
       style={{ flexDirection: 'row', gap: 4, alignSelf: 'stretch' }}>
-      {cell(fmt(base), 'base')}
-      {training > 0
-        ? cell(`+${fmt(training)}`, trainingLabel, c.training)
-        : cell('0', 'rest day', c.text3)}
+      {cell(fmt(base), baseLabel.toLowerCase())}
+      {dayType
+        ? cell(signed(training), training === 0 ? 'as planned' : 'training vs plan', training === 0 ? c.text3 : c.training)
+        : training > 0
+          ? cell(`+${fmt(training)}`, trainingLabel, c.training)
+          : cell('0', 'rest day', c.text3)}
       {cell(signed(weekBalance), 'week balance')}
       {cell(fmt(target), 'target', undefined, true, true)}
     </View>

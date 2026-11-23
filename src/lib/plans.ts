@@ -161,7 +161,7 @@ export async function logPlanItem(item: PlanItem, grams: number): Promise<void> 
     date: item.date,
     meal: item.meal,
     name: item.name,
-    serving: `${round1(grams)} g`,
+    serving: amountLabel(item, grams),
     kcal: Math.round(item.kcal_100g * f),
     protein_g: round1(item.protein_100g * f),
     carbs_g: round1(item.carbs_100g * f),

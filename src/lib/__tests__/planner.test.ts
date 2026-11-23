@@ -102,3 +102,15 @@ describe('helpers', () => {
     expect(planGaps({ kcal: 3000, protein_g: 140, carbs_g: 460, fat_g: 66 }, TRAINING_DAY)).toEqual([]);
   });
 });
+
+describe('agreed portions', () => {
+  it('keeps the typical portions untouched when they already hit the target', () => {
+    const foods = [
+      { id: 'oats', per100g: { kcal: 380, protein_g: 13, carbs_g: 60, fat_g: 7 }, minG: 20, typicalG: 50, maxG: 90 },
+      { id: 'whey', per100g: { kcal: 400, protein_g: 80, carbs_g: 8, fat_g: 6 }, minG: 15, typicalG: 30, maxG: 45 },
+    ];
+    const target = { kcal: 190 + 120, protein_g: 6.5 + 24, carbs_g: 30 + 2.4, fat_g: 3.5 + 1.8 };
+    const r = solvePlan(foods, target, { kcal: 2400, protein_g: 180, carbs_g: 270, fat_g: 67 });
+    expect(r.grams).toEqual({ oats: 50, whey: 30 });
+  });
+});

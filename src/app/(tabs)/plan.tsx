@@ -12,20 +12,19 @@ import { Radius, Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useCountUp } from '@/hooks/use-count-up';
 import { useTheme } from '@/hooks/use-theme';
+import { DayTypePicker } from '@/components/day-type-picker';
 import { computeWeek, loadWeek } from '@/lib/adaptive';
+import { planDay } from '@/lib/day-plan';
 import { isProfileComplete } from '@/lib/api';
 import { resolveSlots, slotsForData } from '@/lib/meals';
 import { addDays, formatDay, formatLongDay, today } from '@/lib/dates';
-import { sumTotals } from '@/lib/nutrition';
-import { addMacros, macrosFor, planGaps, solvePlan, subtractMacros, type Macros } from '@/lib/planner';
+import { macrosFor, type Macros } from '@/lib/planner';
 import {
   addFoodsFromText,
   amountLabel,
   deletePlanItems,
   listPlanItems,
   per100gOf,
-  toPlanFood,
-  type PlanItem,
 } from '@/lib/plans';
 
 const EXAMPLE =
@@ -77,14 +76,7 @@ export default function PlanScreen() {
     : null;
 
   // Everything already logged today (planned or not) counts; the rest of the plan fills the gap.
-  const eaten = sumTotals(food);
-  const consumed: Macros = { kcal: eaten.kcal, protein_g: eaten.proteinG, carbs_g: eaten.carbsG, fat_g: eaten.fatG };
-  const loggedGrams = new Map(food.map((f) => [f.id, f.grams ?? 0]));
-  const isLogged = (i: PlanItem) => !!i.logged_entry_id && loggedGrams.has(i.logged_entry_id);
-  const open = items.filter((i) => !isLogged(i));
-  const solution = target ? solvePlan(open.map(toPlanFood), subtractMacros(target, consumed), target) : null;
-  const planned = solution ? addMacros(consumed, solution.totals) : null;
-  const gaps = planned && target ? planGaps(planned, target) : [];
+  const { consumed, isLogged, open, planned, gaps, gramsFor } = planDay(items, food, target);
 
   async function addFoods() {
     if (text.trim().length < 2) return;
@@ -195,6 +187,15 @@ export default function PlanScreen() {
     <Screen padBottom={120} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
       {stepper}
       <ErrorText message={error ?? actionError} />
+      {isProfileComplete(profile) ? (
+        <DayTypePicker
+          date={date}
+          dayTypes={weekData.dayTypes}
+          selectedId={weekData.assignments[date]}
+          onChanged={reload}
+          title="Day type"
+        />
+      ) : null}
 
       {!isProfileComplete(profile) || !target ? (
         <Card hero>
@@ -257,7 +258,7 @@ export default function PlanScreen() {
             if (mealItems.length === 0) return null;
             const rows = mealItems.map((item) => {
               const logged = isLogged(item);
-              const grams = logged ? (loggedGrams.get(item.logged_entry_id!) ?? 0) : (solution?.grams[item.id] ?? item.typical_g);
+              const grams = gramsFor(item);
               return { item, logged, grams, m: macrosFor(per100gOf(item), grams) };
             });
             const total = rows.reduce((t, r) => t + r.m.kcal, 0);

@@ -20,7 +20,39 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Database changes and server functions go first, so the app never runs ahead of them.
+  # Skipped (successfully) until the SUPABASE_ACCESS_TOKEN and SUPABASE_DB_PASSWORD secrets are added.
+  supabase:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      PROJECT_REF: lubouzocrluaojfjaqjy
+    steps:
+      - uses: actions/checkout@v4
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_DB_PASSWORD != ''
+
+      - uses: supabase/setup-cli@v1
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_DB_PASSWORD != ''
+        with:
+          version: latest
+
+      - name: Apply database migrations
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_DB_PASSWORD != ''
+        run: |
+          supabase link --project-ref "$PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+          supabase db push --linked --password "$SUPABASE_DB_PASSWORD" --yes
+
+      - name: Deploy server functions
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_DB_PASSWORD != ''
+        run: supabase functions deploy --project-ref "$PROJECT_REF" --use-api
+
+      - name: Supabase secrets not set
+        if: env.SUPABASE_ACCESS_TOKEN == '' || env.SUPABASE_DB_PASSWORD == ''
+        run: echo "::warning::Add SUPABASE_ACCESS_TOKEN and SUPABASE_DB_PASSWORD to deploy database changes and functions automatically."
+
   deploy:
+    needs: supabase
     runs-on: ubuntu-latest
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

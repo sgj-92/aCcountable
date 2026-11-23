@@ -16,6 +16,7 @@ import {
   type WeighInRow,
 } from './api';
 import { addDays, startOfWeek, today as todayISO, weekDates } from './dates';
+import { dayTypeMacros, dayTypeTarget, listAssignments, listDayTypes, templateSessionObjects, type DayType } from './day-types';
 import { estimateExpenditure, suggestedAdjustment, type ExpenditureEstimate, type NotEnoughData } from './expenditure';
 import { buildInsights, type Insight } from './insights';
 import { baseTarget, macroTargets, sumTotals, type DayTarget } from './nutrition';
@@ -32,6 +33,9 @@ export interface WeekData {
   food: FoodEntry[];
   /** Dates marked diary only, over the same range. */
   diaryDays: string[];
+  /** Your day types, and which one each date follows (this week). */
+  dayTypes: DayType[];
+  assignments: Record<string, string>;
   weighIns: WeighInRow[];
   whoopRates: ActivityRate[];
   /** Per exact WHOOP activity name, most-logged first. */
@@ -44,16 +48,29 @@ export async function loadWeek(date: string): Promise<WeekData> {
   const weekEnd = addDays(weekStart, 6);
   const windowStart = addDays(todayISO(), -EXPENDITURE_WINDOW);
   const from = windowStart < weekStart ? windowStart : weekStart;
-  const [profile, sessions, food, weighIns, whoop, diaryDays] = await Promise.all([
+  const [profile, sessions, food, weighIns, whoop, diaryDays, dayTypes, assignments] = await Promise.all([
     getProfile(),
     listSessions(from, weekEnd),
     listFood(from, weekEnd),
     listWeighIns(addDays(date < todayISO() ? date : todayISO(), -90)).catch(() => [] as WeighInRow[]),
     listWhoopWorkouts().catch(() => []),
     listDiaryDays(from, weekEnd),
+    listDayTypes(),
+    listAssignments(weekStart, weekEnd),
   ]);
   const rates = ratesFromRows(whoop);
-  return { profile, weekStart, sessions, food, diaryDays, weighIns, whoopRates: rates.byActivity, whoopNamed: rates.byName };
+  return {
+    profile,
+    weekStart,
+    sessions,
+    food,
+    diaryDays,
+    dayTypes,
+    assignments,
+    weighIns,
+    whoopRates: rates.byActivity,
+    whoopNamed: rates.byName,
+  };
 }
 
 export interface AdjustedDay extends WeekDay {
@@ -97,7 +114,18 @@ export function computeWeek(data: WeekData, today: string): WeekView | null {
 
   const diary = new Set(data.diaryDays ?? []);
   const dates = weekDates(weekStart);
-  const raws = dates.map((d) => targetFor(profile, d, sessions, rates)!);
+  // A day that follows a day type uses the agreed numbers (nudged for training that differs from what it assumed).
+  const typeFor = (date: string) => {
+    const id = data.assignments?.[date];
+    return id ? data.dayTypes?.find((t) => t.id === id) : undefined;
+  };
+  const raws = dates.map((d) => {
+    const raw = targetFor(profile, d, sessions, rates)!;
+    const dt = typeFor(d);
+    if (!dt) return raw;
+    const assumed = targetFor(profile, d, templateSessionObjects(dt, d), rates)!.training;
+    return dayTypeTarget(dt, raw, sessions.some((s) => s.date === d), assumed);
+  });
   const balance = balanceWeek(
     dates.map((date, i) => {
       const entries = food.filter((f) => f.date === date);
@@ -111,7 +139,8 @@ export function computeWeek(data: WeekData, today: string): WeekView | null {
   const days: Record<string, AdjustedDay> = {};
   balance.days.forEach((d, i) => {
     const raw = raws[i];
-    const m = macroTargets(d.adjusted, raw.base, stats.weightKg, settings);
+    const dt = typeFor(d.date);
+    const m = dt ? dayTypeMacros(dt, d.adjusted) : macroTargets(d.adjusted, raw.base, stats.weightKg, settings);
     days[d.date] = {
       ...d,
       raw,

@@ -399,7 +399,8 @@ export default function ProfileScreen() {
 
         <Overline>Food and training data</Overline>
         <Card style={{ gap: 0, paddingVertical: 4 }}>
-          <NavRow icon="file" title="Pantry" meta="Your foods and usual portions" onPress={() => router.push('/pantry')} />
+          <NavRow icon="clock" title="Day types" meta="Agreed days: targets, training and meals" onPress={() => router.push('/day-types')} />
+          <NavRow icon="file" title="Pantry" meta="Your foods and usual portions" onPress={() => router.push('/pantry')} divider />
           <NavRow icon="stopwatch" title="WHOOP history" meta="Your own burn rates per activity" onPress={() => router.push('/whoop-import')} divider />
           <NavRow icon="scale" title="Weight & trend" meta="Weigh-ins and the smoothed trend" onPress={() => router.push('/weigh-in')} divider />
         </Card>

@@ -11,6 +11,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { addFoodEntry, deleteFood, updateFood, type FoodEntry } from '@/lib/api';
 import { today } from '@/lib/dates';
 import type { MealSlot } from '@/lib/meals';
+import { amountLabel, type PlanItem } from '@/lib/plans';
 
 /** One meal section on Today: name, total, a round + and its food rows. */
 export function MealCard({
@@ -20,8 +21,13 @@ export function MealCard({
   items,
   slots,
   diary,
+  planned = [],
+  onLogPlanned,
   onChanged,
 }: {
+  /** Planned foods for this meal not eaten yet, with the amount the plan has for them. */
+  planned?: { item: PlanItem; grams: number }[];
+  onLogPlanned?: (item: PlanItem, grams: number) => void;
   /** Diary-only day: food can be logged without calories. */
   diary?: boolean;
   label: string;
@@ -52,7 +58,7 @@ export function MealCard({
           </T>
           {items.length === 0 ? (
             <T variant="footnote" color={c.text3}>
-              Nothing logged
+              {planned.length ? `${planned.length} planned · ≈ ${fmt(planned.reduce((t, p) => t + (p.item.kcal_100g * p.grams) / 100, 0))} kcal` : 'Nothing logged'}
             </T>
           ) : null}
         </View>
@@ -73,6 +79,9 @@ export function MealCard({
       </View>
       {items.map((f) => (
         <FoodRow key={f.id} entry={f} slots={slots} onChanged={onChanged} />
+      ))}
+      {planned.map(({ item, grams }) => (
+        <PlannedRow key={item.id} item={item} grams={grams} onLog={onLogPlanned ? () => onLogPlanned(item, grams) : undefined} />
       ))}
     </View>
   );
@@ -168,5 +177,59 @@ function FoodRow({ entry, slots, onChanged }: { entry: FoodEntry; slots: MealSlo
         <Num size="xs">{fmt(entry.kcal)}</Num>
       </Pressable>
     </ReanimatedSwipeable>
+  );
+}
+
+/** A planned food not eaten yet: tick to log it at the planned amount, tap to change the amount first. */
+function PlannedRow({ item, grams, onLog }: { item: PlanItem; grams: number; onLog?: () => void }) {
+  const c = useTheme();
+  const kcal = Math.round((item.kcal_100g * grams) / 100);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Planned: ${item.name}, ${amountLabel(item, grams)}, ${kcal} kcal. Change amount`}
+      onPress={() => router.push({ pathname: '/plan-item', params: { id: item.id, planned: String(grams) } })}
+      style={({ pressed }) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.md,
+        minHeight: 56,
+        paddingVertical: 10,
+        paddingRight: Spacing.xs,
+        borderTopWidth: 1,
+        borderTopColor: c.line,
+        opacity: pressed ? 0.6 : 1,
+      })}>
+      <View style={{ flex: 1, gap: 2 }}>
+        <T numberOfLines={1} color={c.text2}>
+          {item.name}
+        </T>
+        <T variant="footnote" numberOfLines={1} color={c.text3} style={{ fontVariant: ['tabular-nums'] }}>
+          Planned · {amountLabel(item, grams)}
+        </T>
+      </View>
+      <Num size="xs" color={c.text2}>
+        {fmt(kcal)}
+      </Num>
+      {onLog ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Log ${item.name}, ${amountLabel(item, grams)}`}
+          onPress={onLog}
+          hitSlop={6}
+          style={({ pressed }) => ({
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            borderWidth: 2,
+            borderColor: c.accentLine,
+            backgroundColor: pressed ? c.accentBg : 'transparent',
+            alignItems: 'center',
+            justifyContent: 'center',
+          })}>
+          <Icon name="check" size={16} color={c.accentText} strokeWidth={2.6} />
+        </Pressable>
+      ) : null}
+    </Pressable>
   );
 }

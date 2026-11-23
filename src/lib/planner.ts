@@ -134,6 +134,16 @@ function roundToUnits(grams: number, f: PlanFood): number {
   return clamp(Math.round(grams / unit), lo, hi) * unit;
 }
 
+/** Within ~2 % of the day's calories (at least 40 kcal) and 6 g of each macro. */
+function closeEnough(a: Macros, target: Macros, scale: Macros): boolean {
+  return (
+    Math.abs(a.kcal - target.kcal) <= Math.max(40, scale.kcal * 0.02) &&
+    Math.abs(a.protein_g - target.protein_g) <= 6 &&
+    Math.abs(a.carbs_g - target.carbs_g) <= 6 &&
+    Math.abs(a.fat_g - target.fat_g) <= 6
+  );
+}
+
 /** Scale-friendly rounding: 1 g for small portions (oil, honey), 5 g otherwise. */
 export function roundGrams(grams: number, f: Pick<PlanFood, 'minG' | 'maxG'>): number {
   const step = grams < 30 ? 1 : 5;
@@ -150,6 +160,14 @@ export function solvePlan(foods: PlanFood[], target: Macros, scale: Macros): Pla
   const isFixed = (f: PlanFood) => f.fixedG != null && f.fixedG >= 0;
   const g = foods.map((f) => (isFixed(f) ? f.fixedG! : clamp(f.typicalG, f.minG, f.maxG)));
   const free = foods.map((f) => !isFixed(f));
+
+  // Agreed portions that already land on target stay exactly as they are.
+  const asAgreed = foods.reduce((t, f, i) => addMacros(t, macrosFor(f.per100g, g[i])), ZERO);
+  if (closeEnough(asAgreed, target, scale)) {
+    const grams: Record<string, number> = {};
+    foods.forEach((f, i) => (grams[f.id] = g[i]));
+    return { grams, totals: asAgreed };
+  }
 
   // Stage 1: everything that isn't fixed, continuously.
   descend(foods, g, free, target, scale);

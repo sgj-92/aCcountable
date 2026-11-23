@@ -1,8 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, RefreshControl, Switch, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { Alert, Platform, RefreshControl, Switch, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 
 import { CRing } from '@/components/c-ring';
+import { DayTypePicker } from '@/components/day-type-picker';
 import { FastingBar } from '@/components/fasting-card';
 import { MacroBars, TargetLedger, WeekStrip } from '@/components/hero';
 import { InsightsCard } from '@/components/insights-card';
@@ -17,6 +19,8 @@ import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
 import { computeWeek, loadWeek, type WeekData, type WeekView } from '@/lib/adaptive';
+import { planDay } from '@/lib/day-plan';
+import { listPlanItems, logPlanItem, type PlanItem } from '@/lib/plans';
 import { isProfileComplete, setDiaryDay, type Profile, type TrainingSession } from '@/lib/api';
 import { addDays, formatDay, formatLongDay, isValidISODate, startOfWeek, today } from '@/lib/dates';
 import { parseClock } from '@/lib/fasting';
@@ -42,7 +46,10 @@ export default function TodayScreen() {
     if (params.date && isValidISODate(params.date)) setDate(params.date);
   }
 
-  const { data, error, reload, refreshing, refresh } = useAsync(() => loadWeek(date), date);
+  const { data, error, reload, refreshing, refresh } = useAsync(async () => {
+    const [week, plan] = await Promise.all([loadWeek(date), listPlanItems(date).catch(() => [] as PlanItem[])]);
+    return { ...week, plan };
+  }, date);
   const isToday = date === today();
 
   // Data from a different week is stale for this day: show the skeleton until it arrives.
@@ -153,7 +160,7 @@ function TodayBody({
   fastingWindow,
   onChanged,
 }: {
-  data: WeekData;
+  data: WeekData & { plan: PlanItem[] };
   view: WeekView;
   date: string;
   isToday: boolean;
@@ -186,8 +193,24 @@ function TodayBody({
     sessions.length === 1 ? sessionLabel(sessions[0]).toLowerCase() : sessions.length > 1 ? 'training' : 'rest day';
   const insights = view.insights.filter((i) => !WEEK_INSIGHT_IDS.includes(i.id));
 
+  // The plan for the day: what's still to eat, sized so the day lands on target.
+  const dayPlan = planDay(data.plan, food, { kcal: target, protein_g: day.proteinG, carbs_g: day.carbsG, fat_g: day.fatG });
+  const plannedFor = (meal: string) =>
+    data.plan.filter((i) => i.meal === meal && !dayPlan.isLogged(i)).map((item) => ({ item, grams: dayPlan.gramsFor(item) }));
+
+  async function logPlanned(item: PlanItem, grams: number) {
+    try {
+      await logPlanItem(item, grams);
+      if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      onChanged();
+    } catch (e) {
+      Alert.alert('Couldn’t log that', e instanceof Error ? e.message : String(e));
+    }
+  }
+
   return (
     <>
+      <DayTypePicker date={date} dayTypes={data.dayTypes} selectedId={data.assignments[date]} onChanged={onChanged} />
       {/* Hero: today and the week in one card */}
       <Card hero style={{ alignItems: 'center', gap: Spacing.md, paddingBottom: 14 }}>
         <CRing
@@ -198,6 +221,8 @@ function TodayBody({
           note={diary ? 'Diary only · not counted' : undefined}
         />
         <TargetLedger
+          baseLabel={day.raw.dayType ?? 'base'}
+          dayType={!!day.raw.dayType}
           base={day.raw.base}
           training={day.raw.training}
           trainingLabel={trainingLabel}
@@ -260,16 +285,15 @@ function TodayBody({
           {fmt(eaten.kcal)} kcal eaten
         </T>
       </Row>
-      {slotsForData(
-        slots,
-        food.map((f) => f.meal),
-      ).map(({ key, label }) => (
+      {slotsForData(slots, [...food.map((f) => f.meal), ...data.plan.map((i) => i.meal)]).map(({ key, label }) => (
         <MealCard
           key={key}
           label={label}
           meal={key}
           date={date}
           items={food.filter((f) => f.meal === key)}
+          planned={plannedFor(key)}
+          onLogPlanned={logPlanned}
           slots={slots}
           diary={diary}
           onChanged={onChanged}
