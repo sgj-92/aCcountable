@@ -22,7 +22,7 @@ import { ConfidenceDot, FOOTER_SPACE, Overline, SheetFooter } from '@/components
 import { Button, Card, ErrorText, Field, fmt, Num, Row, Segmented, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
 import { useCountUp } from '@/hooks/use-count-up';
-import { useMealSlots } from '@/hooks/use-profile';
+import { useMealSlots, useProfile } from '@/hooks/use-profile';
 import { useTheme } from '@/hooks/use-theme';
 import { addFood, type Meal, type NewFoodEntry } from '@/lib/api';
 import { deletePlanItems } from '@/lib/plans';
@@ -89,7 +89,12 @@ export default function ScanScreen() {
     replace?: string;
     planned?: string;
     plannedKcal?: string;
+    /** Minutes after midnight it was eaten (from a time group on Today). */
+    time?: string;
   }>();
+  const eatenAt = params.time && Number.isFinite(Number(params.time)) ? Number(params.time) : null;
+  const { profile } = useProfile();
+  const timeMode = profile?.meal_mode === 'time';
   const replaceIds = (params.replace ?? '').split(',').filter(Boolean);
   const plannedKcal = Number(params.plannedKcal) || 0;
   // The plan as a guide for the AI; the photo (and anything you type) wins.
@@ -250,6 +255,7 @@ export default function ScanScreen() {
             {
               date,
               meal,
+              eaten_at: eatenAt,
               name: result.meal_name || 'Meal',
               serving: `${included.length} items${portionNote}`,
               kcal: Math.round(totals.kcal),
@@ -265,6 +271,7 @@ export default function ScanScreen() {
         : included.map((i) => ({
             date,
             meal,
+            eaten_at: eatenAt,
             name: i.name.trim(),
             serving: `${i.portion}${portionNote}`.trim() || null,
             kcal: Math.round(n(i.kcal) * portion),
@@ -515,7 +522,7 @@ export default function ScanScreen() {
             </Row>
 
             <Overline>Meal</Overline>
-            <MealPicker value={meal} onChange={setMeal} />
+            {timeMode ? null : <MealPicker value={meal} onChange={setMeal} />}
             {replaceIds.length ? (
               <T variant="footnote">
                 {meal === params.meal

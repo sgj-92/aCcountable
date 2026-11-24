@@ -14,7 +14,7 @@ import { addFoodEntry, deleteFood, updateFood, type FoodEntry } from '@/lib/api'
 import { today } from '@/lib/dates';
 import { formatClock } from '@/lib/fasting';
 import type { MealTime } from '@/lib/meal-times';
-import type { MealSlot } from '@/lib/meals';
+import { eatenMinutes, type MealSlot } from '@/lib/meals';
 import { amountLabel, deletePlanItems, type PlanItem } from '@/lib/plans';
 
 /** Timeline layout: how far the food cards sit in from the dashed line's side. */
@@ -35,13 +35,6 @@ export function MealTimeline({ children }: { children: ReactNode }) {
   );
 }
 
-/** Minutes after midnight that an entry was logged, if it was logged on its own day. */
-function loggedMinutes(f: FoodEntry): number | null {
-  const d = new Date(f.created_at);
-  if (Number.isNaN(d.getTime())) return null;
-  const local = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  return local === f.date ? d.getHours() * 60 + d.getMinutes() : null;
-}
 
 /** One meal section on Today: name, total, a round + and its food rows. */
 export function MealCard({
@@ -56,7 +49,10 @@ export function MealCard({
   time,
   onChanged,
   variant = 'card',
+  timeGroup,
 }: {
+  /** By-time meals: this group's time (no meal name shown); its entries are moved/timed together. */
+  timeGroup?: { minutes: number | null };
   /** "timeline": a time pill on the dashed line, the meal's totals beside it, and each food as its own card. */
   variant?: 'card' | 'timeline';
   /** Suggested time for this meal (when training has a start time). */
@@ -77,6 +73,9 @@ export function MealCard({
   const c = useTheme();
   const total = items.reduce((s, f) => s + f.kcal, 0);
   const plannedKcal = planned.reduce((t, p) => t + (p.item.kcal_100g * p.grams) / 100, 0);
+  // A time you set for this meal (the earliest, if its foods differ).
+  const setTimes = items.map((f) => f.eaten_at).filter((m): m is number => m != null);
+  const setMinutes = setTimes.length ? Math.min(...setTimes) : null;
   const scanInstead = () =>
     router.push({
       pathname: '/scan',
@@ -86,9 +85,18 @@ export function MealCard({
         replace: planned.map((p) => p.item.id).join(','),
         planned: planned.map((p) => `${p.item.name} ${amountLabel(p.item, p.grams)}`).join(', '),
         plannedKcal: String(Math.round(plannedKcal)),
+        ...timeParam,
       },
     });
-  const addFood = () => router.push({ pathname: '/food', params: { date, meal, ...(diary ? { diary: '1' } : {}) } });
+  const timeParam = timeGroup?.minutes != null ? { time: String(timeGroup.minutes) } : {};
+  const addFood = () =>
+    router.push({ pathname: '/food', params: { date, meal, ...timeParam, ...(diary ? { diary: '1' } : {}) } });
+  // Set the meal's time or move it (a time group: just its entries).
+  const editTime = () =>
+    router.push({
+      pathname: '/meal-time',
+      params: timeGroup ? { date, ids: items.map((f) => f.id).join(',') } : { date, meal },
+    });
   const rows = (
     <>
       {items.map((f) => (
@@ -108,16 +116,25 @@ export function MealCard({
   );
 
   if (variant === 'timeline') {
-    // The pill shows the suggested time (around training), else when the meal was first logged.
-    const firstLogged = items.map(loggedMinutes).filter((m): m is number => m != null);
-    const minutes = time?.minutes ?? (firstLogged.length ? Math.min(...firstLogged) : null);
+    // The pill: a time group's time; else a time you set, the suggested time (around training),
+    // or when the meal was first logged.
+    const logged = items.map(eatenMinutes).filter((m): m is number => m != null);
+    const minutes = timeGroup
+      ? timeGroup.minutes
+      : setMinutes != null
+        ? setMinutes
+        : (time?.minutes ?? (logged.length ? Math.min(...logged) : null));
     const sum = (k: 'protein_g' | 'fat_g' | 'carbs_g') => items.reduce((t, f) => t + (f[k] || 0), 0);
     return (
       <View style={{ gap: Spacing.sm }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, minHeight: 36 }}>
-          <View
-            accessibilityLabel={minutes != null ? `${label} at ${formatClock(minutes)}` : label}
-            style={{
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`${minutes != null ? `${timeGroup ? 'Eaten' : label} at ${formatClock(minutes)}` : label}. Set the time${timeGroup ? '' : ' or move this meal'}`}
+            onPress={editTime}
+            disabled={items.length === 0 && planned.length === 0}
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.6 : 1,
               minWidth: RAIL,
               height: 34,
               paddingHorizontal: 12,
@@ -125,13 +142,13 @@ export function MealCard({
               backgroundColor: time?.tag ? c.trainingBg : c.raised,
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
+            })}>
             <Text style={{ color: time?.tag ? c.training : c.text, fontSize: 15, fontWeight: '600', fontVariant: ['tabular-nums'] }}>
-              {minutes != null ? formatClock(minutes) : label}
+              {minutes != null ? formatClock(minutes) : timeGroup ? 'Planned' : label}
             </Text>
-          </View>
+          </Pressable>
           <View style={{ flex: 1, minWidth: 0 }}>
-            {minutes != null ? (
+            {minutes != null && !timeGroup ? (
               <T variant="footnote" numberOfLines={1}>
                 {label}
                 {time?.tag === 'pre' ? ' · pre' : time?.tag === 'post' ? ' · post' : ''}
@@ -214,11 +231,20 @@ export function MealCard({
         boxShadow: c.e1 === 'none' ? undefined : c.e1,
       }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, minHeight: 52 }}>
-        <View style={{ flex: 1 }}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityHint="Set the time or move this meal"
+          onPress={editTime}
+          disabled={items.length === 0 && planned.length === 0}
+          style={({ pressed }) => ({ flex: 1, opacity: pressed ? 0.6 : 1 })}>
           <T variant="headline" numberOfLines={1}>
             {label}
           </T>
-          {time ? (
+          {setMinutes != null ? (
+            <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
+              {formatClock(setMinutes)}
+            </T>
+          ) : time ? (
             <T variant="footnote" color={time.tag ? c.training : c.text2} style={{ fontVariant: ['tabular-nums'] }}>
               {formatClock(time.minutes)}
               {time.tag === 'pre' ? ' · before training' : time.tag === 'post' ? ' · after training' : ''}
@@ -229,7 +255,7 @@ export function MealCard({
               {planned.length ? `${planned.length} planned · ≈ ${fmt(plannedKcal)} kcal` : 'Nothing logged'}
             </T>
           ) : null}
-        </View>
+        </Pressable>
         {items.length > 0 ? (
           <Num size="xs" color={c.text2}>
             {fmt(total)} kcal

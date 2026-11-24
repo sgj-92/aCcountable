@@ -38,6 +38,7 @@ type Form = {
   fat_pct: string;
   training_eat_back_pct: string;
   meal_slots: MealSlot[];
+  meal_mode: 'meals' | 'time';
   fasting: boolean;
   /** "HH:MM" as typed */
   window_start: string;
@@ -57,6 +58,7 @@ const toForm = (p: Profile): Form => ({
   fat_pct: p.fat_pct.toString(),
   training_eat_back_pct: p.training_eat_back_pct.toString(),
   meal_slots: resolveSlots(p.meal_slots),
+  meal_mode: p.meal_mode,
   fasting: !!p.eating_window_start && !!p.eating_window_end,
   window_start: p.eating_window_start ?? '12:00',
   window_hours: String(windowHours(p.eating_window_start, p.eating_window_end) ?? 8),
@@ -116,6 +118,7 @@ function toPatch(f: Form): Partial<Omit<Profile, 'id'>> {
     fat_pct: parseNum(f.fat_pct) ?? 25,
     training_eat_back_pct: Math.round(parseNum(f.training_eat_back_pct) ?? 100),
     meal_slots: f.meal_slots.map((s) => ({ key: s.key, label: s.label.trim().slice(0, 30) })),
+    meal_mode: f.meal_mode,
     eating_window_start: f.fasting ? formatClock(parseClock(f.window_start) ?? 720) : null,
     eating_window_end: f.fasting ? windowEnd(f) : null,
   };
@@ -306,12 +309,28 @@ export default function ProfileScreen() {
             <Field style={{ flex: 1 }} label="Eat-back %" value={form.training_eat_back_pct} onChangeText={(v) => set('training_eat_back_pct', v)} keyboardType="number-pad" />
           </Row>
           <T variant="footnote">
-            Eat-back is how much of each session’s estimated burn is added to that day. Lower it (e.g. 75%) if estimates run high.
+            Eat-back is how much of each session’s estimated burn becomes fuel. A quarter of a big session’s fuel moves to the
+            next day for recovery, each day’s carbs are capped by its training (anything over is shared across the rest of the
+            week), and your weigh-ins correct the base once a week, so you’re fuelled and still losing at your goal rate.
           </T>
         </Card>
 
         <Overline>Meals</Overline>
         <Card style={{ gap: Spacing.md }}>
+          <Segmented
+            value={form.meal_mode}
+            onChange={(v) => set('meal_mode', v)}
+            options={[
+              { label: 'Meals', value: 'meals' },
+              { label: 'Just times', value: 'time' },
+            ]}
+          />
+          {form.meal_mode === 'time' ? (
+            <T variant="footnote">
+              Today shows food by the time you ate it, with no meal names. Planned meals still use the list below (and so
+              does Ledger).
+            </T>
+          ) : null}
           <Row style={{ flexWrap: 'wrap' }}>
             <Chip
               label="Breakfast · Lunch · Dinner"

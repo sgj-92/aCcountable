@@ -7,11 +7,12 @@ import { FoodSearch } from '@/components/food-search';
 import { Icon } from '@/components/icon';
 import { MealPicker } from '@/components/meal-picker';
 import { PressableScale } from '@/components/pressable-scale';
+import { minutesOf, TimeField } from '@/components/time-field';
 import { CountStepper, GramsField, Overline, ServingChips, SourceBadge } from '@/components/sheet';
 import { Button, Card, ErrorText, Field, fmt, Loading, Num, Row, Screen, T } from '@/components/ui';
 import { Radius, Spacing } from '@/constants/theme';
 import { useCountUp } from '@/hooks/use-count-up';
-import { useMealSlots } from '@/hooks/use-profile';
+import { useFastingWindow, useMealSlots, useProfile } from '@/hooks/use-profile';
 import { useTheme } from '@/hooks/use-theme';
 import {
   addFood,
@@ -26,7 +27,8 @@ import {
 } from '@/lib/api';
 import { formatDay, isValidISODate, today } from '@/lib/dates';
 import { countLabel, estimateFoods, per100gFromEntry, scale, type FoodResult, type Per100g } from '@/lib/foods';
-import { SLOT_KEYS } from '@/lib/meals';
+import { slotForMinutes, SLOT_KEYS } from '@/lib/meals';
+import { formatClock } from '@/lib/fasting';
 import { listPantry, pantryFromFood, savePantryItems, type PantryItem } from '@/lib/pantry';
 import { kcalFromMacros } from '@/lib/nutrition';
 
@@ -85,7 +87,15 @@ const basisFromEntry = (e: FoodEntry): Basis | null => {
 
 export default function FoodEditor() {
   const c = useTheme();
-  const params = useLocalSearchParams<{ id?: string; date?: string; meal?: string; diary?: string; pantry?: string }>();
+  const params = useLocalSearchParams<{
+    id?: string;
+    date?: string;
+    meal?: string;
+    diary?: string;
+    pantry?: string;
+    /** Minutes after midnight the food was eaten (from a time group on Today). */
+    time?: string;
+  }>();
   // Opened from the Pantry: weighing a food saves it to the pantry instead of logging it.
   const forPantry = params.pantry === '1';
   // On a diary-only day calories are optional: a name is enough to keep a record.
@@ -119,6 +129,20 @@ export default function FoodEditor() {
   const [triedSave, setTriedSave] = useState(false);
   const [aiFilling, setAiFilling] = useState(false);
   const slots = useMealSlots();
+  const { profile } = useProfile();
+  const fastingWindow = useFastingWindow();
+  const timeMode = profile?.meal_mode === 'time';
+  // When it was eaten: empty means now (when it's logged).
+  const [timeText, setTimeText] = useState(() => {
+    const t = Number(params.time);
+    return params.time && Number.isFinite(t) ? formatClock(t) : '';
+  });
+  const eatenAt = minutesOf(timeText);
+  // By-time meals: the meal follows the time eaten.
+  const logMeal: Meal = timeMode
+    ? slotForMinutes(slots, eatenAt ?? new Date().getHours() * 60 + new Date().getMinutes(), fastingWindow)
+    : meal;
+  const timeFields = { meal: logMeal, eaten_at: eatenAt };
   const isToday = date === today();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,6 +153,7 @@ export default function FoodEditor() {
         (f) => {
           setDate(f.date);
           setMeal(f.meal);
+          if (f.eaten_at != null) setTimeText(formatClock(f.eaten_at));
           setSource(f.source);
           setSourceRef(f.source_ref);
           const b = basisFromEntry(f);
@@ -221,7 +246,7 @@ export default function FoodEditor() {
       const fullName = basis.brand ? `${basis.name} · ${basis.brand}` : basis.name;
       entry = {
         date,
-        meal,
+        ...timeFields,
         name: fullName.slice(0, 200),
         serving: basis.unit
           ? `${countLabel(g / basis.unit.grams, basis.unit.name)} · about ${fmt(g)} g`
@@ -237,7 +262,7 @@ export default function FoodEditor() {
       if (manualInvalid) return;
       entry = {
         date,
-        meal,
+        ...timeFields,
         name: name.trim().slice(0, 200),
         serving: serving.trim() || null,
         // If only macros were entered, derive kcal from them.
@@ -325,7 +350,7 @@ export default function FoodEditor() {
     try {
       const newId = await addFoodEntry({
         date,
-        meal,
+        ...timeFields,
         name: f.name.slice(0, 200),
         serving: amount ? `${amount} · about ${fmt(g)} g` : `about ${fmt(g)} g`,
         ...v,
@@ -373,7 +398,7 @@ export default function FoodEditor() {
     setError(null);
     try {
       const { id: _id, created_at: _created, ...rest } = f;
-      const newId = await addFoodEntry({ ...rest, date, meal });
+      const newId = await addFoodEntry({ ...rest, date, ...timeFields });
       if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setLogged({ id: newId, label: `${f.name} · ${fmt(f.kcal)} kcal` });
     } catch (e) {
@@ -396,13 +421,19 @@ export default function FoodEditor() {
     return <Screen padTop={false}>{error ? <ErrorText message={error} /> : <Loading />}</Screen>;
   }
 
-  const mealLabel = slots.find((s) => s.key === meal)?.label ?? 'log';
+  // By time: "Add to log" (or "… at 13:30"); otherwise the meal's name.
+  const mealLabel = timeMode
+    ? eatenAt != null
+      ? `log at ${formatClock(eatenAt)}`
+      : 'log'
+    : (slots.find((s) => s.key === meal)?.label ?? 'log');
   const per = basis?.per100g;
 
   return (
     <Screen padTop={false}>
       <Stack.Screen options={{ title: forPantry ? 'Add to pantry' : id ? 'Edit food' : isToday ? 'Add food' : `Add food · ${formatDay(date)}` }} />
-      <MealPicker value={meal} onChange={setMeal} />
+      {timeMode ? null : <MealPicker value={meal} onChange={setMeal} />}
+      {forPantry ? null : <TimeField value={timeText} onChange={setTimeText} />}
 
       {logged ? (
         <Row

@@ -29,7 +29,8 @@ import { buildLedgerSnapshot, snapshotKey } from '@/lib/ledger';
 import { pushToLedger } from '@/lib/ledger-push';
 import MacroWidget from '@/widgets/macros';
 import { mealTimes } from '@/lib/meal-times';
-import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
+import { defaultSlotForNow, resolveSlots, slotForMinutes, slotsForData } from '@/lib/meals';
+import { nowMinutes, timeGroups } from '@/lib/time-groups';
 import { sumTotals } from '@/lib/nutrition';
 import { sessionKcalDetail, sessionLabel, targetFor } from '@/lib/targets';
 
@@ -354,6 +355,7 @@ function TodayBody({
             {fmt(eaten.kcal)} kcal eaten
           </T>
         </View>
+        {profile.meal_mode === 'time' ? null : (
         <View style={{ width: 172 }}>
           <Segmented
             height={32}
@@ -365,8 +367,29 @@ function TodayBody({
             ]}
           />
         </View>
+        )}
       </Row>
-      {(() => {
+      {profile.meal_mode === 'time' ? (
+        <MealTimeline>
+          {timeGroups(food, data.plan.filter((i) => !dayPlan.isLogged(i)), times, isToday).map((g) => (
+            <MealCard
+              key={g.key}
+              variant="timeline"
+              timeGroup={{ minutes: g.minutes }}
+              label=""
+              meal={slotForMinutes(slots, g.minutes ?? nowMinutes(), fastingWindow)}
+              date={date}
+              items={g.items}
+              planned={g.planned.map((item) => ({ item, grams: dayPlan.gramsFor(item) }))}
+              time={g.suggested}
+              onLogPlanned={logPlanned}
+              slots={slots}
+              diary={diary}
+              onChanged={onChanged}
+            />
+          ))}
+        </MealTimeline>
+      ) : (() => {
         const cards = shownSlots.map(({ key, label }) => (
           <MealCard
             key={key}
@@ -529,3 +552,4 @@ function TodaySkeleton() {
     </>
   );
 }
+

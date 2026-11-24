@@ -100,3 +100,22 @@ export function defaultSlotForNow(
   if (h >= 17 && h < 22) return pick(2);
   return slots[slots.length - 1].key;
 }
+
+/** The meal a time of day falls in (as when logging at that time). */
+export function slotForMinutes(
+  slots: MealSlot[],
+  minutes: number,
+  window?: { startMin: number; endMin: number } | null,
+): MealKey {
+  const d = new Date(2000, 0, 1, Math.floor(minutes / 60) % 24, minutes % 60);
+  return defaultSlotForNow(slots, d, window);
+}
+
+/** When an entry was eaten, in minutes after midnight: its set time, else when it was logged (that day). */
+export function eatenMinutes(f: { date: string; created_at: string; eaten_at?: number | null }): number | null {
+  if (f.eaten_at != null) return f.eaten_at;
+  const d = new Date(f.created_at);
+  if (Number.isNaN(d.getTime())) return null;
+  const local = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return local === f.date ? d.getHours() * 60 + d.getMinutes() : null;
+}

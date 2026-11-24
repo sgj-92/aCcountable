@@ -221,6 +221,13 @@ export async function addFoodEntry(entry: NewFoodEntry): Promise<string> {
   return (res.data as { id: string }).id;
 }
 
+/** The same change to several entries, e.g. moving a whole meal or setting its time. */
+export async function updateFoods(ids: string[], patch: Partial<NewFoodEntry>): Promise<void> {
+  if (ids.length === 0) return;
+  const res = await supabase.from('food_entries').update(patch).in('id', ids);
+  if (res.error) throw new Error(res.error.message);
+}
+
 export async function updateFood(id: string, patch: Partial<NewFoodEntry>): Promise<void> {
   const res = await supabase.from('food_entries').update(patch).eq('id', id);
   if (res.error) throw new Error(res.error.message);
