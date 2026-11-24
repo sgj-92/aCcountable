@@ -6,8 +6,7 @@ import { Alert, Platform, RefreshControl, Switch, View, type NativeScrollEvent, 
 import { CRing } from '@/components/c-ring';
 import { DayTypePicker } from '@/components/day-type-picker';
 import { FastingBar } from '@/components/fasting-card';
-import { MacroBars, TargetLedger, WeekStrip } from '@/components/hero';
-import { InsightsCard } from '@/components/insights-card';
+import { MacroBars, TargetLedger } from '@/components/hero';
 import { MealCard, MealTimeline } from '@/components/meal-card';
 import { showMenu } from '@/components/menu';
 import { QuickDock } from '@/components/quick-dock';
@@ -17,6 +16,7 @@ import { AddSlot, DotNote, Sparkline, Tile, TileValue } from '@/components/tiles
 import { Button, Card, Divider, ErrorText, fmt, Num, Row, Screen, Segmented, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
+import { useAutoCorrect } from '@/hooks/use-auto-correct';
 import { useMealsLayout } from '@/hooks/use-meals-layout';
 import { useTheme } from '@/hooks/use-theme';
 import { computeWeek, loadWeek, type WeekData, type WeekView } from '@/lib/adaptive';
@@ -32,7 +32,6 @@ import { mealTimes } from '@/lib/meal-times';
 import { defaultSlotForNow, resolveSlots, slotsForData } from '@/lib/meals';
 import { sumTotals } from '@/lib/nutrition';
 import { sessionKcalDetail, sessionLabel, targetFor } from '@/lib/targets';
-import { WEEK_INSIGHT_IDS, weekSummary } from '@/lib/week-summary';
 
 /** Clears the floating dock and the tab bar. */
 const BOTTOM_PAD = 200;
@@ -110,6 +109,10 @@ export default function TodayScreen() {
     />
   );
 
+  const view = fresh && profile ? computeWeek(fresh, today()) : null;
+  // The weigh-in correction steps by itself once a week when it's due.
+  useAutoCorrect(fresh?.profile, view, reload);
+
   if (!fresh || !profile) {
     return (
       <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -129,7 +132,6 @@ export default function TodayScreen() {
     );
   }
 
-  const view = computeWeek(fresh, today());
   const day = view?.days[date];
 
   return (
@@ -197,7 +199,20 @@ function TodayBody({
   }
   const trainingLabel =
     sessions.length === 1 ? sessionLabel(sessions[0]).toLowerCase() : sessions.length > 1 ? 'training' : 'rest day';
-  const insights = view.insights.filter((i) => !WEEK_INSIGHT_IDS.includes(i.id));
+  // How the day's training fuel was shaped (see lib/fuel): recovery in, a carb ceiling, shared fuel.
+  const f = day.fuel;
+  const fuelNote = day.raw.dayType
+    ? null
+    : [
+        f.recovery > 0 ? `+${fmt(f.recovery)} kcal recovery fuel from yesterday's training` : null,
+        f.toTomorrow < 0 ? `${fmt(-f.toTomorrow)} kcal of today's fuel saved for tomorrow's recovery` : null,
+        f.overCeiling < 0
+          ? `${fmt(-f.overCeiling)} kcal over today's carb ceiling (${f.ceilingGPerKg.toFixed(1)} g/kg) shared over the rest of the week`
+          : null,
+        f.shared > 0 ? `+${fmt(f.shared)} kcal shared from earlier training this week` : null,
+      ]
+        .filter(Boolean)
+        .join(' · ') || null;
 
   // The plan for the day: what's still to eat, sized so the day lands on target.
   const dayPlan = planDay(data.plan, food, { kcal: target, protein_g: day.proteinG, carbs_g: day.carbsG, fat_g: day.fatG });
@@ -270,7 +285,7 @@ function TodayBody({
   return (
     <>
       <DayTypePicker date={date} dayTypes={data.dayTypes} selectedId={data.assignments[date]} onChanged={onChanged} />
-      {/* Hero: today and the week in one card */}
+      {/* Hero: today's target and how it's made up (the week lives on Plan) */}
       <Card hero style={{ alignItems: 'center', gap: Spacing.md, paddingBottom: 14 }}>
         <CRing
           eaten={eaten.kcal}
@@ -298,18 +313,12 @@ function TodayBody({
             { label: 'Fat', value: eaten.fatG, target: day.fatG, color: c.fat },
           ]}
         />
-        <View style={{ alignSelf: 'stretch' }}>
-          <Divider />
-        </View>
-        <WeekStrip days={view.week.days} viewedDate={date} summary={weekSummary(view.week)} />
-        {day.raw.flooredAtBmr ? (
+        {fuelNote ? (
           <T variant="footnote" style={{ alignSelf: 'stretch' }}>
-            Your goal deficit was capped so the base target doesn’t drop below your BMR ({fmt(day.raw.bmr)}).
+            {fuelNote}
           </T>
         ) : null}
       </Card>
-
-      {isToday ? <InsightsCard insights={insights} /> : null}
 
       {isToday && fastingWindow ? <FastingBar {...fastingWindow} /> : null}
 

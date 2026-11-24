@@ -25,6 +25,10 @@ export interface Profile {
   eating_window_end: string | null;
   /** Accepted correction to estimated maintenance calories (from weigh-ins). */
   maintenance_adjust_kcal: number;
+  /** When the weigh-in correction last stepped by itself (at most weekly). */
+  maintenance_adjusted_on: string | null;
+  /** Today names meals Meal 1, Meal 2… ('meals') or by the time eaten ('time'). */
+  meal_mode: 'meals' | 'time';
 }
 
 export interface TrainingSession {
@@ -63,6 +67,8 @@ export interface FoodEntry {
   source_ref: string | null;
   ai_confidence: 'low' | 'medium' | 'high' | null;
   created_at: string;
+  /** When it was eaten, minutes after midnight; null = when it was logged. */
+  eaten_at?: number | null;
 }
 
 export type NewTrainingSession = Omit<TrainingSession, 'id'>;
@@ -90,6 +96,8 @@ function normaliseProfile(p: Profile): Profile {
     eating_window_end: p.eating_window_end ? p.eating_window_end.slice(0, 5) : null,
     // 0 until the burn-correction migration is applied.
     maintenance_adjust_kcal: p.maintenance_adjust_kcal == null ? 0 : num(p.maintenance_adjust_kcal),
+    maintenance_adjusted_on: p.maintenance_adjusted_on ?? null,
+    meal_mode: p.meal_mode === 'time' ? 'time' : 'meals',
   };
 }
 
@@ -184,7 +192,7 @@ export async function copyPreviousWeek(weekStart: string): Promise<number> {
 // ───────────── food ─────────────
 
 const FOOD_COLUMNS =
-  'id,date,meal,name,serving,kcal,protein_g,carbs_g,fat_g,grams,source,source_ref,ai_confidence,created_at';
+  'id,date,meal,name,serving,kcal,protein_g,carbs_g,fat_g,grams,source,source_ref,ai_confidence,created_at,eaten_at';
 
 export async function listFood(from: string, to: string): Promise<FoodEntry[]> {
   const res = await supabase

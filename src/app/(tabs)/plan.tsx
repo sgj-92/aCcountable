@@ -13,6 +13,7 @@ import { useAsync } from '@/hooks/use-async';
 import { useCountUp } from '@/hooks/use-count-up';
 import { useTheme } from '@/hooks/use-theme';
 import { DayTypePicker } from '@/components/day-type-picker';
+import { WeekCard } from '@/components/week-card';
 import { computeWeek, loadWeek } from '@/lib/adaptive';
 import { planDay } from '@/lib/day-plan';
 import { isProfileComplete } from '@/lib/api';
@@ -70,7 +71,8 @@ export default function PlanScreen() {
   const food = weekData.food.filter((f) => f.date === date);
   const slots = resolveSlots(profile.meal_slots);
   // Same target as Today: base + training, after weekly balancing.
-  const day = computeWeek(weekData, today())?.days[date];
+  const view = computeWeek(weekData, today());
+  const day = view?.days[date];
   const target: Macros | null = day
     ? { kcal: day.adjusted, protein_g: day.proteinG, carbs_g: day.carbsG, fat_g: day.fatG }
     : null;
@@ -187,6 +189,7 @@ export default function PlanScreen() {
     <Screen padBottom={120} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
       {stepper}
       <ErrorText message={error ?? actionError} />
+      {view ? <WeekCard view={view} date={date} profile={profile} /> : null}
       {isProfileComplete(profile) ? (
         <DayTypePicker
           date={date}

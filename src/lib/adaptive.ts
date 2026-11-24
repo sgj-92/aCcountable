@@ -18,6 +18,7 @@ import {
 import { addDays, startOfWeek, today as todayISO, weekDates } from './dates';
 import { dayTypeMacros, dayTypeTarget, listAssignments, listDayTypes, templateSessionObjects, type DayType } from './day-types';
 import { estimateExpenditure, suggestedAdjustment, type ExpenditureEstimate, type NotEnoughData } from './expenditure';
+import { autoCorrection, shapeFuel, type FuelDay } from './fuel';
 import { buildInsights, type Insight } from './insights';
 import { baseTarget, macroTargets, sumTotals, type DayTarget } from './nutrition';
 import { sessionKcalDetail, sessionLabel, settingsFor, statsFor, targetFor, type Rates } from './targets';
@@ -76,6 +77,8 @@ export async function loadWeek(date: string): Promise<WeekData> {
 export interface AdjustedDay extends WeekDay {
   /** Target before balancing (base + training), with its breakdown. */
   raw: DayTarget;
+  /** How the day's training fuel was shaped (recovery, carb ceiling, shared from earlier days). */
+  fuel: FuelDay;
   /** Macro targets that go with the balanced calories. */
   proteinG: number;
   carbsG: number;
@@ -88,6 +91,8 @@ export interface BurnView {
   estimate: ExpenditureEstimate | NotEnoughData;
   /** New maintenance correction to offer, or null if none is needed. */
   suggestion: number | null;
+  /** The correction to apply by itself now (a weekly step of at most ±150), or null if not due. */
+  auto: number | null;
 }
 
 export interface WeekView {
@@ -119,13 +124,36 @@ export function computeWeek(data: WeekData, today: string): WeekView | null {
     const id = data.assignments?.[date];
     return id ? data.dayTypes?.find((t) => t.id === id) : undefined;
   };
-  const raws = dates.map((d) => {
+  const unshaped = dates.map((d) => {
     const raw = targetFor(profile, d, sessions, rates)!;
     const dt = typeFor(d);
     if (!dt) return raw;
     const assumed = targetFor(profile, d, templateSessionObjects(dt, d), rates)!.training;
     return dayTypeTarget(dt, raw, sessions.some((s) => s.date === d), assumed);
   });
+  // Training fuel across the week: recovery the day after big sessions, a carb ceiling per day,
+  // and what a ceiling holds back shared with the following days (the week's total stays the same).
+  const fuel = shapeFuel(
+    dates.map((date, i) => {
+      const r = unshaped[i];
+      const m = macroTargets(r.kcal, r.base, stats.weightKg, settings);
+      return {
+        date,
+        base: r.base,
+        training: r.training,
+        trainingMin: sessions
+          .filter((s) => s.date === date)
+          .reduce((t, s) => t + (s.actual_duration_min ?? s.duration_min), 0),
+        proteinG: m.proteinG,
+        fatG: m.fatG,
+        fixed: !!typeFor(date),
+      };
+    }),
+    stats.weightKg,
+  );
+  const raws: DayTarget[] = unshaped.map((r, i) =>
+    typeFor(dates[i]) ? r : { ...r, training: fuel[i].fuel, kcal: Math.round(r.base + fuel[i].fuel) },
+  );
   const balance = balanceWeek(
     dates.map((date, i) => {
       const entries = food.filter((f) => f.date === date);
@@ -144,6 +172,7 @@ export function computeWeek(data: WeekData, today: string): WeekView | null {
     days[d.date] = {
       ...d,
       raw,
+      fuel: fuel[i],
       proteinG: Math.round(m.proteinG),
       carbsG: Math.round(m.carbsG),
       fatG: Math.round(m.fatG),
@@ -171,9 +200,11 @@ export function computeWeek(data: WeekData, today: string): WeekView | null {
     };
   });
   const estimate = estimateExpenditure(burnDays, trend, end, EXPENDITURE_WINDOW);
+  const suggestion = estimate.burn === null ? null : suggestedAdjustment(estimate, profile.maintenance_adjust_kcal ?? 0);
   const burn: BurnView = {
     estimate,
-    suggestion: estimate.burn === null ? null : suggestedAdjustment(estimate, profile.maintenance_adjust_kcal ?? 0),
+    suggestion,
+    auto: autoCorrection(suggestion, profile.maintenance_adjust_kcal ?? 0, profile.maintenance_adjusted_on, today),
   };
 
   const unconfirmed = sessions
