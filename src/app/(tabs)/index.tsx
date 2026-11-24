@@ -8,15 +8,16 @@ import { DayTypePicker } from '@/components/day-type-picker';
 import { FastingBar } from '@/components/fasting-card';
 import { MacroBars, TargetLedger, WeekStrip } from '@/components/hero';
 import { InsightsCard } from '@/components/insights-card';
-import { MealCard } from '@/components/meal-card';
+import { MealCard, MealTimeline } from '@/components/meal-card';
 import { showMenu } from '@/components/menu';
 import { QuickDock } from '@/components/quick-dock';
 import { Skeleton } from '@/components/skeleton';
 import { TabHeader } from '@/components/tab-header';
 import { AddSlot, DotNote, Sparkline, Tile, TileValue } from '@/components/tiles';
-import { Button, Card, Divider, ErrorText, fmt, Num, Row, Screen, T } from '@/components/ui';
+import { Button, Card, Divider, ErrorText, fmt, Num, Row, Screen, Segmented, T } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useAsync } from '@/hooks/use-async';
+import { useMealsLayout } from '@/hooks/use-meals-layout';
 import { useTheme } from '@/hooks/use-theme';
 import { computeWeek, loadWeek, type WeekData, type WeekView } from '@/lib/adaptive';
 import { planDay } from '@/lib/day-plan';
@@ -180,6 +181,7 @@ function TodayBody({
   const eaten = sumTotals(food);
   const target = day.adjusted;
   const [diaryOverride, setDiaryOverride] = useState<boolean | null>(null);
+  const [mealsLayout, setMealsLayout] = useMealsLayout();
   const diary = diaryOverride ?? view.diary.has(date);
   const closedUnder = !diary && date < today() && food.length > 0 && eaten.kcal < target;
 
@@ -334,29 +336,46 @@ function TodayBody({
         </T>
       </Card>
 
-      <Row style={{ justifyContent: 'space-between', alignItems: 'baseline', paddingTop: Spacing.md, paddingHorizontal: 4 }}>
-        <T variant="title" style={{ fontSize: 20, lineHeight: 25 }}>
-          Meals
-        </T>
-        <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
-          {fmt(eaten.kcal)} kcal eaten
-        </T>
+      <Row style={{ justifyContent: 'space-between', alignItems: 'center', paddingTop: Spacing.md, paddingHorizontal: 4 }}>
+        <View>
+          <T variant="title" style={{ fontSize: 20, lineHeight: 25 }}>
+            Meals
+          </T>
+          <T variant="footnote" style={{ fontVariant: ['tabular-nums'] }}>
+            {fmt(eaten.kcal)} kcal eaten
+          </T>
+        </View>
+        <View style={{ width: 172 }}>
+          <Segmented
+            height={32}
+            value={mealsLayout}
+            onChange={setMealsLayout}
+            options={[
+              { label: 'Timeline', value: 'timeline' },
+              { label: 'Cards', value: 'cards' },
+            ]}
+          />
+        </View>
       </Row>
-      {shownSlots.map(({ key, label }) => (
-        <MealCard
-          key={key}
-          label={label}
-          meal={key}
-          date={date}
-          items={food.filter((f) => f.meal === key)}
-          planned={plannedFor(key)}
-          time={times?.[key]}
-          onLogPlanned={logPlanned}
-          slots={slots}
-          diary={diary}
-          onChanged={onChanged}
-        />
-      ))}
+      {(() => {
+        const cards = shownSlots.map(({ key, label }) => (
+          <MealCard
+            key={key}
+            variant={mealsLayout === 'timeline' ? 'timeline' : 'card'}
+            label={label}
+            meal={key}
+            date={date}
+            items={food.filter((f) => f.meal === key)}
+            planned={plannedFor(key)}
+            time={times?.[key]}
+            onLogPlanned={logPlanned}
+            slots={slots}
+            diary={diary}
+            onChanged={onChanged}
+          />
+        ));
+        return mealsLayout === 'timeline' ? <MealTimeline>{cards}</MealTimeline> : cards;
+      })()}
     </>
   );
 }
