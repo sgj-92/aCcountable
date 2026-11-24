@@ -1,15 +1,16 @@
 // The "Macros" home-screen and Lock Screen widget on iOS (SwiftUI through Expo UI).
 // The layout runs in the widget's own runtime: everything it uses is declared inside it.
-import { HStack, ProgressView, Spacer, Text, VStack } from '@expo/ui/swift-ui';
+import { HStack, ProgressView, Rectangle, Spacer, Text, VStack } from '@expo/ui/swift-ui';
 import {
+  clipShape,
   containerBackground,
   font,
   foregroundStyle,
+  frame,
+  lineLimit,
+  minimumScaleFactor,
   monospacedDigit,
-  padding,
   progressViewStyle,
-  scaleEffect,
-  tint,
 } from '@expo/ui/swift-ui/modifiers';
 import { createWidget, type WidgetEnvironment } from 'expo-widgets';
 
@@ -19,8 +20,12 @@ const Macros = (props: MacroWidgetProps, environment: WidgetEnvironment) => {
   'widget';
   const dark = environment.colorScheme === 'dark';
   const c = dark
-    ? { bg: '#161814', text: '#F2F4EC', text2: '#A9AD9F', track: '#2C2F29', kcal: '#5B82F0', protein: '#FF7BAC', fat: '#FFC94D', carbs: '#55C2FF', over: '#FF6359' }
-    : { bg: '#FFFFFF', text: '#11130E', text2: '#55594E', track: '#E2E4DB', kcal: '#4169E1', protein: '#C92F6B', fat: '#9A6400', carbs: '#0B73B0', over: '#CC2E26' };
+    ? { bg: '#161814', text: '#F2F4EC', text2: '#A9AD9F', kcal: '#5B82F0', protein: '#FF7BAC', fat: '#FFC94D', carbs: '#55C2FF', over: '#FF6359' }
+    : { bg: '#FFFFFF', text: '#11130E', text2: '#55594E', kcal: '#4169E1', protein: '#C92F6B', fat: '#9A6400', carbs: '#0B73B0', over: '#CC2E26' };
+  // Each bar's track: a pale version of its colour (over the widget's background).
+  const pale = dark
+    ? { kcal: '#232B45', protein: '#3A2530', fat: '#3A3322', carbs: '#1E3340', over: '#3D2220' }
+    : { kcal: '#D3DCF8', protein: '#F3D2DF', fat: '#EFE2C9', carbs: '#CBE1EE', over: '#F4D1CF' };
 
   // A new day since the app last updated the widget: nothing eaten yet, targets not known.
   const d = environment.date ?? new Date();
@@ -30,11 +35,15 @@ const Macros = (props: MacroWidgetProps, environment: WidgetEnvironment) => {
   const num = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
   const rows = [
-    { label: 'KCAL', value: fresh ? 0 : props.kcal, target: fresh ? 0 : props.kcalTarget, color: c.kcal },
-    { label: 'PROTEIN', value: fresh ? 0 : props.protein, target: fresh ? 0 : props.proteinTarget, color: c.protein },
-    { label: 'FAT', value: fresh ? 0 : props.fat, target: fresh ? 0 : props.fatTarget, color: c.fat },
-    { label: 'CARBS', value: fresh ? 0 : props.carbs, target: fresh ? 0 : props.carbsTarget, color: c.carbs },
+    { label: 'KCAL', value: fresh ? 0 : props.kcal, target: fresh ? 0 : props.kcalTarget, color: c.kcal, track: pale.kcal },
+    { label: 'PROTEIN', value: fresh ? 0 : props.protein, target: fresh ? 0 : props.proteinTarget, color: c.protein, track: pale.protein },
+    { label: 'FAT', value: fresh ? 0 : props.fat, target: fresh ? 0 : props.fatTarget, color: c.fat, track: pale.fat },
+    { label: 'CARBS', value: fresh ? 0 : props.carbs, target: fresh ? 0 : props.carbsTarget, color: c.carbs, track: pale.carbs },
   ];
+  // A thick rounded bar: 40 equal slices, as many filled as the share of the target reached
+  // (a widget can't measure its width, so the fill is made of equal-width pieces instead).
+  const SLICES = 40;
+  const slices = Array.from({ length: SLICES }, (_, i) => i);
 
   // Lock Screen: one line of calories, one of macros, in the system's tint.
   if (environment.widgetFamily === 'accessoryRectangular') {
@@ -54,27 +63,39 @@ const Macros = (props: MacroWidgetProps, environment: WidgetEnvironment) => {
 
   const medium = environment.widgetFamily === 'systemMedium';
   return (
-    <VStack alignment="leading" spacing={medium ? 6 : 5} modifiers={[containerBackground(c.bg, 'widget'), padding({ all: 2 })]}>
+    <VStack alignment="leading" spacing={medium ? 7 : 6} modifiers={[containerBackground(c.bg, 'widget')]}>
       {rows.map((r) => {
         const over = r.target > 0 && r.value > r.target;
+        const filled = r.target ? Math.round(Math.min(1, r.value / r.target) * SLICES) : 0;
         return (
-          <VStack key={r.label} alignment="leading" spacing={4}>
-            <HStack spacing={4}>
-              <Text modifiers={[font({ size: medium ? 13 : 12, weight: 'semibold' }), foregroundStyle(c.text2)]}>{r.label}</Text>
-              <Spacer />
+          <VStack key={r.label} alignment="leading" spacing={5}>
+            <HStack spacing={6}>
+              <Text modifiers={[font({ size: medium ? 14 : 12, weight: 'medium' }), foregroundStyle(c.text2), lineLimit(1)]}>
+                {r.label}
+              </Text>
+              <Spacer minLength={2} />
               <Text
                 modifiers={[
-                  font({ size: medium ? 14 : 13, weight: 'bold' }),
+                  font({ size: medium ? 17 : 15, weight: 'semibold' }),
                   monospacedDigit(),
                   foregroundStyle(over ? c.over : c.text),
+                  lineLimit(1),
+                  minimumScaleFactor(0.6),
                 ]}>
                 {r.target ? `${num(r.value)} / ${num(r.target)}` : '– / –'}
               </Text>
             </HStack>
-            <ProgressView
-              value={r.target ? Math.min(1, r.value / r.target) : 0}
-              modifiers={[progressViewStyle('linear'), tint(over ? c.over : r.color), scaleEffect({ x: 1, y: 2.2 })]}
-            />
+            <HStack spacing={0} modifiers={[frame({ height: medium ? 12 : 11 }), clipShape('capsule')]}>
+              {slices.map((i) => (
+                <Rectangle
+                  key={i}
+                  modifiers={[
+                    foregroundStyle(i < filled ? (over ? c.over : r.color) : over ? pale.over : r.track),
+                    frame({ maxWidth: 1000, maxHeight: 1000 }),
+                  ]}
+                />
+              ))}
+            </HStack>
           </VStack>
         );
       })}
