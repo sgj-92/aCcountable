@@ -3,15 +3,30 @@
 // From the app (signed in): { action: "status" } or { action: "push", snapshot } —
 //   forwards the day's snapshot to Ledger, signed, unless it hasn't changed.
 // From Ledger (x-sync-timestamp + x-sync-signature, HMAC-SHA256 of "<ts>.<body>"):
-//   one day of Ledger's training, meals ticked done and weight; applies only differences.
+//   one day of Ledger's training, meals ticked done, weight and food typed in Ledger
+//   (diaryAdded); applies only differences, and logs each food line once (calories by AI).
 //
-// Secrets: LEDGER_SYNC_SECRET (shared with Ledger), LEDGER_SYNC_URL (Ledger's endpoint).
+// Secrets: LEDGER_SYNC_SECRET (shared with Ledger), LEDGER_SYNC_URL (Ledger's endpoint),
+// ANTHROPIC_API_KEY (for food typed in Ledger).
 // Optional: LEDGER_USER_ID (the aCcountable user Ledger's days belong to; otherwise the
-// user who last pushed).
+// user who last pushed), LEDGER_TIMEZONE (for "now" on food typed in Ledger; default
+// Europe/London), DAILY_SCAN_LIMIT (shared AI limit, default 60 a day).
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-import { isInbound, latestTrend, planInbound, sign, verify, type Session, type SentMeal } from './logic.ts';
+import { estimateDiary } from './diary-ai.ts';
+import {
+  isInbound,
+  latestTrend,
+  newDiary,
+  planInbound,
+  sign,
+  verify,
+  withDiary,
+  type DiaryFood,
+  type Session,
+  type SentMeal,
+} from './logic.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -139,20 +154,169 @@ async function fromLedger(raw: string, req: Request) {
     }
   }
 
+  // Food typed in Ledger: each line logged once, calories worked out from the words.
+  const diary = await logDiary(db, userId, date, inbound.diaryAdded);
+
   await db
     .from('ledger_sync_state')
     .upsert({ user_id: userId, date, last_received: inbound, updated_at: new Date().toISOString() }, { onConflict: 'user_id,date' });
 
-  return json({
-    ok: true,
-    applied: {
-      added: changes.insert.length,
-      updated: changes.update.length,
-      removed: changes.remove.length,
-      weight: changes.weightKg != null,
-      logged,
-    },
+  // Tell Ledger straight away (its lines show "sending" until aCcountable's next day arrives).
+  if (diary.logged.length) {
+    const echo = echoDiary(db, userId, date, diary.logged, diary.labelOf);
+    const runtime = (globalThis as { EdgeRuntime?: { waitUntil: (p: Promise<unknown>) => void } }).EdgeRuntime;
+    if (runtime) runtime.waitUntil(echo);
+    else await echo;
+  }
+
+  const applied = {
+    added: changes.insert.length,
+    updated: changes.update.length,
+    removed: changes.remove.length,
+    weight: changes.weightKg != null,
+    logged,
+    foodAdded: diary.logged.length,
+  };
+  // Lines that couldn't be logged stay pending in Ledger, which sends them again; logged refs are skipped.
+  if (diary.error) return json({ ok: false, error: diary.error, applied }, diary.status ?? 502);
+  return json({ ok: true, applied });
+}
+
+const CLASSIC_MEALS = [
+  { key: 'breakfast', label: 'Breakfast' },
+  { key: 'lunch', label: 'Lunch' },
+  { key: 'dinner', label: 'Dinner' },
+  { key: 'snack', label: 'Snacks' },
+];
+const MEAL_KEYS = ['breakfast', 'lunch', 'dinner', 'snack', 'meal5', 'meal6'];
+
+/** Local date and HH:MM in the person's time zone. */
+function localNow(): { date: string; hhmm: string; minutes: number } {
+  const tz = Deno.env.get('LEDGER_TIMEZONE') || 'Europe/London';
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+      .formatToParts(new Date())
+      .map((p) => [p.type, p.value]),
+  );
+  const minutes = Number(parts.hour) * 60 + Number(parts.minute);
+  return { date: `${parts.year}-${parts.month}-${parts.day}`, hhmm: `${parts.hour}:${parts.minute}`, minutes };
+}
+
+async function logDiary(
+  db: SupabaseClient,
+  userId: string,
+  date: string,
+  added: unknown,
+): Promise<{ logged: DiaryFood[]; labelOf: (meal: string) => string; error?: string; status?: number }> {
+  const none = { logged: [] as DiaryFood[], labelOf: (m: string) => m };
+  if (!Array.isArray(added) || added.length === 0) return none;
+
+  const existing = await db
+    .from('food_entries')
+    .select('source_ref')
+    .eq('user_id', userId)
+    .eq('date', date)
+    .like('source_ref', 'ledger:diary:%');
+  const lines = newDiary(added, date, new Set((existing.data ?? []).map((r) => r.source_ref as string)));
+  if (lines.length === 0) return none;
+
+  const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
+  if (!apiKey) return { ...none, error: 'Server is missing ANTHROPIC_API_KEY', status: 500 };
+  const limit = Number(Deno.env.get('DAILY_SCAN_LIMIT') ?? '60');
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { count } = await db.from('ai_scans').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('created_at', since);
+  if ((count ?? 0) >= limit) return { ...none, error: `Daily AI limit reached (${limit})`, status: 429 };
+
+  const profile = await db.from('profiles').select('meal_slots').eq('id', userId).maybeSingle();
+  const stored = profile.data?.meal_slots as { key: string; label: string }[] | null;
+  const meals = Array.isArray(stored) && stored.length
+    ? stored.filter((m) => MEAL_KEYS.includes(m.key) && typeof m.label === 'string')
+    : CLASSIC_MEALS;
+  const labelOf = (key: string) => meals.find((m) => m.key === key)?.label ?? CLASSIC_MEALS.find((m) => m.key === key)?.label ?? key;
+  const now = localNow();
+  const sameDay = now.date === date;
+
+  let estimate;
+  try {
+    estimate = await estimateDiary(apiKey, lines, meals.length ? meals : CLASSIC_MEALS, sameDay ? now.hhmm : null);
+  } catch (e) {
+    console.error('diary estimate failed:', e instanceof Error ? e.message : e);
+    return { ...none, labelOf, error: 'Couldn’t work out the calories just now', status: 502 };
+  }
+  const usage = await db.from('ai_scans').insert({
+    user_id: userId,
+    model: estimate.model,
+    kind: 'plan',
+    input_tokens: estimate.inputTokens,
+    output_tokens: estimate.outputTokens,
   });
+  if (usage.error) console.error('Failed to log AI usage:', usage.error.message);
+
+  const logged: DiaryFood[] = [];
+  for (const f of estimate.foods) {
+    const r = await db.from('food_entries').insert({
+      user_id: userId,
+      date,
+      meal: f.meal,
+      name: f.name,
+      serving: f.serving,
+      kcal: f.kcal,
+      protein_g: f.protein_g,
+      carbs_g: f.carbs_g,
+      fat_g: f.fat_g,
+      grams: f.grams,
+      source: 'manual',
+      source_ref: f.ref,
+      ai_confidence: f.confidence,
+      eaten_at: sameDay ? now.minutes : null,
+    });
+    // A duplicate ref (sent twice at once) is refused by the unique index: already logged.
+    if (r.error) {
+      if (!/duplicate|unique/i.test(r.error.message)) console.error('log Ledger food', r.error.message);
+      continue;
+    }
+    logged.push(f);
+  }
+  return { logged, labelOf };
+}
+
+/** Adds the new foods to the day last sent to Ledger and sends it (if aCcountable has sent that day). */
+async function echoDiary(db: SupabaseClient, userId: string, date: string, foods: DiaryFood[], labelOf: (m: string) => string) {
+  if (!configured()) return;
+  const prev = await db.from('ledger_sync_state').select('last_sent').eq('user_id', userId).eq('date', date).maybeSingle();
+  const last = prev.data?.last_sent as Record<string, unknown> | null;
+  // Without a day sent before, the app sends the whole day when it's next opened.
+  if (!last) return;
+  const snap = withDiary(last, foods, labelOf);
+  const sent = await postToLedger(snap);
+  if (sent.ok) {
+    await db
+      .from('ledger_sync_state')
+      .upsert({ user_id: userId, date, last_sent: snap, updated_at: new Date().toISOString() }, { onConflict: 'user_id,date' });
+  }
+}
+
+/** Sends one day to Ledger, signed. */
+async function postToLedger(snap: unknown): Promise<{ ok: true } | { ok: false; error: string }> {
+  const payload = JSON.stringify(snap);
+  const ts = String(Date.now());
+  let res: Response;
+  try {
+    res = await fetch(LEDGER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-sync-timestamp': ts, 'x-sync-signature': `sha256=${await sign(SECRET, ts, payload)}` },
+      body: payload,
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch (e) {
+    console.error('Ledger unreachable:', e instanceof Error ? e.message : e);
+    return { ok: false, error: 'Ledger unreachable' };
+  }
+  if (!res.ok) {
+    console.error('Ledger refused:', res.status, await res.text().catch(() => ''));
+    return { ok: false, error: `Ledger returned ${res.status}` };
+  }
+  return { ok: true };
 }
 
 async function ownerFromState(db: SupabaseClient): Promise<string | null> {
@@ -195,24 +359,8 @@ async function fromApp(raw: string, req: Request) {
     return json({ configured: true, sent: false });
   }
 
-  const payload = JSON.stringify(snap);
-  const ts = String(Date.now());
-  let res: Response;
-  try {
-    res = await fetch(LEDGER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-sync-timestamp': ts, 'x-sync-signature': `sha256=${await sign(SECRET, ts, payload)}` },
-      body: payload,
-      signal: AbortSignal.timeout(10_000),
-    });
-  } catch (e) {
-    console.error('Ledger unreachable:', e instanceof Error ? e.message : e);
-    return json({ configured: true, sent: false, error: 'Ledger unreachable' }, 502);
-  }
-  if (!res.ok) {
-    console.error('Ledger refused:', res.status, await res.text().catch(() => ''));
-    return json({ configured: true, sent: false, error: `Ledger returned ${res.status}` }, 502);
-  }
+  const sent = await postToLedger(snap);
+  if (!sent.ok) return json({ configured: true, sent: false, error: sent.error }, 502);
   await db
     .from('ledger_sync_state')
     .upsert({ user_id: userData.user.id, date: snap.date, last_sent: snap, updated_at: new Date().toISOString() }, { onConflict: 'user_id,date' });

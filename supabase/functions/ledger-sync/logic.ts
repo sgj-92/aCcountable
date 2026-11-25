@@ -53,6 +53,13 @@ export interface Inbound {
   training: InTraining[];
   mealsDone: string[];
   weightKg: number | null;
+  /** Food Shaun typed in Ledger: additions only, each logged once by its ref. */
+  diaryAdded?: DiaryAdd[];
+}
+
+export interface DiaryAdd {
+  ref: string;
+  text: string;
 }
 
 export interface Session {
@@ -150,4 +157,147 @@ export function latestTrend(weighIns: { date: string; weight_kg: number }[], alp
     prev = w.date;
   }
   return trend;
+}
+
+// ───────────── food added in Ledger ─────────────
+
+const DIARY_REF = /^ledger:diary:\d{4}-\d{2}-\d{2}:[A-Za-z0-9_.:-]{1,100}$/;
+
+/**
+ * The entries from `diaryAdded` still to log: well-formed, for this day, not logged before
+ * (by ref), each ref once, at most 40 a day.
+ */
+export function newDiary(added: unknown, date: string, alreadyLogged: Set<string>): DiaryAdd[] {
+  if (!Array.isArray(added)) return [];
+  const out: DiaryAdd[] = [];
+  const seen = new Set<string>();
+  for (const x of added) {
+    const ref = typeof x?.ref === 'string' ? x.ref.trim() : '';
+    const text = typeof x?.text === 'string' ? x.text.replace(/\s+/g, ' ').trim().slice(0, 500) : '';
+    if (!DIARY_REF.test(ref) || !ref.startsWith(`ledger:diary:${date}:`) || !text) continue;
+    if (seen.has(ref) || alreadyLogged.has(ref)) continue;
+    seen.add(ref);
+    out.push({ ref, text });
+    if (out.length >= 40) break;
+  }
+  return out;
+}
+
+export interface DiaryFood {
+  ref: string;
+  meal: string;
+  name: string;
+  serving: string | null;
+  kcal: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+  grams: number | null;
+  confidence: 'low' | 'medium' | 'high';
+}
+
+const clampNum = (n: unknown, max: number) => {
+  const v = typeof n === 'number' && Number.isFinite(n) ? n : 0;
+  return Math.min(max, Math.max(0, v));
+};
+const r1 = (n: number) => Math.round(n * 10) / 10;
+
+/** The AI's estimate for one line, made safe to store; null if it doesn't match a line sent. */
+export function normalizeDiaryFood(raw: Record<string, unknown>, lines: DiaryAdd[], mealKeys: string[]): DiaryFood | null {
+  const line = lines.find((l) => l.ref === raw.ref);
+  if (!line) return null;
+  const clean = (t: unknown, max: number) => (typeof t === 'string' ? t.replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, max) : '');
+  const name = clean(raw.name, 200) || line.text.slice(0, 200);
+  const serving = clean(raw.serving, 200) || null;
+  const meal = mealKeys.includes(String(raw.meal)) ? String(raw.meal) : mealKeys[mealKeys.length - 1];
+  const grams = clampNum(raw.grams, 5000);
+  const confidence = raw.confidence === 'high' || raw.confidence === 'medium' ? raw.confidence : 'low';
+  return {
+    ref: line.ref,
+    meal,
+    name,
+    serving,
+    kcal: Math.round(clampNum(raw.kcal, 5000)),
+    protein_g: r1(clampNum(raw.protein_g, 500)),
+    carbs_g: r1(clampNum(raw.carbs_g, 1000)),
+    fat_g: r1(clampNum(raw.fat_g, 500)),
+    grams: grams > 0 ? r1(grams) : null,
+    confidence,
+  };
+}
+
+interface SentFood {
+  name: string;
+  amount: string;
+  kcal: number;
+  done: boolean;
+}
+interface SentMealFull {
+  ref: string;
+  name: string;
+  time: string | null;
+  tag: string | null;
+  kcal: number;
+  done: boolean;
+  foods: SentFood[];
+  planned: { planItemId: string; grams: number }[];
+}
+interface SentNutrition {
+  eatenKcal: number;
+  proteinG: number;
+  carbsG: number;
+  fatG: number;
+  targetKcal: number;
+  targetProteinG: number;
+  targetCarbsG: number;
+  targetFatG: number;
+  dayType: string | null;
+  diaryOnly: boolean;
+  diary: string[];
+}
+
+/**
+ * The day last sent to Ledger with newly logged foods added: each in its meal, in the day's
+ * totals and as a diary line (in the app's own format), so Ledger sees them straight away.
+ * The app sends the full day the next time it's opened.
+ */
+export function withDiary(
+  lastSent: Record<string, unknown>,
+  foods: DiaryFood[],
+  labelOf: (meal: string) => string,
+): Record<string, unknown> {
+  const date = String(lastSent.date);
+  const meals = (Array.isArray(lastSent.meals) ? lastSent.meals : []) as SentMealFull[];
+  const nextMeals = meals.map((m) => ({ ...m, foods: [...m.foods] }));
+  const n = (lastSent.nutrition as SentNutrition | null) ?? {
+    eatenKcal: 0,
+    proteinG: 0,
+    carbsG: 0,
+    fatG: 0,
+    targetKcal: 0,
+    targetProteinG: 0,
+    targetCarbsG: 0,
+    targetFatG: 0,
+    dayType: null,
+    diaryOnly: false,
+    diary: [],
+  };
+  const nutrition: SentNutrition = { ...n, diary: [...n.diary] };
+  for (const f of foods) {
+    const ref = `acc:meal:${date}:${f.meal}`;
+    let meal = nextMeals.find((m) => m.ref === ref);
+    if (!meal) {
+      meal = { ref, name: labelOf(f.meal), time: null, tag: null, kcal: 0, done: false, foods: [], planned: [] };
+      nextMeals.push(meal);
+    }
+    meal.foods.push({ name: f.name, amount: f.serving ?? '', kcal: f.kcal, done: true });
+    meal.kcal += f.kcal;
+    meal.done = meal.planned.length === 0;
+    nutrition.eatenKcal = Math.round(nutrition.eatenKcal + f.kcal);
+    nutrition.proteinG = Math.round(nutrition.proteinG + f.protein_g);
+    nutrition.carbsG = Math.round(nutrition.carbsG + f.carbs_g);
+    nutrition.fatG = Math.round(nutrition.fatG + f.fat_g);
+    nutrition.diary.push(`${labelOf(f.meal)}: ${f.name}${f.serving ? ` · ${f.serving}` : ''} (${f.kcal} kcal)`);
+  }
+  return { ...lastSent, meals: nextMeals, nutrition };
 }

@@ -10,6 +10,7 @@ day-planning app). One owner on each side, one day at a time.
 | Planned training (type, start time, duration) | both ways | whichever app last changed it |
 | Meals: name, suggested time, foods, kcal, done | aCcountable → Ledger | aCcountable |
 | Meal ticked done in Ledger | Ledger → aCcountable | Ledger's tick logs the planned foods in aCcountable |
+| Food typed in Ledger | Ledger → aCcountable (additions only) | aCcountable: logged once per ref; edits and deletions happen in aCcountable |
 | Day's nutrition (eaten, targets, macros, food diary, day type) | aCcountable → Ledger | aCcountable |
 | Day's carb level (Ledger's Nutrition Plan) | aCcountable → Ledger | aCcountable, on days Shaun leaves to it |
 | Weight for the day | both ways | whichever app last changed it |
@@ -98,7 +99,8 @@ Sent when Ledger's plan for the day changes (training, meal ticks) or a weigh-in
     { "ref": "ledger:2026-11-24:yoga", "type": "yoga", "startTime": null, "durationMin": 30 }
   ],
   "mealsDone": ["acc:meal:2026-11-24:lunch"],
-  "weightKg": 98.0
+  "weightKg": 98.0,
+  "diaryAdded": [{ "ref": "ledger:diary:2026-11-24:k3f9", "text": "2 eggs and toast" }]
 }
 ```
 
@@ -111,6 +113,22 @@ Sent when Ledger's plan for the day changes (training, meal ticks) or a weigh-in
 - `mealsDone` lists the refs of aCcountable meals ticked done in Ledger; aCcountable logs that
   meal's planned foods at the amounts it last sent.
 - `weightKg` is the day's weigh-in in Ledger, or `null`.
+- `diaryAdded` (optional) is food Shaun typed in Ledger, additions only. aCcountable:
+  - logs each `ref` once (`ledger:diary:<date>:<id>`, stored as the entry's `source_ref`
+    under a unique index), so sending a line again does nothing;
+  - works out the calories and macros from the words (one AI call for the day's new lines),
+    one food entry per line, named in the person's words, with the amounts assumed as the
+    serving;
+  - files it under the meal the line names, else what the food suggests, else the time it
+    arrived (in `LEDGER_TIMEZONE`, default Europe/London), and records that time as when
+    it was eaten;
+  - replies with an error when the calories can't be worked out (AI unavailable or the daily
+    AI limit reached), so Ledger keeps the lines and sends them again;
+  - sends the day straight back with the new foods in their meal, the totals and the diary,
+    when it has sent that day before (otherwise the app sends the whole day when next opened).
+
+  Changing or deleting one of these entries is done in aCcountable, and Ledger gets the
+  result through the diary as usual.
 
 ## Loop safety
 
